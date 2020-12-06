@@ -73,7 +73,7 @@ public class PlanetIsCalling extends JFrame {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 458, 333);
-		setTitle("The Planet Is Calling You");
+		setTitle("The Planet Is Calling You and Me");
 	
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
@@ -96,7 +96,7 @@ public class PlanetIsCalling extends JFrame {
 		tabPane.addTab( "Airport", panelLandmarks.getAirportWorld(manageXMLFile,selectAiport,selectCity,selectMountain));
 		tabPane.addTab( "City", panelLandmarks.getCityWorld(manageXMLFile));
 		tabPane.addTab( "Mountain",panelLandmarks.getMountainWorld(manageXMLFile));
-		tabPane.addTab( "Help", panel5);
+		tabPane.addTab( "Setting", panel5);
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);
 
