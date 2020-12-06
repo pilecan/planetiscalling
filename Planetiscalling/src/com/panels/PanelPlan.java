@@ -2,6 +2,7 @@ package com.panels;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-import com.cfg.common.DistanceObject;
+import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
 import com.model.Distance;
@@ -21,7 +22,7 @@ import net.SelectAiport;
 import net.SelectCity;
 import net.SelectMountain;
 
-public class PanelPlan extends DistanceObject {
+public class PanelPlan {
 
 	private ManageXMLFile manageXMLFile;
 	private SelectAiport selectAiport;
@@ -29,6 +30,7 @@ public class PanelPlan extends DistanceObject {
 	private SelectMountain selectMountain;
 	private Map <String, JCheckBox> mapSelector;	
 	
+	private ReadData readData;	
 
 	private List<Placemark> airports ;
 
@@ -39,8 +41,10 @@ public class PanelPlan extends DistanceObject {
 
 	
 	public JPanel getFlightplan(ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
+		DistanceSpinner distanceSpin = new DistanceSpinner();
 		
-		initPanelDistances("plan");
+		distanceSpin.initPanelDistances("plan");
+		
 		
 		JPanel panelSearch = new JPanel();
 		panelSearch.setLayout(null);
@@ -52,25 +56,45 @@ public class PanelPlan extends DistanceObject {
 		
 		final JLabel labelResult = new JLabel();
 		
-		labelResult.setBounds(300, 40, 89, 63);
+		JButton buttonGoogle = new JButton("Reload");
 		
 		JButton buttonFP = new JButton("Flightplan");
-		buttonFP.setBounds(10, 20, 120, 23);
 		buttonFP.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	  new ReadData(labelResult, manageXMLFile, selectAiport, selectCity, selectMountain,new Distance((int)citySpinner.getValue(), (int)mountainSpinner.getValue(), (int)airportSpinner.getValue(), checkLinedist.isSelected()));	        
-	    	 // System.out.println(textArea.getText());
+	    	  readData =  new ReadData(labelResult, manageXMLFile, selectAiport, selectCity, selectMountain,
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
+		      manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
+			  buttonGoogle.setVisible(true); 
+
 	        
 	      }
 	    });
+		
+
+		buttonGoogle.addActionListener(new ActionListener()
+	    {
+	      public void actionPerformed(ActionEvent e)
+	      {
+	    	 readData.createFlightplan(new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected())); 
+	    	 manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
+	        
+	      }
+	    });
+		buttonGoogle.setVisible(false); 
+		
+		
+		buttonFP.setBounds(10, 20, 120, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 50, 130, 140);
+    	buttonGoogle.setBounds(10, 200, 120, 23);
+
+		labelResult.setBounds(200, 20, 300, 200);		
+	
      	panelSearch.add(buttonFP);
 		panelSearch.add(labelResult);
-	
-		form.setBounds(10, 50, 130, 140);
-	
-		panelSearch.add(form);
+		panelSearch.add(distanceSpin.getSpinnerPanel());
+     	panelSearch.add(buttonGoogle);
 
 		return panelSearch;
 	}

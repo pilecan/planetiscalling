@@ -73,7 +73,7 @@ public class PlanetIsCalling extends JFrame {
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 458, 333);
-		setTitle("The Planet Is Calling You and Me");
+		setTitle("The Planet Is Calling You and Me Too");
 	
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());

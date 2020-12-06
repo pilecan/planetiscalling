@@ -13,7 +13,7 @@ import javax.swing.SpinnerNumberModel;
 
 import com.cfg.util.FormUtility;
 
-public class DistanceObject implements Info {
+public class DistanceSpinner implements Info {
 	private SpinnerModel distanceCity;
 	private SpinnerModel distanceMountain;
 	private SpinnerModel distanceAirport;
@@ -23,11 +23,18 @@ public class DistanceObject implements Info {
 	
 	public JCheckBox checkLinedist;
 	
-	public JPanel form;
+	public JPanel spinnerPanel;
 	protected JPanel panelCity;
 	private JPanel panelMountain;
 	private JPanel panelAirport;
 	private JPanel panelLineDistance;
+	
+	
+
+	public DistanceSpinner() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
 	public void initPanelDistances(String topic) {
 		
@@ -51,8 +58,8 @@ public class DistanceObject implements Info {
         panelAirport = new JPanel();
         panelLineDistance = new JPanel();
         
-        form = new JPanel();
-        form.setLayout(new GridBagLayout());
+        spinnerPanel = new JPanel();
+        spinnerPanel.setLayout(new GridBagLayout());
         FormUtility formUtility = new FormUtility();
 
         
@@ -60,29 +67,29 @@ public class DistanceObject implements Info {
 	        citySpinner=new JSpinner(distanceCity);
 	     //   citySpinner.setPreferredSize( new Dimension (10, 10) );
 	        citySpinner.setToolTipText("City distances in Nautical Miles");
-	        formUtility.addLabel("City ",form, Color.BLACK,new Font("arial", Font.BOLD, 12));
+	        formUtility.addLabel("City ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
 	        panelCity = new JPanel();
 	        panelCity.add(citySpinner, BorderLayout.WEST);
-	        formUtility.addLastField(panelCity, form);
+	        formUtility.addLastField(panelCity, spinnerPanel);
         }
         
         if (!"mountain".equals(topic)) {
             mountainSpinner=new JSpinner(distanceMountain);
             mountainSpinner.setToolTipText("Mountain distances in Nautical Miles");
-            formUtility.addLabel("Mountain ",form, Color.BLACK,new Font("arial", Font.BOLD, 12));
+            formUtility.addLabel("Mountain ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
             panelMountain = new JPanel();
             panelMountain.add(mountainSpinner, BorderLayout.WEST);
-            formUtility.addLastField(panelMountain, form);
+            formUtility.addLastField(panelMountain, spinnerPanel);
 
         }
         if (!"airport".equals(topic)) {
             airportSpinner=new JSpinner(distanceAirport);
             //    mountainSpinner.setPreferredSize( new Dimension (10, 10) );
             airportSpinner.setToolTipText("Airport distances in Nautical Miles");
-            formUtility.addLabel("Airport ",form, Color.BLACK,new Font("arial", Font.BOLD, 12));
+            formUtility.addLabel("Airport ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
             panelAirport = new JPanel();
             panelAirport.add(airportSpinner, BorderLayout.WEST);
-            formUtility.addLastField(panelAirport, form);
+            formUtility.addLastField(panelAirport, spinnerPanel);
         }
 
         
@@ -91,12 +98,52 @@ public class DistanceObject implements Info {
         checkLinedist.setToolTipText("Check it for lines between Objects");
      //   checkLinedist.setPreferredSize( new Dimension (10, 10) );
 
-        formUtility.addLabel("Lines ",form, Color.BLACK,new Font("arial", Font.BOLD, 12));
+        formUtility.addLabel("Lines ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
         panelLineDistance = new JPanel();
         panelLineDistance.add(checkLinedist, BorderLayout.WEST);
-        formUtility.addLastField(panelLineDistance, form);
+        formUtility.addLastField(panelLineDistance, spinnerPanel);
       
 		
+	}
+
+	public JSpinner getCitySpinner() {
+		return citySpinner;
+	}
+
+	public void setCitySpinner(JSpinner citySpinner) {
+		this.citySpinner = citySpinner;
+	}
+
+	public JSpinner getMountainSpinner() {
+		return mountainSpinner;
+	}
+
+	public void setMountainSpinner(JSpinner mountainSpinner) {
+		this.mountainSpinner = mountainSpinner;
+	}
+
+	public JSpinner getAirportSpinner() {
+		return airportSpinner;
+	}
+
+	public void setAirportSpinner(JSpinner airportSpinner) {
+		this.airportSpinner = airportSpinner;
+	}
+
+	public JPanel getSpinnerPanel() {
+		return spinnerPanel;
+	}
+
+	public void setSpinnerPanel(JPanel spinnerPanel) {
+		this.spinnerPanel = spinnerPanel;
+	}
+
+	public JCheckBox getCheckLinedist() {
+		return checkLinedist;
+	}
+
+	public void setCheckLinedist(JCheckBox checkLinedist) {
+		this.checkLinedist = checkLinedist;
 	}
 	
 	

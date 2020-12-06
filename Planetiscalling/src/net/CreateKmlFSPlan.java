@@ -201,6 +201,9 @@ public class CreateKmlFSPlan{
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()){
 						selectedPlacemarks.put(placemark.getName(),new Placemark(placemark));
+						if (dist.isLine()) {
+							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
 					}
 				}
 			}
@@ -217,6 +220,9 @@ public class CreateKmlFSPlan{
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
 						selectedCities.put(city.getCityName(),new City(city));
+						if (dist.isLine()) {
+							dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
 					}
 				}
 			}
@@ -259,7 +265,7 @@ public class CreateKmlFSPlan{
 		if (isGoogleEarth){
 	   		createAndsaveFlightPlan(kmlFlightPlanFile);
 			
-		    manageXMLFile.launchGoogleEarth(new File(kmlFlightPlanFile));
+		  //  manageXMLFile.launchGoogleEarth(new File(kmlFlightPlanFile));
 		}
 		
 		isDone = true;
@@ -290,7 +296,7 @@ public class CreateKmlFSPlan{
 		    
 		    //Create KML Header
 		    writer.write(createKMLHeader());
-
+		    
  			writer.write("<Folder><name> Waypoints </name>");
 		    
 		    for (LegPoint legPoint : legPoints){
@@ -299,11 +305,12 @@ public class CreateKmlFSPlan{
 		    	}
 		    }
 		    
-		    
 		   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
 
 		    for (LegPoint legPoint : legPoints){
-		    	writer.write(legPoint.getPosition()+"\n");
+		    	if ("1".equals(legPoint.getVisible())) {
+			    	writer.write(legPoint.getPosition()+"\n");
+		    	}
 		    }
 
 		    writer.write("</coordinates></LineString></Placemark>");
@@ -311,7 +318,7 @@ public class CreateKmlFSPlan{
 		    
 		    writer.write("</Folder>");
 		    
-		    if (isAirport){
+		    if (dist.isAirport()){
 			    writer.write("<Folder><name> FS2020 Airports found ("+selectedPlacemarks.size()+") </name>");
 			    
 			    for(Placemark placemark:selectedPlacemarks.values()){
@@ -320,7 +327,7 @@ public class CreateKmlFSPlan{
 		    	
 			    writer.write("</Folder>"); 
 		    }
-		    if (isCity){
+		    if (dist.isCity()){
 			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");
 			    
 			    
@@ -331,7 +338,7 @@ public class CreateKmlFSPlan{
 			    writer.write("</Folder>"); 
 		    }
 		    
-		    if (isMountain){
+		    if (dist.isMountain()){
 			    writer.write("<Folder><name> Mountains found ("+selectedMountains.size()+") </name>");
 			    
 			    
@@ -343,6 +350,29 @@ public class CreateKmlFSPlan{
 		    }
 		    
 		    if (dist.isLine()){
+		    	for (String key: dataline.getMapData().keySet()) {
+			    	writer.write("<Folder><name>"+key+" distance </name>"
+			    			+ "<Placemark> "
+			    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+			    			+ " <Style>" + 
+			    			"  <LineStyle> " + 
+			    			"   <color>"+dataline.getColor(key)+"</color>"
+			    			+ "<width>2</width> " + 
+			    			"  </LineStyle>" + 
+			    			" </Style>"
+			    			+ "<LineString><extrude>1</extrude>"
+			    			+ "<tessellate>1</tessellate>"
+			    			+ "<altitudeMode>relativeToGround</altitudeMode>"
+			    			+ "<coordinates>\r\n");
+			    	writer.write(dataline.getMapData().get(key));
+			    	writer.write("</coordinates></LineString></Placemark></Folder>");
+		    		
+		    	}
+		    	
+		    }
+		    
+		    
+/*		    if (dist.isLine()){
 		    	writer.write("<Folder><name> Distances </name>"
 		    			+ "<Placemark> "
 		    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
@@ -360,7 +390,7 @@ public class CreateKmlFSPlan{
 		    	writer.write("</coordinates></LineString></Placemark></Folder>");
 		    }
 
-		    
+*/		    
 		    
 		    //Create KML Footer
 		    writer.write("</Document></kml>");

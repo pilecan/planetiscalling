@@ -48,6 +48,8 @@ public class ReadData implements Info{
 	
 	private JLabel panelResult;
 	
+	private String flightplan ;
+	
 	
 	private Dataline dataline;
 	private Distance dist;
@@ -109,30 +111,36 @@ public class ReadData implements Info{
 			
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				//System.out.println(chooser.getSelectedFile());
-				String flightplan = chooser.getSelectedFile().toString();
-
-				try {
-					CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, true, dist, 
-							manageXMLFile,true, 
-							selectCity.getCities(), true,
-							selectMountain.getMountains(),true);
-					
-					kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
-
-					panelResult.setText("<html>"
-							+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
-							+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
-						    + "Mountains: "+createKmlFSPlan.getNbMountain()
-						    +" </html>");
-					
-					
-				} catch (NullPointerException | NoPoints | IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}	        
-			}
+				flightplan = chooser.getSelectedFile().toString();
+				createFlightplan(dist);
+		}
 			
 		
+	}
+	
+	public void createFlightplan( Distance dist) {
+		
+		try {
+			CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, true, dist, 
+					manageXMLFile,true, 
+					selectCity.getCities(), true,
+					selectMountain.getMountains(),true);
+			
+			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
+
+			panelResult.setText("<html>"
+					+ "Flightplan: "+new File(flightplan).getName()+"<br>"
+					+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
+					+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
+				    + "Mountains: "+createKmlFSPlan.getNbMountain()
+				    +" </html>");
+			
+			
+		} catch (NullPointerException | NoPoints | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}	        
+			
 	}
 	
     private JFileChooser selectDirectoryProgram(String title,String directory){
@@ -697,5 +705,9 @@ public class ReadData implements Info{
     	}
 		return null;
     }
+
+	public String getKmlFlightPlanFile() {
+		return kmlFlightPlanFile;
+	}
 
 }

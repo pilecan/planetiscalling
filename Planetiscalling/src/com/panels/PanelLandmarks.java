@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import com.cfg.common.Dataline;
-import com.cfg.common.DistanceObject;
+import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
 import com.model.Distance;
 import com.util.ReadData;
@@ -26,7 +26,7 @@ import net.SelectCity;
 import net.SelectDB;
 import net.SelectMountain;
 
-public class PanelLandmarks extends DistanceObject {
+public class PanelLandmarks {
 
 	/**
 	 * 
@@ -71,7 +71,9 @@ public class PanelLandmarks extends DistanceObject {
 	 * @return
 	 */
 	public JPanel getAirportWorld(ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
-		initPanelDistances("airport");
+		DistanceSpinner distanceSpin = new DistanceSpinner();
+		
+		distanceSpin.initPanelDistances("airport");
 		
 		labelHeader = new JLabel("Select Airport cities to find their surrounding Cities and Mountains :");
 		panelResult = new JPanel();
@@ -140,7 +142,7 @@ public class PanelLandmarks extends DistanceObject {
 		labelHeader.setBounds(10, 5, 300, 23);
 		panelCombo.setBounds(10, 30, 240, 80);
 		
-		form.setBounds(10, 110, 320, 100);
+		distanceSpin.getSpinnerPanel().setBounds(10, 110, 320, 100);
 
 		
 		clearButton.setBounds(120, 210, 90, 23);
@@ -152,7 +154,7 @@ public class PanelLandmarks extends DistanceObject {
 		      public void actionPerformed(ActionEvent e)
 		      {
 		         new ReadData().createKMLAirport(manageXMLFile,selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		 new Distance((int)citySpinner.getValue(), (int)mountainSpinner.getValue(), (int)airportSpinner.getValue(), checkLinedist.isSelected()));
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), 0, distanceSpin.getCheckLinedist().isSelected()));
 		      }
 		    });
 
@@ -166,7 +168,7 @@ public class PanelLandmarks extends DistanceObject {
 		
 		panelResult.add(labelHeader);
 		panelResult.add(panelCombo);
-		panelResult.add(form);
+		panelResult.add(distanceSpin.getSpinnerPanel());
 		panelResult.add(searchButton);
 		panelResult.add(clearButton);
 		panelResult.add(labelResult);
@@ -194,7 +196,8 @@ public class PanelLandmarks extends DistanceObject {
 	 * @return
 	 */
 	public JPanel getCityWorld(ManageXMLFile manageXMLFile) {
-		initPanelDistances("city");
+		DistanceSpinner distanceSpin = new DistanceSpinner();
+		distanceSpin.initPanelDistances("city");
 
 		labelHeader = new JLabel("Select Cities or States to find their surrounding Airports and Mountains :");
 		panelResult = new JPanel();
@@ -273,7 +276,7 @@ public class PanelLandmarks extends DistanceObject {
 		
 		panelCombo.setBounds(10, 30, 240, 80);
 		
-		form.setBounds(10, 110, 320, 100);
+		distanceSpin.getSpinnerPanel().setBounds(10, 110, 320, 100);
 		
 		clearButton.setBounds(120, 210, 90, 23);
   	    searchButton.setBounds(10, 210, 90, 23);
@@ -284,7 +287,7 @@ public class PanelLandmarks extends DistanceObject {
 		      public void actionPerformed(ActionEvent e)
 		      {
 		          new ReadData().createKMLCity(manageXMLFile,selectDB.getMapCities(), comboCountry,comboState,comboCity,
-			        		 new Distance((int)citySpinner.getValue(), (int)mountainSpinner.getValue(), (int)airportSpinner.getValue(), checkLinedist.isSelected()));
+			        		 new Distance(0, (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
 		      }
 		    });
 
@@ -298,7 +301,7 @@ public class PanelLandmarks extends DistanceObject {
 		
 		panelResult.add(labelHeader);
 		panelResult.add(panelCombo);
-		panelResult.add(form);
+ 		panelResult.add(distanceSpin.getSpinnerPanel());
 		panelResult.add(searchButton);
 		panelResult.add(clearButton);
 		panelResult.add(labelResult);
@@ -315,7 +318,8 @@ public class PanelLandmarks extends DistanceObject {
 	  */
 	public JPanel getMountainWorld(ManageXMLFile manageXMLFile) {
 		
-		initPanelDistances("mountain");
+		DistanceSpinner distanceSpin = new DistanceSpinner();
+		distanceSpin.initPanelDistances("mountain");
 		
 		labelHeader = new JLabel("Mountain to find their surrounding Airports and Cities:");
 		panelResult = new JPanel();
@@ -367,7 +371,7 @@ public class PanelLandmarks extends DistanceObject {
 		labelHeader.setBounds(10, 5, 330, 23);
 		panelCombo.setBounds(5, 30, 240, 60);
 		
-		form.setBounds(10, 85, 320, 100);
+		distanceSpin.getSpinnerPanel().setBounds(10, 85, 320, 100);
 		
 		clearButton.setBounds(120, 190, 90, 23);
   	    searchButton.setBounds(10, 190, 90, 23);
@@ -378,7 +382,7 @@ public class PanelLandmarks extends DistanceObject {
 		      public void actionPerformed(ActionEvent e)
 		      {
 		          new ReadData().createKMLMountain(manageXMLFile,selectDB.getMapCities(), comboCountry,comboMountain,
-		        		  new Distance((int)citySpinner.getValue(), 0, (int)airportSpinner.getValue(), checkLinedist.isSelected()));
+			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 0, (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
 		      }
 		    });
 
@@ -392,7 +396,7 @@ public class PanelLandmarks extends DistanceObject {
 		
 		panelResult.add(labelHeader);
 		panelResult.add(panelCombo);
-		panelResult.add(form);		
+ 		panelResult.add(distanceSpin.getSpinnerPanel());
 		panelResult.add(searchButton);
 		panelResult.add(clearButton);
 		panelResult.add(labelResult);
