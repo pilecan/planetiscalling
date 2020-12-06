@@ -1,0 +1,537 @@
+package net;
+
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import com.cfg.common.Dataline;
+import com.cfg.file.ManageConfigFile;
+import com.cfg.file.ManageXMLFile;
+import com.cfg.model.LegPoint;
+import com.cfg.model.Placemark;
+import com.cfg.plan.ReadFs9Plan;
+import com.cfg.plan.ReadFsxPlan;
+import com.cfg.plan.ReadPlanGPlan;
+import com.geo.util.Geoinfo;
+import com.model.City;
+import com.model.Distance;
+import com.model.Mountain;
+import com.util.CreateKML;
+
+public class CreateKmlFSPlan{
+	
+	
+	private static String flightPlan = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
+
+	private Map<String, Placemark> selectedPlacemarks ;
+	private Map<String, City> selectedCities ;
+	private Map<String, Mountain> selectedMountains ;
+	private Map<String, Placemark> addonPlacemarks ;
+	private List <String> addonList;
+	
+	private int totalFsxPlacemarks;
+	private int totalPlacemarks;
+	private int totalAddonPlacemarks;
+
+	private String kmlFlightPlanFile = "/data/fsl_flightplan.kml";
+
+	private ManageXMLFile manageXMLFile;
+
+	private ManageConfigFile configFile;
+	
+	private LinkedList<LegPoint> legPoints;
+	
+	
+	private LegPoint atcWaypoint;
+	
+	//private double distanceRequired;
+	
+	private Distance dist;
+	
+	private ReadFs9Plan fs9Plan;
+	
+	private ReadFsxPlan fsxPlan;
+	
+	private ReadPlanGPlan planGPlan;
+	
+
+	private boolean isGoogleEarth;
+	
+	private boolean isDone;
+	
+	private boolean isAirport;
+	private boolean isCity;
+	private boolean isMountain;
+	
+	private List<City> cities;
+	private List<Mountain> mountains;
+	
+	private Dataline dataline;
+
+	private CreateKML createKML;
+	
+	private int current;
+	
+	private int nbAirport;
+	private int nbCity;
+	private int nbMountain;
+	
+	
+	public CreateKmlFSPlan(String flightPlan,boolean isGoogleEarth,  Distance dist, 
+			ManageXMLFile xmlfile,boolean isAirport, 
+			List<City> cities, boolean isCity,
+			List<Mountain> mountains, boolean isMountain) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
+		this.flightPlan = flightPlan;
+		this.dist = dist;
+		this.manageXMLFile = xmlfile;
+		this.selectedPlacemarks = new HashMap<>();
+		this.selectedCities = new HashMap<>();
+		this.selectedMountains = new HashMap<>();
+		this.addonPlacemarks = new HashMap<>();
+		this.isGoogleEarth = isGoogleEarth;
+		this.isDone = false;
+		this.isAirport = isAirport;
+		this.isCity = isCity;
+		this.isMountain = isMountain;
+		this.cities = cities;
+		this.mountains = mountains;
+		
+		this.dataline = new Dataline();
+		
+		current = 0;
+		
+		Path currentRelativePath = Paths.get("");
+   		kmlFlightPlanFile = currentRelativePath.toAbsolutePath().toString()+kmlFlightPlanFile.replace("\\", "/");
+		
+		String text = new String(Files.readAllBytes(Paths.get(flightPlan)), StandardCharsets.UTF_8);
+		
+		if (text.contains("[flightplan]")){
+			fs9Plan = new ReadFs9Plan(flightPlan);
+			legPoints = fs9Plan.getLegPoints();
+		} else if (text.contains("<ATCWaypoint")){
+			fsxPlan = new ReadFsxPlan(flightPlan);
+			legPoints = fsxPlan.getLegPoints();
+		} else if (text.contains("<Waypoint>")){
+			planGPlan = new ReadPlanGPlan(flightPlan);
+			legPoints = planGPlan.getLegPoints();
+			
+		}
+		
+		if (legPoints.size() > 0){
+			makeFlightPlan();
+		} else {
+			//System.out.println("points = "+points.size());
+			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
+		}
+		
+		
+		
+	}
+	
+	
+	public void makeFlightPlan() throws FileNotFoundException, NullPointerException, IOException, NoPoints{
+		
+		if (legPoints.size() == 0){
+			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
+		} 
+		
+		
+//		System.out.println(manageXMLFile.getPlacemarks().size());
+//		System.out.println(legPoints.size());
+		
+		long start = System.currentTimeMillis();
+		
+		int cptNew = 0;
+		double distanceBetween;
+		
+		boolean isfound = false;
+		boolean isfinish = false;
+		
+		while (!isfinish) {
+			for (int i = 0; i < legPoints.size()-1; i++) {
+				isfound = false;
+			
+				System.out.println(legPoints.get(i));
+				String[] begin = legPoints.get(i).getPosition().split(",");
+				String[] end = legPoints.get(i+1).getPosition().split(",");
+				
+				
+				distanceBetween = Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
+				if (distanceBetween > 15) {
+					
+					 String midpoint = Geoinfo.midpoint(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]));
+/*						System.out.println(Double.parseDouble(begin[1])+","+ Double.parseDouble(begin[0]));
+						System.out.println(Double.parseDouble(end[1])+","+Double.parseDouble(end[0]));
+						System.out.println("midpoint - > "+midpoint);
+*/					 LegPoint legPoint = new LegPoint("MID"+(cptNew++),"VOR",midpoint+","+legPoints.get(i+1).getPosition().split(",")[2],"0"); 
+					 
+					//System.out.println(legPoint.toString());
+				   legPoints.add(i+1,legPoint);
+					 
+				   i++;
+				   isfound = true;
+				}
+			}
+			isfinish = !isfound;
+		}
+		
+
+		// search airports
+
+		if (dist.isAirport()) {
+			for(Placemark placemark : manageXMLFile.getPlacemarks()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(placemark.getCoordinates());
+				current++;
+				for(LegPoint point : legPoints){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()){
+						selectedPlacemarks.put(placemark.getName(),new Placemark(placemark));
+					}
+				}
+			}
+		}
+		
+		// search cities
+		if (dist.isCity()) {
+			for(City city : cities){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
+				current++;
+				
+				for(LegPoint point : legPoints){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
+						selectedCities.put(city.getCityName(),new City(city));
+					}
+				}
+			}
+		}
+			
+		// search mountains
+		if (dist.isMountain()) {
+			for(Mountain mountain : mountains){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
+				current++;
+				
+				for(LegPoint point : legPoints){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()){
+						selectedMountains.put(mountain.getName(),new Mountain(mountain));
+						if (dist.isLine()) {
+							dataline.setData("mountain",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+	
+		totalPlacemarks = manageXMLFile.getPlacemarks().size();
+		totalFsxPlacemarks = selectedPlacemarks.size();
+
+		System.out.println("Seconds = "+(System.currentTimeMillis()-start)/1000);
+		System.out.println("Total waypoints = "+legPoints.size() );
+		System.out.println("Total Airports = "+selectedPlacemarks.size());
+		System.out.println("Total selectedCities = "+selectedCities.size());
+		System.out.println("Total selectedMountains = "+selectedMountains.size());
+
+		nbAirport = selectedPlacemarks.size();
+		nbCity = selectedCities.size();
+		nbMountain = selectedMountains.size();
+		
+		if (isGoogleEarth){
+	   		createAndsaveFlightPlan(kmlFlightPlanFile);
+			
+		    manageXMLFile.launchGoogleEarth(new File(kmlFlightPlanFile));
+		}
+		
+		isDone = true;
+
+	}
+	
+	
+	public boolean done(){
+		return isDone;
+	}
+	
+	
+
+	
+
+	
+	public  synchronized void createAndsaveFlightPlan(String file){
+		Writer writer = null;
+		
+		createKML = new CreateKML();
+				
+ 		try {
+ 			
+ 			
+		    writer = new BufferedWriter(new OutputStreamWriter(
+		          new FileOutputStream(file), "utf-8"));
+		    
+		    
+		    //Create KML Header
+		    writer.write(createKMLHeader());
+
+ 			writer.write("<Folder><name> Waypoints </name>");
+		    
+		    for (LegPoint legPoint : legPoints){
+		    	if ("1".equals(legPoint.getVisible())) {
+			    	writer.write(legPoint.buildPoint());
+		    	}
+		    }
+		    
+		    
+		   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
+
+		    for (LegPoint legPoint : legPoints){
+		    	writer.write(legPoint.getPosition()+"\n");
+		    }
+
+		    writer.write("</coordinates></LineString></Placemark>");
+		    
+		    
+		    writer.write("</Folder>");
+		    
+		    if (isAirport){
+			    writer.write("<Folder><name> FS2020 Airports found ("+selectedPlacemarks.size()+") </name>");
+			    
+			    for(Placemark placemark:selectedPlacemarks.values()){
+			    	writer.write(placemark.buildXML("fsx_airport"));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    if (isCity){
+			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");
+			    
+			    
+			    for(City city: selectedCities.values()){
+			    	writer.write(createKML.buildCityPlaceMark(city));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    
+		    if (isMountain){
+			    writer.write("<Folder><name> Mountains found ("+selectedMountains.size()+") </name>");
+			    
+			    
+			    for(Mountain mountain: selectedMountains.values()){
+			    	writer.write(createKML.buildMountainPlaceMark(mountain));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    
+		    if (dist.isLine()){
+		    	writer.write("<Folder><name> Distances </name>"
+		    			+ "<Placemark> "
+		    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+		    			+ " <Style>" + 
+		    			"  <LineStyle> " + 
+		    			"   <color>"+dataline.getColor("mountain")+"</color>"
+		    			+ "<width>2</width> " + 
+		    			"  </LineStyle>" + 
+		    			" </Style>"
+		    			+ "<LineString><extrude>1</extrude>"
+		    			+ "<tessellate>1</tessellate>"
+		    			+ "<altitudeMode>relativeToGround</altitudeMode>"
+		    			+ "<coordinates>\r\n");
+		    	writer.write(dataline.getData("mountain"));
+		    	writer.write("</coordinates></LineString></Placemark></Folder>");
+		    }
+
+		    
+		    
+		    //Create KML Footer
+		    writer.write("</Document></kml>");
+	   
+		} catch (IOException ex) {
+		  System.err.println(ex.getMessage());
+		} finally {
+		   try {writer.close();} catch (Exception ex) {}
+		}			
+    	
+    }
+  
+	public void createPlan(Writer writer) throws IOException{
+		writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
+
+	    for (LegPoint legPoint : legPoints){
+	    	writer.write(legPoint.getPosition()+"\n");
+	    }
+
+	    writer.write("</coordinates></LineString></Placemark>");
+
+	}
+    
+	public String createKMLHeader() {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">"	
+				+ "<Document>"
+				+ "<name>"+new File(flightPlan).getName()+"</name>"
+				+ "<open>1</open><Style id=\"s_ylw-pushpin\"><IconStyle><color>b200ffff</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle><LabelStyle><color>7fffff55</color></LabelStyle><ListStyle><ItemIcon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars-lv.png</href></ItemIcon></ListStyle></Style><StyleMap id=\"m_grn-pushpin\"><Pair><key>normal</key><styleUrl>#s_ylw-pushpin</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#s_ylw-pushpin_hl</styleUrl></Pair></StyleMap><StyleMap id=\"msn_ylw-pushpin\"><Pair><key>normal</key><styleUrl>#sn_ylw-pushpin</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#sh_ylw-pushpin</styleUrl></Pair></StyleMap>"
+				+ "<Style id=\"sh_ylw-pushpin\"><IconStyle><scale>1.2</scale></IconStyle><LineStyle><color>7f0000ff</color><width>3</width></LineStyle><PolyStyle><color>7f00ff55</color></PolyStyle></Style>"
+				+ "<Style id=\"s_ylw-pushpin_hl\"><IconStyle><color>7fffffff</color><scale>1.18182</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle><LabelStyle><color>7fffff55</color></LabelStyle><ListStyle><ItemIcon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars-lv.png</href></ItemIcon></ListStyle></Style>"
+				+ "<Style id=\"sn_ylw-pushpin\"><LineStyle><color>7f0000ff</color><width>4</width></LineStyle><PolyStyle><color>7f00ff55</color></PolyStyle></Style>"
+				+ "<Style id=\"fsx_airport\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/shapes/airports.png</href></Icon></IconStyle></Style>"
+				+ "<Style id=\"addon_airport\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/shapes/airports.png</href></Icon></IconStyle></Style>"
+				;	
+		}	
+
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static void main(String[] args) throws FileNotFoundException, NullPointerException, NoPoints, IOException {
+		ManageXMLFile manageXMLFile = new ManageXMLFile("");
+		List<Placemark> placemarks = new ArrayList<>();
+
+		SelectAiport selectAiport = new SelectAiport();
+		selectAiport.selectAll("", placemarks);
+		
+		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
+		
+		SelectCity selectCity = new SelectCity();
+		selectCity.selectAll("");
+		
+		SelectMountain selectMountain = new SelectMountain();
+		selectMountain.selectAll("");
+		
+		Distance dist = new Distance(10, 100, 20, true);
+		
+
+		new CreateKmlFSPlan(flightPlan, true,dist, 
+				manageXMLFile,true, 
+				selectCity.getCities(), true,
+				selectMountain.getMountains(),true);
+		
+	}
+	
+	public LinkedList<LegPoint> getLegPoints() {
+		return legPoints;
+	}
+
+	public void setLegPoints(LinkedList<LegPoint> points) {
+		this.legPoints = points;
+	}
+
+
+	public Map<String, Placemark> getAddonPlacemarks() {
+		return addonPlacemarks;
+	}
+
+
+	public void setAddonPlacemarks(Map<String, Placemark> addonPlacemarks) {
+		this.addonPlacemarks = addonPlacemarks;
+	}
+	
+	public class NoPoints extends Exception {
+	    public NoPoints(String message) {
+	        super(message);
+	    }
+	}
+
+	public List<String> getAddonList() {
+		return addonList;
+	}
+
+
+	public void setAddonList(List<String> addonList) {
+		this.addonList = addonList;
+	}
+
+	public int getTotalFsxPlacemarks() {
+		return totalFsxPlacemarks;
+	}
+
+	public void setTotalFsxPlacemarks(int totalFsxPlacemarks) {
+		this.totalFsxPlacemarks = totalFsxPlacemarks;
+	}
+
+	public int getTotalAddonPlacemarks() {
+		return totalAddonPlacemarks;
+	}
+
+	public void setTotalAddonPlacemarks(int totalAddonPlacemarks) {
+		this.totalAddonPlacemarks = totalAddonPlacemarks;
+	}
+
+	public int getTotalPlacemarks() {
+		return totalPlacemarks;
+	}
+
+	public void setTotalPlacemarks(int totalPlacemarks) {
+		this.totalPlacemarks = totalPlacemarks;
+	}
+
+	public int getCurrent() {
+		return current;
+	}
+
+	public void setCurrent(int current) {
+		this.current = current;
+	}
+
+
+	public int getNbAirport() {
+		return nbAirport;
+	}
+
+
+	public void setNbAirport(int nbAirport) {
+		this.nbAirport = nbAirport;
+	}
+
+
+	public int getNbCity() {
+		return nbCity;
+	}
+
+
+	public void setNbCity(int nbCity) {
+		this.nbCity = nbCity;
+	}
+
+
+	public int getNbMountain() {
+		return nbMountain;
+	}
+
+
+	public void setNbMountain(int nbMountain) {
+		this.nbMountain = nbMountain;
+	}
+
+
+	public String getKmlFlightPlanFile() {
+		return kmlFlightPlanFile;
+	}
+
+
+	public void setKmlFlightPlanFile(String kmlFlightPlanFile) {
+		this.kmlFlightPlanFile = kmlFlightPlanFile;
+	}
+
+	
+}
+
+
+
