@@ -89,6 +89,9 @@ public class CreateKmlFSPlan{
 	private int nbAirport;
 	private int nbCity;
 	private int nbMountain;
+	private double distanceBetween = 0;
+	private double altitude = 0;
+
 	
 	
 	public CreateKmlFSPlan(String flightPlan,boolean isGoogleEarth,  Distance dist, 
@@ -111,6 +114,8 @@ public class CreateKmlFSPlan{
 		this.mountains = mountains;
 		
 		this.dataline = new Dataline();
+		
+
 		
 		current = 0;
 		
@@ -156,18 +161,19 @@ public class CreateKmlFSPlan{
 		long start = System.currentTimeMillis();
 		
 		int cptNew = 0;
-		double distanceBetween;
 		
 		boolean isfound = false;
 		boolean isfinish = false;
+		String[] begin;
+		String[] end;
 		
 		while (!isfinish) {
 			for (int i = 0; i < legPoints.size()-1; i++) {
 				isfound = false;
 			
 				System.out.println(legPoints.get(i));
-				String[] begin = legPoints.get(i).getPosition().split(",");
-				String[] end = legPoints.get(i+1).getPosition().split(",");
+				begin = legPoints.get(i).getPosition().split(",");
+				end = legPoints.get(i+1).getPosition().split(",");
 				
 				
 				distanceBetween = Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
@@ -189,6 +195,19 @@ public class CreateKmlFSPlan{
 			isfinish = !isfound;
 		}
 		
+		distanceBetween = 0;
+		altitude = 0;
+		for (int i = 0; i < legPoints.size()-1; i++) {
+			begin = legPoints.get(i).getPosition().split(",");
+			end = legPoints.get(i+1).getPosition().split(",");
+			
+			distanceBetween += Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
+			altitude = (altitude < Double.parseDouble(begin[2])?Double.parseDouble(begin[2]):altitude);
+
+		}
+		
+		System.out.println("distanceBetween = "+distanceBetween);
+		System.out.println("altitude = "+altitude*3.2808);
 
 		// search airports
 
@@ -559,6 +578,17 @@ public class CreateKmlFSPlan{
 	public void setKmlFlightPlanFile(String kmlFlightPlanFile) {
 		this.kmlFlightPlanFile = kmlFlightPlanFile;
 	}
+
+
+	public double getDistanceBetween() {
+		return distanceBetween;
+	}
+
+
+	public double getAltitude() {
+		return altitude;
+	}
+
 
 	
 }

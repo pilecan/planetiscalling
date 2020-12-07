@@ -25,7 +25,7 @@ public class CreateKML {
 	
 	
 	
-	private static final Map<Object, Object> ICON_MAP =
+/*	private static final Map<Object, Object> ICON_MAP =
 		    Arrays.stream(new String[][] {
 		        { "Airstrip", "http://maps.google.com/mapfiles/kml/shapes/airports.png" }, 
 		        { "Animal", "http://maps.google.com/mapfiles/kml/shapes/camera.png" }, 
@@ -58,6 +58,40 @@ public class CreateKML {
 		        { "volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" }, 
 		        { "mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" }, 
 		    }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+*/	
+    private static final Map<String, String> ICON_MAP;
+    static {
+        Map<String, String> aMap = new HashMap<>();
+        aMap.put("Canyon", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
+        aMap.put("Cap", "http://maps.google.com/mapfiles/kml/shapes/trail.png" ); 
+        aMap.put("Chalet", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("Cove", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
+        aMap.put("Historic", "http://maps.google.com/mapfiles/kml/shapes/info_circle.png" ); 
+        aMap.put("Hostel", "http://maps.google.com/mapfiles/kml/shapes/lodging.png" ); 
+        aMap.put("Lake", "http://maps.google.com/mapfiles/kml/shapes/fishing.png" ); 
+        aMap.put("Lighthouse", "http://maps.google.com/mapfiles/kml/shapes/target.png" ); 
+        aMap.put("Pavillon", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
+        aMap.put("Plane", "http://maps.google.com/mapfiles/kml/shapes/flag.png" ); 
+        aMap.put("Port", "http://maps.google.com/mapfiles/kml/shapes/ferry.png" ); 
+        aMap.put("Pourvoirie", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
+        aMap.put("Reserve", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("Waterfall", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("Wreck", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
+        aMap.put("River", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("Castle", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
+        aMap.put("Village", "http://maps.google.com/mapfiles/kml/shapes/square.png" ); 
+        aMap.put("Church", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("Abbey", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put(null, "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put("minor", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" ); 
+        aMap.put("admin", "http://maps.google.com/mapfiles/kml/paddle/pink-stars.png" ); 
+        aMap.put("primary", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
+        aMap.put("volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" ); 
+        aMap.put("mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
+        ICON_MAP = Collections.unmodifiableMap(aMap);
+    }
+
 	
 	
 

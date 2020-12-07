@@ -19,6 +19,7 @@ public interface Info {
     
     
 
+    
 	String imagesPath = "/images/";
 	//String path = "C:/projects/fsx/readconfig/data/";
 	String sceneryWork = "Scenery_work.CFG";
@@ -36,6 +37,6 @@ public interface Info {
 
 	String fsl = "./FSLaunchPad.exe";
 	
-    String imageLogo = "/images/fslLogo.jpg";
+    String imageLogo = "/images/hello_here.jpg";
 	
 }

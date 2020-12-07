@@ -70,8 +70,8 @@ public class PanelLandmarks {
 	 * 
 	 * @return
 	 */
-	public JPanel getAirportWorld(ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
-		DistanceSpinner distanceSpin = new DistanceSpinner();
+	public JPanel getAirportWorld(final ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
+		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		
 		distanceSpin.initPanelDistances("airport");
 		
@@ -86,16 +86,16 @@ public class PanelLandmarks {
 		this.selectAiport = selectAiport;
 		this.manageXMLFile = manageXMLFile;
 		
-		JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountry());
-		JComboBox<String> comboState = new JComboBox<>(selectDB.getStates(comboCountry.getSelectedItem()));
-		JComboBox<String> comboCity = new JComboBox<>();
+		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountry());
+		final JComboBox<String> comboState = new JComboBox<>(selectDB.getStates(comboCountry.getSelectedItem()));
+		final JComboBox<String> comboCity = new JComboBox<>();
 		comboCity.addItem(" All");
 
         selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 
-		comboCountry.setPreferredSize(new Dimension(240,20));
-        comboState.setPreferredSize(new Dimension(240,20));
-        comboCity.setPreferredSize(new Dimension(240,20));
+		comboCountry.setPreferredSize(new Dimension(240,25));
+        comboState.setPreferredSize(new Dimension(240,25));
+        comboCity.setPreferredSize(new Dimension(240,25));
         
         
 		comboCountry.addItemListener(new ItemListener() {
@@ -140,13 +140,12 @@ public class PanelLandmarks {
 		JButton clearButton = new JButton("Reset");
 			
 		labelHeader.setBounds(10, 5, 300, 23);
-		panelCombo.setBounds(10, 30, 240, 80);
+		panelCombo.setBounds(10, 30, 240, 90);
 		
-		distanceSpin.getSpinnerPanel().setBounds(10, 110, 320, 100);
-
+		distanceSpin.getSpinnerPanel().setBounds(10, 135, 320, 100);
 		
-		clearButton.setBounds(120, 210, 90, 23);
-  	    searchButton.setBounds(10, 210, 90, 23);
+		clearButton.setBounds(120, 245, 90, 23);
+  	    searchButton.setBounds(10, 245, 90, 23);
   	  	labelResult.setBounds(260, 200, 200, 63);
 
 		searchButton.addActionListener(new ActionListener()
@@ -195,8 +194,8 @@ public class PanelLandmarks {
 	 * @param manageXMLFile
 	 * @return
 	 */
-	public JPanel getCityWorld(ManageXMLFile manageXMLFile) {
-		DistanceSpinner distanceSpin = new DistanceSpinner();
+	public JPanel getCityWorld(final ManageXMLFile manageXMLFile) {
+		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("city");
 
 		labelHeader = new JLabel("Select Cities or States to find their surrounding Airports and Mountains :");
@@ -208,21 +207,21 @@ public class PanelLandmarks {
 		selectDB.selectAirportTableNew();
 		this.manageXMLFile = manageXMLFile;
 		
-		SelectDB selectDB = new SelectDB();
+		final SelectDB selectDB = new SelectDB();
 		selectDB.selectCityTable();
 		
-		JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryCity());
-		JComboBox<String> comboState = new JComboBox<>(selectDB.getStateCity("Afghanistan"));
-		JComboBox<String> comboCity = new JComboBox<>();
+		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryCity());
+		final JComboBox<String> comboState = new JComboBox<>(selectDB.getStateCity("Afghanistan"));
+		final JComboBox<String> comboCity = new JComboBox<>();
 		comboCity.addItem(" All");
 	    comboState.addItem(" All");
 
         selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 
 
-		comboCountry.setPreferredSize(new Dimension(240,20));
-        comboState.setPreferredSize(new Dimension(240,20));
-        comboCity.setPreferredSize(new Dimension(240,20));
+		comboCountry.setPreferredSize(new Dimension(240,25));
+        comboState.setPreferredSize(new Dimension(240,25));
+        comboCity.setPreferredSize(new Dimension(240,25));
         
         
 		comboCountry.addItemListener(new ItemListener() {
@@ -274,12 +273,12 @@ public class PanelLandmarks {
 			
 		labelHeader.setBounds(10, 5, 300, 23);
 		
-		panelCombo.setBounds(10, 30, 240, 80);
+		panelCombo.setBounds(10, 30, 240, 90);
 		
-		distanceSpin.getSpinnerPanel().setBounds(10, 110, 320, 100);
+		distanceSpin.getSpinnerPanel().setBounds(10, 135, 320, 100);
 		
-		clearButton.setBounds(120, 210, 90, 23);
-  	    searchButton.setBounds(10, 210, 90, 23);
+		clearButton.setBounds(120, 245, 90, 23);
+  	    searchButton.setBounds(10, 245, 90, 23);
   	  	labelResult.setBounds(260, 40, 200, 63);
 
 		searchButton.addActionListener(new ActionListener()
@@ -316,9 +315,9 @@ public class PanelLandmarks {
 	  * @param manageXMLFile
 	  * @return
 	  */
-	public JPanel getMountainWorld(ManageXMLFile manageXMLFile) {
+	public JPanel getMountainWorld(final ManageXMLFile manageXMLFile) {
 		
-		DistanceSpinner distanceSpin = new DistanceSpinner();
+		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");
 		
 		labelHeader = new JLabel("Mountain to find their surrounding Airports and Cities:");
@@ -330,18 +329,18 @@ public class PanelLandmarks {
 		selectDB.selectAirportTableNew();
 		this.manageXMLFile = manageXMLFile;
 		
-		SelectDB selectDB = new SelectDB();
+		final SelectDB selectDB = new SelectDB();
 		selectDB.selectMountainTable();
 		
-		JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryMountain());
-		JComboBox<String> comboMountain = new JComboBox<>(selectDB.getMountain("Afghanistan"));
+		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryMountain());
+		final JComboBox<String> comboMountain = new JComboBox<>(selectDB.getMountain("Afghanistan"));
 		comboMountain.addItem(" All");
 
 //        selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboMountain.getSelectedItem(), comboMountain.getItemCount());
 
 
-		comboCountry.setPreferredSize(new Dimension(200,20));
-        comboMountain.setPreferredSize(new Dimension(200,20));
+		comboCountry.setPreferredSize(new Dimension(200,25));
+        comboMountain.setPreferredSize(new Dimension(200,25));
         
         
 		comboCountry.addItemListener(new ItemListener() {
@@ -371,10 +370,10 @@ public class PanelLandmarks {
 		labelHeader.setBounds(10, 5, 330, 23);
 		panelCombo.setBounds(5, 30, 240, 60);
 		
-		distanceSpin.getSpinnerPanel().setBounds(10, 85, 320, 100);
+		distanceSpin.getSpinnerPanel().setBounds(10, 95, 320, 100);
 		
-		clearButton.setBounds(120, 190, 90, 23);
-  	    searchButton.setBounds(10, 190, 90, 23);
+		clearButton.setBounds(120, 200, 90, 23);
+  	    searchButton.setBounds(10, 200, 90, 23);
   	  	labelResult.setBounds(260, 40, 200, 63);
 
 		searchButton.addActionListener(new ActionListener()

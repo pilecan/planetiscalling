@@ -66,7 +66,7 @@ public class ReadData implements Info{
 		this.selectMountain = selectMountain;
 		this.panelResult = panelResult;
 		this.dataline = new Dataline();
-		searchFlightplan(dist);
+		selectFlightplan(dist);
 		
 	}
 	
@@ -99,7 +99,7 @@ public class ReadData implements Info{
 
 	
 	
-	private void searchFlightplan( Distance dist) {
+	private void selectFlightplan( Distance dist) {
 		JFileChooser chooser = selectDirectoryProgram("Flightplan selection", "c:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\");
 	       // setAlwaysOnTop(false);
 
@@ -130,6 +130,8 @@ public class ReadData implements Info{
 
 			panelResult.setText("<html>"
 					+ "Flightplan: "+new File(flightplan).getName()+"<br>"
+					+ "Distance: "+Math.round(createKmlFSPlan.getDistanceBetween())+" nm<br>"
+					+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude()*3.2808)+" ft<br>"
 					+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
 					+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
 				    + "Mountains: "+createKmlFSPlan.getNbMountain()

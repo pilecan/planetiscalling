@@ -46,7 +46,7 @@ public class PanelAiport extends JFrame {
 	}
 
 	
-	public JPanel getIcao(ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
+	public JPanel getIcao(final ManageXMLFile manageXMLFile,final SelectAiport selectAiport,SelectCity selectCity,final SelectMountain selectMountain) {
 		
 		JPanel panelSearch = new JPanel();
 		panelSearch.setLayout(null);

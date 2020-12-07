@@ -40,8 +40,8 @@ public class PanelPlan {
 	}
 
 	
-	public JPanel getFlightplan(ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
-		DistanceSpinner distanceSpin = new DistanceSpinner();
+	public JPanel getFlightplan(final ManageXMLFile manageXMLFile,final SelectAiport selectAiport,final SelectCity selectCity,final SelectMountain selectMountain) {
+		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		
 		distanceSpin.initPanelDistances("plan");
 		
@@ -56,7 +56,7 @@ public class PanelPlan {
 		
 		final JLabel labelResult = new JLabel();
 		
-		JButton buttonGoogle = new JButton("Reload");
+		final JButton buttonGoogle = new JButton("Reload");
 		
 		JButton buttonFP = new JButton("Flightplan");
 		buttonFP.addActionListener(new ActionListener()
@@ -86,10 +86,10 @@ public class PanelPlan {
 		
 		
 		buttonFP.setBounds(10, 20, 120, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 50, 130, 140);
+		distanceSpin.getSpinnerPanel().setBounds(10, 50, 170, 140);
     	buttonGoogle.setBounds(10, 200, 120, 23);
 
-		labelResult.setBounds(200, 20, 300, 200);		
+		labelResult.setBounds(300, 20, 300, 200);		
 	
      	panelSearch.add(buttonFP);
 		panelSearch.add(labelResult);

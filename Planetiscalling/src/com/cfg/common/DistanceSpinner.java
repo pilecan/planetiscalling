@@ -67,7 +67,7 @@ public class DistanceSpinner implements Info {
 	        citySpinner=new JSpinner(distanceCity);
 	     //   citySpinner.setPreferredSize( new Dimension (10, 10) );
 	        citySpinner.setToolTipText("City distances in Nautical Miles");
-	        formUtility.addLabel("City ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
+	        formUtility.addLabel("City (nm)",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
 	        panelCity = new JPanel();
 	        panelCity.add(citySpinner, BorderLayout.WEST);
 	        formUtility.addLastField(panelCity, spinnerPanel);
@@ -76,7 +76,7 @@ public class DistanceSpinner implements Info {
         if (!"mountain".equals(topic)) {
             mountainSpinner=new JSpinner(distanceMountain);
             mountainSpinner.setToolTipText("Mountain distances in Nautical Miles");
-            formUtility.addLabel("Mountain ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
+            formUtility.addLabel("Mountain (nm)",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
             panelMountain = new JPanel();
             panelMountain.add(mountainSpinner, BorderLayout.WEST);
             formUtility.addLastField(panelMountain, spinnerPanel);
@@ -86,7 +86,7 @@ public class DistanceSpinner implements Info {
             airportSpinner=new JSpinner(distanceAirport);
             //    mountainSpinner.setPreferredSize( new Dimension (10, 10) );
             airportSpinner.setToolTipText("Airport distances in Nautical Miles");
-            formUtility.addLabel("Airport ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
+            formUtility.addLabel("Airport (nm)",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
             panelAirport = new JPanel();
             panelAirport.add(airportSpinner, BorderLayout.WEST);
             formUtility.addLastField(panelAirport, spinnerPanel);
@@ -95,10 +95,10 @@ public class DistanceSpinner implements Info {
         
         checkLinedist = new JCheckBox();
         checkLinedist.setSelected(true);
-        checkLinedist.setToolTipText("Check it for lines between Objects");
+        checkLinedist.setToolTipText("Check it to see lines between placemarks");
      //   checkLinedist.setPreferredSize( new Dimension (10, 10) );
 
-        formUtility.addLabel("Lines ",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
+        formUtility.addLabel("Lines between",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
         panelLineDistance = new JPanel();
         panelLineDistance.add(checkLinedist, BorderLayout.WEST);
         formUtility.addLastField(panelLineDistance, spinnerPanel);

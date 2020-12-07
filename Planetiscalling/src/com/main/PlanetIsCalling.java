@@ -1,29 +1,35 @@
 package com.main;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
+import com.cfg.common.Info;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
 import com.panels.PanelAiport;
 import com.panels.PanelLandmarks;
 import com.panels.PanelPlan;
-import com.util.ReadData;
+import com.util.Utility;
 
 import net.SelectAiport;
 import net.SelectCity;
 import net.SelectMountain;
 
 
-public class PlanetIsCalling extends JFrame {
+public class PlanetIsCalling extends JFrame implements Info {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -72,7 +78,38 @@ public class PlanetIsCalling extends JFrame {
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 458, 333);
+		setSize(600, 400);
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
+		
+		try {
+			for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			// If Nimbus is not available, fall back to cross-platform
+			try {
+				UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+			} catch (Exception ex) {
+				// not worth my time
+			}
+		}
+
+		this.addWindowListener(new WindowAdapter() {
+
+			@Override
+			public void windowClosing(WindowEvent e) {
+				dispose();
+				System.exit(0);
+			}
+		});
+		
+        Utility.getInstance().setIcon(this, imageLogo);
+
+	    
 		setTitle("The Planet Is Calling You and Me Too");
 	
 		JPanel mainPanel = new JPanel();
