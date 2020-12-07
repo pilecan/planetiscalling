@@ -174,6 +174,19 @@ public class Utility {
 		}
 		return keys;
 	}
+	
+    public String getFlightPlanNane(String flightplanName) {
+    	if (getPrefs() == null) {
+        	readPrefProperties();
+    	}
+    	flightplanName = getPrefs().getProperty("kmlflightplandir")+flightplanName;		
+		if (flightplanName.contains("/data/")){
+ 			Path currentRelativePath = Paths.get("");
+ 			flightplanName = currentRelativePath.toAbsolutePath().toString()+flightplanName.replace("\\", "/");
+		}
+		
+		return flightplanName;
+    }
 
 	
 

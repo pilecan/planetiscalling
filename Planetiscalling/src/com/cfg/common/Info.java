@@ -17,26 +17,17 @@ public interface Info {
     Font fontList 	= new Font("arial", Font.BOLD, 12);
     Font fontTitle 	= new Font("arial", Font.BOLD, 13);
     
-    
-
-    
 	String imagesPath = "/images/";
 	//String path = "C:/projects/fsx/readconfig/data/";
-	String sceneryWork = "Scenery_work.CFG";
-	String sceneryOriginal = "Scenery_original_before_FSL.CFG";
-	String sceneryBak = "Scenery_bak.CFG";
-	String sceneryArea = "SceneryArea.dat";
-	String ADDON_SCENERY = "Addon Scenery";
 
 	String SCENERY_ROOT_LM = "C:\\ProgramData\\Lockheed Martin\\";
 	String SCENERY_ROOT_FSX = "C:\\ProgramData\\Microsoft/FSX\\";
-	String SIM_P3D_V3 = "Prepar3D v3";
 	String SIM_FSX = "Microsoft Flight Simulator X";
 	
 	String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 
-	String fsl = "./FSLaunchPad.exe";
 	
     String imageLogo = "/images/hello_here.jpg";
+    String datadir  = "/data/";
 	
 }

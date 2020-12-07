@@ -1,5 +1,6 @@
 package com.util;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +52,8 @@ public class ReadData implements Info{
 	private JLabel panelResult;
 	
 	private String flightplan ;
+	
+	private String flightplanName;
 	
 	
 	private Dataline dataline;
@@ -100,8 +105,13 @@ public class ReadData implements Info{
 	
 	
 	private void selectFlightplan( Distance dist) {
-		JFileChooser chooser = selectDirectoryProgram("Flightplan selection", "c:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\");
+		
+		Utility.getInstance().readPrefProperties();
+		
+		JFileChooser chooser = selectDirectoryProgram("Flightplan selection", Utility.getInstance().getPrefs().getProperty("flightplandir"));
 	       // setAlwaysOnTop(false);
+		
+		chooser.setPreferredSize(new Dimension(550,400));
 
 			Action details = chooser.getActionMap().get("viewTypeDetails");
 			details.actionPerformed(null);
@@ -113,7 +123,9 @@ public class ReadData implements Info{
 				//System.out.println(chooser.getSelectedFile());
 				flightplan = chooser.getSelectedFile().toString();
 				createFlightplan(dist);
-		}
+		    } else {
+		    	kmlFlightPlanFile = "";
+		    }
 			
 		
 	}
@@ -121,6 +133,7 @@ public class ReadData implements Info{
 	public void createFlightplan( Distance dist) {
 		
 		try {
+
 			CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, true, dist, 
 					manageXMLFile,true, 
 					selectCity.getCities(), true,
@@ -222,13 +235,13 @@ public class ReadData implements Info{
 			placemarks = selectAiport.getPlacemarks();
 			
 			search = search.replaceAll("\\s+", "");
-
-	    	String kmlRelative = "data\\icao_airports.kml";
+	    	
+	    	flightplanName = Utility.getInstance().getFlightPlanNane("icao_airports.kml");
 			
 			if (placemarks.size() > 0) {
 			  	//searchAiportNeighbor(placemarks,selectCity,selectMoutain);
-				saveKMLFileICAO(manageXMLFile, placemarks,kmlRelative);
-				manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+				saveKMLFileICAO(manageXMLFile, placemarks,flightplanName);
+				manageXMLFile.launchGoogleEarth(new File(flightplanName));
 			}
 
 			
@@ -429,8 +442,7 @@ public class ReadData implements Info{
 
 		selectMountain.selectAll(sql);
 		
-    	String kmlRelative = "data\\mountain_city_airport.kml";
- 
+
     	List<Placemark> airports = new ArrayList<>();
     	SelectAiport selectAiport = new SelectAiport();
 		selectAiport.selectAll(sqlCountry, airports);
@@ -442,9 +454,10 @@ public class ReadData implements Info{
 		
 		selectedMountains = selectMountain.getMapMountains();
 		
-		saveKMLFile(manageXMLFile,airports,kmlRelative);
-		
-		manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+    	flightplanName = Utility.getInstance().getFlightPlanNane("mountain_city_airport.kml");
+
+		saveKMLFile(manageXMLFile,airports,flightplanName);
+		manageXMLFile.launchGoogleEarth(new File(flightplanName));
 		
 		System.out.println(airports.size());
 
@@ -495,8 +508,8 @@ public class ReadData implements Info{
 		
 		selectCity.selectAll(sql);
 		
-    	String kmlRelative = "data\\city_airport_mountain.kml";
-    	SelectMountain selectMoutain = new SelectMountain();
+
+		SelectMountain selectMoutain = new SelectMountain();
 		selectMoutain.selectAll("");
 
     	List<Placemark> airports = new ArrayList<>();
@@ -509,9 +522,11 @@ public class ReadData implements Info{
 		
 		selectedCities = selectCity.getMapCities();
 		
-		saveKMLFile(manageXMLFile,airports,kmlRelative);
+    	flightplanName = Utility.getInstance().getFlightPlanNane("city_airport_mountain.kml");
+    	
+		saveKMLFile(manageXMLFile,airports,flightplanName);
 		
-		manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+		manageXMLFile.launchGoogleEarth(new File(flightplanName));
 		
 		System.out.println(airports.size());
 
@@ -560,11 +575,7 @@ public class ReadData implements Info{
 		
 		
 		selectCity.selectAll(sql.replace("state", "admin_name"));
-		
-		//selectedCities = selectCity.getMapCities();
-		
-    	String kmlRelative = "data\\airport_city_mountain.kml";
-    	
+   	
     	SelectMountain selectMoutain = new SelectMountain();
 		selectMoutain.selectAll("");
 		
@@ -579,9 +590,11 @@ public class ReadData implements Info{
 	
 		searchAiportNeighbor(placemarks,selectCity,selectMoutain);
 	
-		saveKMLFile(manageXMLFile,placemarks,kmlRelative);
+    	flightplanName = Utility.getInstance().getFlightPlanNane("airport_city_mountain.kml");
 		
-		manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+		saveKMLFile(manageXMLFile,placemarks,flightplanName);
+		
+		manageXMLFile.launchGoogleEarth(new File(flightplanName));
 		
 		System.out.println("airports found = "+ placemarks.size());
 
@@ -592,6 +605,8 @@ public class ReadData implements Info{
 		Writer writer = null;
 						
  		try {
+ 			
+			
 		    writer = new BufferedWriter(new OutputStreamWriter(
 		          new FileOutputStream(kmlRelative), "utf-8"));
 		    

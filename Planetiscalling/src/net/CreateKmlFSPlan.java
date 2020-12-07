@@ -31,6 +31,7 @@ import com.model.City;
 import com.model.Distance;
 import com.model.Mountain;
 import com.util.CreateKML;
+import com.util.Utility;
 
 public class CreateKmlFSPlan{
 	
@@ -47,7 +48,7 @@ public class CreateKmlFSPlan{
 	private int totalPlacemarks;
 	private int totalAddonPlacemarks;
 
-	private String kmlFlightPlanFile = "/data/fsl_flightplan.kml";
+	private String kmlFlightPlanFile = "/data/last_flightplan.kml";
 
 	private ManageXMLFile manageXMLFile;
 
@@ -119,8 +120,6 @@ public class CreateKmlFSPlan{
 		
 		current = 0;
 		
-		Path currentRelativePath = Paths.get("");
-   		kmlFlightPlanFile = currentRelativePath.toAbsolutePath().toString()+kmlFlightPlanFile.replace("\\", "/");
 		
 		String text = new String(Files.readAllBytes(Paths.get(flightPlan)), StandardCharsets.UTF_8);
 		
@@ -281,11 +280,7 @@ public class CreateKmlFSPlan{
 		nbCity = selectedCities.size();
 		nbMountain = selectedMountains.size();
 		
-		if (isGoogleEarth){
-	   		createAndsaveFlightPlan(kmlFlightPlanFile);
-			
-		  //  manageXMLFile.launchGoogleEarth(new File(kmlFlightPlanFile));
-		}
+	   	createAndsaveFlightPlan();
 		
 		isDone = true;
 
@@ -301,16 +296,21 @@ public class CreateKmlFSPlan{
 	
 
 	
-	public  synchronized void createAndsaveFlightPlan(String file){
+	public  synchronized void createAndsaveFlightPlan(){
 		Writer writer = null;
 		
 		createKML = new CreateKML();
 				
  		try {
  			
- 			
+			kmlFlightPlanFile = Utility.getInstance().getPrefs().getProperty("kmlflightplandir")+"last_flightplan.kml";
+ 			if (kmlFlightPlanFile.contains("/data/")){
+ 	 			Path currentRelativePath = Paths.get("");
+	 	   		kmlFlightPlanFile = currentRelativePath.toAbsolutePath().toString()+kmlFlightPlanFile.replace("\\", "/");
+ 			}
+
 		    writer = new BufferedWriter(new OutputStreamWriter(
-		          new FileOutputStream(file), "utf-8"));
+		          new FileOutputStream(kmlFlightPlanFile), "utf-8"));
 		    
 		    
 		    //Create KML Header

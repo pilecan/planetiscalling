@@ -46,8 +46,8 @@ public class PanelPlan {
 		distanceSpin.initPanelDistances("plan");
 		
 		
-		JPanel panelSearch = new JPanel();
-		panelSearch.setLayout(null);
+		JPanel panelFlightplan = new JPanel();
+		panelFlightplan.setLayout(null);
 		
 		JPanel panelResult = new JPanel();
 		JPanel panel = new JPanel();
@@ -63,8 +63,11 @@ public class PanelPlan {
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
+	    	  labelResult.setText("one moment please");
+
 	    	  readData =  new ReadData(labelResult, manageXMLFile, selectAiport, selectCity, selectMountain,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
+	    	  
 		      manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 			  buttonGoogle.setVisible(true); 
 
@@ -77,6 +80,8 @@ public class PanelPlan {
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
+	    	  labelResult.setText("one moment please");
+
 	    	 readData.createFlightplan(new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected())); 
 	    	 manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 	        
@@ -91,12 +96,12 @@ public class PanelPlan {
 
 		labelResult.setBounds(300, 20, 300, 200);		
 	
-     	panelSearch.add(buttonFP);
-		panelSearch.add(labelResult);
-		panelSearch.add(distanceSpin.getSpinnerPanel());
-     	panelSearch.add(buttonGoogle);
+     	panelFlightplan.add(buttonFP);
+		panelFlightplan.add(labelResult);
+		panelFlightplan.add(distanceSpin.getSpinnerPanel());
+     	panelFlightplan.add(buttonGoogle);
 
-		return panelSearch;
+		return panelFlightplan;
 	}
 	
 	public JPanel getAirport() {
