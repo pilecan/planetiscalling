@@ -1,6 +1,7 @@
 package com.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -59,27 +60,30 @@ public class PanelAiport extends JFrame {
 		JButton searchButton = new JButton("Search");
 		JButton clearButton = new JButton("Clear");
 		
-		final JTextArea textArea = new JTextArea(5, 20);
+		final JTextArea textArea = new JTextArea(500, 500);
 
 		labelHeader = new JLabel("Type or Paste you ICAO Codes here");
 		
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		textArea.setColumns(20);
+		textArea.setColumns(500);
 		textArea.setLineWrap(true);
-		textArea.setRows(5);
+		textArea.setRows(500);
 		textArea.setWrapStyleWord(true);
+		textArea.setPreferredSize(new Dimension(300,500));
 
 		JPanel content = new JPanel(new BorderLayout());
 
 	//	content.add(textArea);
-		content.add(new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		content.add(new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 		content.setVisible(true);
+		content.setPreferredSize(new Dimension(300,500));
+
 		
 		labelHeader.setBounds(10, 5, 300, 23);
-		content.setBounds(10, 30, 200, 63);
-		clearButton.setBounds(120, 95, 90, 23);
-  	    searchButton.setBounds(10, 95, 90, 23);
+		content.setBounds(10, 30, 250, 160);
+		clearButton.setBounds(140, 200, 90, 23);
+  	    searchButton.setBounds(10, 200, 90, 23);
   	  	labelResult.setBounds(270, 40, 120, 63);
 
 		searchButton.addActionListener(new ActionListener()

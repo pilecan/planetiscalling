@@ -24,12 +24,6 @@ import net.SelectMountain;
 
 public class PanelPlan {
 
-	private ManageXMLFile manageXMLFile;
-	private SelectAiport selectAiport;
-	private SelectCity selectCity;
-	private SelectMountain selectMountain;
-	private Map <String, JCheckBox> mapSelector;	
-	
 	private ReadData readData;	
 
 	private List<Placemark> airports ;

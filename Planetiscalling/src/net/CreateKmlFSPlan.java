@@ -207,6 +207,7 @@ public class CreateKmlFSPlan{
 		
 		System.out.println("distanceBetween = "+distanceBetween);
 		System.out.println("altitude = "+altitude*3.2808);
+		altitude = altitude*3.2808;
 
 		// search airports
 
@@ -324,7 +325,7 @@ public class CreateKmlFSPlan{
 		    	}
 		    }
 		    
-		   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
+			   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>"+(altitude < 10000?"clampToGround":"absolute")+"</altitudeMode><coordinates>"); 
 
 		    for (LegPoint legPoint : legPoints){
 		    	if ("1".equals(legPoint.getVisible())) {
@@ -377,11 +378,11 @@ public class CreateKmlFSPlan{
 			    			"  <LineStyle> " + 
 			    			"   <color>"+dataline.getColor(key)+"</color>"
 			    			+ "<width>2</width> " + 
-			    			"  </LineStyle>" + 
+			    			"  </LineStyle>" +
 			    			" </Style>"
 			    			+ "<LineString><extrude>1</extrude>"
 			    			+ "<tessellate>1</tessellate>"
-			    			+ "<altitudeMode>relativeToGround</altitudeMode>"
+			    			+ "<altitudeMode>"+(altitude < 10000?"clampToGround":"relativeToGround")+"</altitudeMode>"
 			    			+ "<coordinates>\r\n");
 			    	writer.write(dataline.getMapData().get(key));
 			    	writer.write("</coordinates></LineString></Placemark></Folder>");
@@ -433,6 +434,7 @@ public class CreateKmlFSPlan{
 
 	}
     
+
 	public String createKMLHeader() {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">"	

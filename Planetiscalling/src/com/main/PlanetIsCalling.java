@@ -21,6 +21,7 @@ import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
 import com.panels.PanelAiport;
 import com.panels.PanelLandmarks;
+import com.panels.PanelManage;
 import com.panels.PanelPlan;
 import com.util.Utility;
 
@@ -133,7 +134,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 		tabPane.addTab( "Airport", panelLandmarks.getAirportWorld(manageXMLFile,selectAiport,selectCity,selectMountain));
 		tabPane.addTab( "City", panelLandmarks.getCityWorld(manageXMLFile));
 		tabPane.addTab( "Mountain",panelLandmarks.getMountainWorld(manageXMLFile));
-		tabPane.addTab( "Setting", panel5);
+		tabPane.addTab( "Setting", new PanelManage().getSettingPanel());
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);
 

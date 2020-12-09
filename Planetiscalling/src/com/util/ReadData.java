@@ -200,6 +200,10 @@ public class ReadData implements Info{
     	icaos = icaos.replaceAll("'", "");
     	icaos = icaos.replaceAll("=", " ");
     	icaos = icaos.replaceAll(",", " ");
+    	icaos = icaos.replaceAll(":", " ");
+    	icaos = icaos.replaceAll(";", " ");
+    	icaos = icaos.replaceAll("\\.", " ");
+    	icaos = icaos.replaceAll("\\|", " ");
 
 
 
