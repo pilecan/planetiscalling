@@ -195,22 +195,58 @@ public class CreateKmlFSPlan{
 		}
 		
 		distanceBetween = 0;
-		altitude = 0;
+		altitude = Double.parseDouble(fsxPlan.getCruisingAlt());
 		for (int i = 0; i < legPoints.size()-1; i++) {
 			begin = legPoints.get(i).getPosition().split(",");
+			//Correct altitude if = 0
+			try {
+				double alt = Double.parseDouble(begin[2]);
+				if (alt == 0.0) {
+					legPoints.get(i).setPosition(begin[0]+","+begin[1]+","+altitude);
+				}
+				System.out.println(legPoints.get(i).getPosition().toString());
+			} catch (NumberFormatException e) {
+			}
 			end = legPoints.get(i+1).getPosition().split(",");
 			
 			distanceBetween += Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
-			altitude = (altitude < Double.parseDouble(begin[2])?Double.parseDouble(begin[2]):altitude);
+		//	altitude = (altitude < Double.parseDouble(begin[2])?Double.parseDouble(begin[2]):altitude);
 
 		}
 		
+		
 		System.out.println("distanceBetween = "+distanceBetween);
-		System.out.println("altitude = "+altitude*3.2808);
-		altitude = altitude*3.2808;
+		System.out.println("altitude = "+altitude);
+		//altitude = altitude*3.2808;
 
 		// search airports
+		searchNeighbor() ;
+		
+	
+		totalPlacemarks = manageXMLFile.getPlacemarks().size();
+		totalFsxPlacemarks = selectedPlacemarks.size();
 
+		System.out.println("Seconds = "+(System.currentTimeMillis()-start)/1000);
+		System.out.println("Total waypoints = "+legPoints.size() );
+		System.out.println("Total Airports = "+selectedPlacemarks.size());
+		System.out.println("Total selectedCities = "+selectedCities.size());
+		System.out.println("Total selectedMountains = "+selectedMountains.size());
+
+		nbAirport = selectedPlacemarks.size();
+		nbCity = selectedCities.size();
+		nbMountain = selectedMountains.size();
+		
+	   	createAndsaveFlightPlan();
+		
+		isDone = true;
+
+	}
+	
+	
+	
+	private void searchNeighbor() {
+		
+		
 		if (dist.isAirport()) {
 			for(Placemark placemark : manageXMLFile.getPlacemarks()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(placemark.getCoordinates());
@@ -267,26 +303,7 @@ public class CreateKmlFSPlan{
 			}
 		}
 		
-	
-		totalPlacemarks = manageXMLFile.getPlacemarks().size();
-		totalFsxPlacemarks = selectedPlacemarks.size();
-
-		System.out.println("Seconds = "+(System.currentTimeMillis()-start)/1000);
-		System.out.println("Total waypoints = "+legPoints.size() );
-		System.out.println("Total Airports = "+selectedPlacemarks.size());
-		System.out.println("Total selectedCities = "+selectedCities.size());
-		System.out.println("Total selectedMountains = "+selectedMountains.size());
-
-		nbAirport = selectedPlacemarks.size();
-		nbCity = selectedCities.size();
-		nbMountain = selectedMountains.size();
-		
-	   	createAndsaveFlightPlan();
-		
-		isDone = true;
-
 	}
-	
 	
 	public boolean done(){
 		return isDone;
@@ -304,7 +321,7 @@ public class CreateKmlFSPlan{
 				
  		try {
  			
-			kmlFlightPlanFile = Utility.getInstance().getPrefs().getProperty("kmlflightplandir")+"last_flightplan.kml";
+			kmlFlightPlanFile = Utility.getInstance().getPrefs().getProperty("kmlflightplandir")+"/last_flightplan.kml";
  			if (kmlFlightPlanFile.contains("/data/")){
  	 			Path currentRelativePath = Paths.get("");
 	 	   		kmlFlightPlanFile = currentRelativePath.toAbsolutePath().toString()+kmlFlightPlanFile.replace("\\", "/");
@@ -324,8 +341,9 @@ public class CreateKmlFSPlan{
 			    	writer.write(legPoint.buildPoint());
 		    	}
 		    }
-		    
-			   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>"+(altitude < 10000?"clampToGround":"absolute")+"</altitudeMode><coordinates>"); 
+
+		    //"+(altitude < 10000?"clampToGround":"absolute")+"
+			   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
 
 		    for (LegPoint legPoint : legPoints){
 		    	if ("1".equals(legPoint.getVisible())) {

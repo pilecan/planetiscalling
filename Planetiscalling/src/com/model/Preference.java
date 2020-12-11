@@ -45,6 +45,13 @@ public class Preference {
 	}
 
 
+
+	@Override
+	public String toString() {
+		return "Preference [type=" + type + ", path=" + path + ", fileName=" + fileName + ", key=" + key + "]";
+	}
+
+
 	
 
 }

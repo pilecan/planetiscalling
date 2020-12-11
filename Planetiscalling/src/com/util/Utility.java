@@ -2,11 +2,15 @@ package com.util;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -56,6 +60,24 @@ public class Utility {
 	     
 	    
 	}
+	
+	   public void savePrefProperties(){
+		   Writer out = null;
+	   		Path currentRelativePath = Paths.get("");
+	   		String file = currentRelativePath.toAbsolutePath().toString()+"\\data\\preferences.properties";
+		    File f = new File(file);
+	   		
+	 		try {
+		        out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "utf-8"));
+		        prefs.store(out, "Planetiscalling Application Preferences");
+
+			} catch (IOException ex) {
+					  System.err.println(ex.getMessage());
+			} finally {
+			   try {out.close();} catch (Exception ex) {}
+			}			
+	    }
+
 	public List<String> geListDirectories(String dirSource) {
 		listDirectories = new LinkedList<String>();
 
@@ -175,11 +197,11 @@ public class Utility {
 		return keys;
 	}
 	
-    public String getFlightPlanNane(String flightplanName) {
+    public String getFlightPlanName(String flightplanName) {
     	if (getPrefs() == null) {
         	readPrefProperties();
     	}
-    	flightplanName = getPrefs().getProperty("kmlflightplandir")+flightplanName;		
+    	flightplanName = getPrefs().getProperty("kmlflightplandir")+"/"+flightplanName;		
 		if (flightplanName.contains("/data/")){
  			Path currentRelativePath = Paths.get("");
  			flightplanName = currentRelativePath.toAbsolutePath().toString()+flightplanName.replace("\\", "/");

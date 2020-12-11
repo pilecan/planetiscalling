@@ -39,7 +39,7 @@ public class DistanceSpinner implements Info {
 	public void initPanelDistances(String topic) {
 		
 		
-		distanceCity =  new SpinnerNumberModel(20, 
+		distanceCity =  new SpinnerNumberModel(10, 
       		  0, //min
       		  200, //max
       	      10);               
@@ -49,7 +49,7 @@ public class DistanceSpinner implements Info {
       		  200, //max
       	      10);               
 		
-		distanceAirport =  new SpinnerNumberModel(50, 
+		distanceAirport =  new SpinnerNumberModel(10, 
       		  0, //min
       		  1000, //max
       	      10);               
@@ -94,7 +94,7 @@ public class DistanceSpinner implements Info {
 
         
         checkLinedist = new JCheckBox();
-        checkLinedist.setSelected(true);
+        checkLinedist.setSelected(!"plan".equals(topic));
         checkLinedist.setToolTipText("Check it to see lines between placemarks");
      //   checkLinedist.setPreferredSize( new Dimension (10, 10) );
 
