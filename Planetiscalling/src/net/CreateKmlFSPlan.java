@@ -219,10 +219,10 @@ public class CreateKmlFSPlan{
 		// search airports
 		searchNeighbor() ;
 		
-		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 	
 			
-		Geoinfo.searchFirstCruisingPoint(fsxPlan.getCruisingAlt(), legPoints);
+		Geoinfo.createTOC(fsxPlan.getCruisingAlt(), legPoints);
+		Geoinfo.createTOD(fsxPlan.getCruisingAlt(), legPoints);
 		
 		//System.err.println(pointFound.getId());
 		
