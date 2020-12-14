@@ -144,7 +144,7 @@ public class ReadData implements Info{
 			panelResult.setText("<html>"
 					+ "Flightplan: "+new File(flightplan).getName()+"<br>"
 					+ "Distance: "+Math.round(createKmlFSPlan.getDistanceBetween())+" nm<br>"
-					+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude())+" ft<br>"
+					+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude()*3.28084)+" ft<br>"
 					+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
 					+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
 				    + "Mountains: "+createKmlFSPlan.getNbMountain()

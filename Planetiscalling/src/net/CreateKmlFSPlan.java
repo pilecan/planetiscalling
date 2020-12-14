@@ -166,14 +166,14 @@ public class CreateKmlFSPlan{
 		String[] begin;
 		String[] end;
 		
-		while (!isfinish) {
+		altitude = Double.parseDouble(fsxPlan.getCruisingAlt())/3.28084;
+	    while (!isfinish) {
 			for (int i = 0; i < legPoints.size()-1; i++) {
 				isfound = false;
 			
 				System.out.println(legPoints.get(i));
 				begin = legPoints.get(i).getPosition().split(",");
 				end = legPoints.get(i+1).getPosition().split(",");
-				
 				
 				distanceBetween = Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
 				if (distanceBetween > 15) {
@@ -195,7 +195,6 @@ public class CreateKmlFSPlan{
 		}
 		
 		distanceBetween = 0;
-		altitude = Double.parseDouble(fsxPlan.getCruisingAlt());
 		for (int i = 0; i < legPoints.size()-1; i++) {
 			begin = legPoints.get(i).getPosition().split(",");
 			//Correct altitude if = 0
@@ -204,11 +203,10 @@ public class CreateKmlFSPlan{
 				if (alt == 0.0) {
 					legPoints.get(i).setPosition(begin[0]+","+begin[1]+","+altitude);
 				}
-				System.out.println(legPoints.get(i).getPosition().toString());
 			} catch (NumberFormatException e) {
 			}
 			end = legPoints.get(i+1).getPosition().split(",");
-			
+
 			distanceBetween += Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
 		//	altitude = (altitude < Double.parseDouble(begin[2])?Double.parseDouble(begin[2]):altitude);
 
@@ -216,12 +214,20 @@ public class CreateKmlFSPlan{
 		
 		
 		System.out.println("distanceBetween = "+distanceBetween);
-		System.out.println("altitude = "+altitude);
-		//altitude = altitude*3.2808;
+		System.out.println("altitude meter = "+altitude);
 
 		// search airports
 		searchNeighbor() ;
 		
+		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+	
+			
+		Geoinfo.searchFirstCruisingPoint(fsxPlan.getCruisingAlt(), legPoints);
+		
+		//System.err.println(pointFound.getId());
+		
+		//Geoinfo.setTocTod(altitude,legPoints);
+
 	
 		totalPlacemarks = manageXMLFile.getPlacemarks().size();
 		totalFsxPlacemarks = selectedPlacemarks.size();

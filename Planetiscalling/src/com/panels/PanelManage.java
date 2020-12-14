@@ -80,6 +80,7 @@ public class PanelManage implements Info {
 	      {
 			isFromAdd = true;
 		  	selectFlightplan("Select Flightplan Directory","flightplandir");
+	     	Utility.getInstance().savePrefProperties();
 	      }
 	    });
 
@@ -90,6 +91,7 @@ public class PanelManage implements Info {
 	      {
 			isFromAdd = true;
 	  		selectFlightplan("Select KML Directory","kmlflightplandir");
+	     	Utility.getInstance().savePrefProperties();
 	      }
 	    });
 		
@@ -101,6 +103,7 @@ public class PanelManage implements Info {
 						labelDefaultFP.setText("Current dir :"+hashFP.get(e.getItem()).getPath());
 						labelDefaultFP.setToolTipText(hashFP.get(e.getItem()).getPath());
 						Utility.getInstance().getPrefs().put("flightplandir", hashFP.get(e.getItem()).getPath());
+				     	Utility.getInstance().savePrefProperties();
 					}
 					isFromAdd = false;
 
@@ -120,6 +123,7 @@ public class PanelManage implements Info {
 						labelDefaultKML.setText("Current dir :" + hashKML.get(e.getItem()).getPath());
 						labelDefaultKML.setToolTipText(hashKML.get(e.getItem()).getPath());
 						Utility.getInstance().getPrefs().put("kmlflightplandir", hashKML.get(e.getItem()).getPath());
+				    	Utility.getInstance().savePrefProperties();
 
 					}
 					isFromAdd = false;
@@ -137,12 +141,10 @@ public class PanelManage implements Info {
 	      public void actionPerformed(ActionEvent e)
 	      {
 		  	    selectFlightplan("Select Google Earth Directory","googleearth");
-				for (Entry<Object, Object> e1 : Utility.getInstance().getPrefs().entrySet()) {
+/*				for (Entry<Object, Object> e1 : Utility.getInstance().getPrefs().entrySet()) {
 					System.out.println(e1);
 				}
-				
-				System.out.println();
-		  	
+*/		  	
 	      }
 	    });
 
@@ -176,8 +178,8 @@ public class PanelManage implements Info {
 		panelResult.add(comboFPDir);
 		panelResult.add(comboKMLDir);
 		panelResult.add(labelGoogle);
-		panelResult.add(saveButton);
-		panelResult.add(resetButton);
+		//panelResult.add(saveButton);
+		//panelResult.add(resetButton);
 		panelResult.add(buttonGoogle);
 		
 		return panelResult;
