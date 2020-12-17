@@ -28,6 +28,8 @@ import com.util.Utility;
 import net.SelectAiport;
 import net.SelectCity;
 import net.SelectMountain;
+import net.SelectNdb;
+import net.SelectVor;
 
 
 public class PlanetIsCalling extends JFrame implements Info {
@@ -45,6 +47,8 @@ public class PlanetIsCalling extends JFrame implements Info {
 	private SelectAiport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
+	private SelectVor selectVor;
+	private SelectNdb selectNdb;
 
 	
 	private List<Placemark> airports ;
@@ -69,6 +73,8 @@ public class PlanetIsCalling extends JFrame implements Info {
 		selectAiport = new SelectAiport();
 		selectCity = new SelectCity();
 		selectMountain = new SelectMountain();
+		selectVor = new SelectVor();
+		selectNdb = new SelectNdb();
 		airports = new ArrayList<>();
 
 		selectAiport.selectAll("", airports);
@@ -76,6 +82,8 @@ public class PlanetIsCalling extends JFrame implements Info {
 		
 		selectCity.selectAll("");
 		selectMountain.selectAll("");
+		selectVor.selectAll("");
+		selectNdb.selectAll("");
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -129,7 +137,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 		PanelLandmarks panelLandmarks = new PanelLandmarks();
 
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", panelPlan.getFlightplan(manageXMLFile,selectAiport,selectCity,selectMountain));
+		tabPane.addTab( "Fightplan", panelPlan.getFlightplan(manageXMLFile,selectAiport,selectCity,selectMountain,selectVor, selectNdb));
 		tabPane.addTab( "ICAO", panelAiport.getIcao(manageXMLFile,selectAiport,selectCity,selectMountain));
 		tabPane.addTab( "Airport", panelLandmarks.getAirportWorld(manageXMLFile,selectAiport,selectCity,selectMountain));
 		tabPane.addTab( "City", panelLandmarks.getCityWorld(manageXMLFile));

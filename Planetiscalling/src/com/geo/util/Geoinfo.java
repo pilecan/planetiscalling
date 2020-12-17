@@ -112,7 +112,6 @@ public class Geoinfo {
         	tod = Math.round(altitude/rate/1000);
         	
         	double angle = Geoinfo.calculateAngle(lon1, lat1, lon2, lat2 );
-        	System.out.println(angle);
         	
         	dist1 = Geoinfo.distance(lat1, lon1,lat2, lon2, 'N');
         	double todKM = tod*1.852/100;
@@ -145,11 +144,7 @@ public class Geoinfo {
 		
 	}
 	
-	public static  void createTOC(String alt, LinkedList<LegPoint> legPoints) {
-		removeInvisiblePointAndInitialiseDist(legPoints);
-		
-		double altitude = Double.parseDouble(alt);
-
+	public static  void createTOC(double altitude, LinkedList<LegPoint> legPoints) {
 		double rate = 0.444;
 		if (altitude <= 10000) {
 			rate = 0.444;
@@ -182,12 +177,7 @@ public class Geoinfo {
 		}
 		
 		if (isfound) {
-			System.out.println(legPoints.get(i-1).getId());
-			System.out.println(legPoints.get(i).getId());
         	double angle = Geoinfo.calculateAngle(legPoints.get(i-1).getLonx(), legPoints.get(i-1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i).getLaty() );
-        	System.out.println(angle);
-        	
-        	System.out.println(legPoints.get(i-1).getId()+" - "+legPoints.get(i-1).getDistFrom());
         	
         	double distRest = distForAltitude -legPoints.get(i-1).getDistFrom();
 
@@ -205,11 +195,8 @@ public class Geoinfo {
 	
 	}
 	
-	public static  void createTOD(String alt, LinkedList<LegPoint> legPoints) {
-		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+	public static  void createTOD(double altitude, LinkedList<LegPoint> legPoints) {
 		
-		double altitude = Double.parseDouble(alt);
-
 		double rate = 0.300;
 		
     	double distForAltitude = Math.round(altitude/rate/1000);
@@ -234,12 +221,7 @@ public class Geoinfo {
 		}
 		
 		if (isfound) {
-			System.out.println(legPoints.get(i+1).getId());
-			System.out.println(legPoints.get(i).getId());
         	double angle = Geoinfo.calculateAngle(legPoints.get(i+1).getLonx(), legPoints.get(i+1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i).getLaty() );
-        	System.out.println(angle);
-        	
-        	System.out.println(legPoints.get(i+1).getId()+" - "+legPoints.get(i+1).getDistFrom());
         	
         	double distRest = distForAltitude -legPoints.get(i+1).getDistFrom();
 
@@ -262,7 +244,6 @@ public class Geoinfo {
 		removeInvisiblePointAndInitialiseDist(legPoints);
 			
 		// Set top of climb
-		System.out.println("set toc-------------------------");
 		String[] first = legPoints.get(0).getPosition().split(",");
 		String[] second = legPoints.get(1).getPosition().split(",");
 		

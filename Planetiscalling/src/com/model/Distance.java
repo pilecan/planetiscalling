@@ -4,15 +4,27 @@ public class Distance {
 	private int mountainDist;
 	private int cityDist;
 	private int airportDist;
+	private int vorNdbDist;
 	private boolean line;
 	
 		
 	/**
-	 * @param city
-	 * @param mountain
-	 * @param airport
+	 * @param mountainDist
+	 * @param cityDist
+	 * @param airportDist
+	 * @param vorNdbDist
 	 * @param line
 	 */
+	public Distance(int cityDist, int mountainDist,  int airportDist, int vorNdbDist, boolean line) {
+		super();
+		this.mountainDist = mountainDist;
+		this.cityDist = cityDist;
+		this.airportDist = airportDist;
+		this.vorNdbDist = vorNdbDist;
+		this.line = line;
+	}
+
+
 	public Distance(int city, int mountain, int airport, boolean line) {
 		super();
 		this.cityDist = city;
@@ -27,6 +39,10 @@ public class Distance {
 	
 	public boolean isCity() {
 		return cityDist > 0;
+	}
+
+	public boolean isVorNdb() {
+		return vorNdbDist > 0;
 	}
 	
 	public boolean isAirport() {
@@ -60,7 +76,18 @@ public class Distance {
 
 	@Override
 	public String toString() {
-		return "Distance [mountain=" + mountainDist + ", city=" + cityDist + ", airport=" + airportDist + ", line=" + line + "]";
+		return "Distance [mountainDist=" + mountainDist + ", cityDist=" + cityDist + ", airportDist=" + airportDist
+				+ ", vorNdbDist=" + vorNdbDist + ", line=" + line + "]";
+	}
+
+
+	public int getVorNdbDist() {
+		return vorNdbDist;
+	}
+
+
+	public void setVorNdbDist(int vorNdbDist) {
+		this.vorNdbDist = vorNdbDist;
 	}
 
 	

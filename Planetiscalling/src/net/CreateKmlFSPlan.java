@@ -30,6 +30,8 @@ import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
 import com.model.Mountain;
+import com.model.Ndb;
+import com.model.Vor;
 import com.util.CreateKML;
 import com.util.Utility;
 
@@ -42,6 +44,8 @@ public class CreateKmlFSPlan{
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
 	private Map<String, Placemark> addonPlacemarks ;
+	private Map<Integer, Vor> selectedVors;
+	private Map<Integer, Ndb> selectedNdbs;
 	private List <String> addonList;
 	
 	private int totalFsxPlacemarks;
@@ -70,16 +74,12 @@ public class CreateKmlFSPlan{
 	private ReadPlanGPlan planGPlan;
 	
 
-	private boolean isGoogleEarth;
-	
 	private boolean isDone;
-	
-	private boolean isAirport;
-	private boolean isCity;
-	private boolean isMountain;
 	
 	private List<City> cities;
 	private List<Mountain> mountains;
+	private List<Vor> vors;
+	private List<Ndb> ndbs;
 	
 	private Dataline dataline;
 
@@ -90,33 +90,35 @@ public class CreateKmlFSPlan{
 	private int nbAirport;
 	private int nbCity;
 	private int nbMountain;
+	private int nbVor;
+	private int nbNdb;
 	private double distanceBetween = 0;
 	private double altitude = 0;
 
 	
 	
-	public CreateKmlFSPlan(String flightPlan,boolean isGoogleEarth,  Distance dist, 
-			ManageXMLFile xmlfile,boolean isAirport, 
-			List<City> cities, boolean isCity,
-			List<Mountain> mountains, boolean isMountain) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
+	public CreateKmlFSPlan(String flightPlan,  Distance dist, 
+			ManageXMLFile xmlfile,
+			List<City> cities, 
+			List<Mountain> mountains,
+			List<Vor> vors,
+			List<Ndb> ndbs) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
 		this.flightPlan = flightPlan;
 		this.dist = dist;
 		this.manageXMLFile = xmlfile;
 		this.selectedPlacemarks = new HashMap<>();
 		this.selectedCities = new HashMap<>();
 		this.selectedMountains = new HashMap<>();
+		this.selectedNdbs = new HashMap<>();
+		this.selectedVors = new HashMap<>();
 		this.addonPlacemarks = new HashMap<>();
-		this.isGoogleEarth = isGoogleEarth;
 		this.isDone = false;
-		this.isAirport = isAirport;
-		this.isCity = isCity;
-		this.isMountain = isMountain;
 		this.cities = cities;
 		this.mountains = mountains;
+		this.vors = vors;
+		this.ndbs = ndbs;
 		
 		this.dataline = new Dataline();
-		
-
 		
 		current = 0;
 		
@@ -213,22 +215,17 @@ public class CreateKmlFSPlan{
 		}
 		
 		
-		System.out.println("distanceBetween = "+distanceBetween);
-		System.out.println("altitude meter = "+altitude);
 
 		// search airports
 		searchNeighbor() ;
-		
-	
-			
-		Geoinfo.createTOC(fsxPlan.getCruisingAlt(), legPoints);
-		Geoinfo.createTOD(fsxPlan.getCruisingAlt(), legPoints);
-		
-		//System.err.println(pointFound.getId());
-		
-		//Geoinfo.setTocTod(altitude,legPoints);
 
-	
+		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+
+		Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
+				legPoints);
+		Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
+				legPoints);
+
 		totalPlacemarks = manageXMLFile.getPlacemarks().size();
 		totalFsxPlacemarks = selectedPlacemarks.size();
 
@@ -237,18 +234,22 @@ public class CreateKmlFSPlan{
 		System.out.println("Total Airports = "+selectedPlacemarks.size());
 		System.out.println("Total selectedCities = "+selectedCities.size());
 		System.out.println("Total selectedMountains = "+selectedMountains.size());
+		System.out.println("Total selectedVors = "+selectedVors.size());
 
 		nbAirport = selectedPlacemarks.size();
 		nbCity = selectedCities.size();
 		nbMountain = selectedMountains.size();
+		nbVor = selectedVors.size();
+		nbNdb = selectedNdbs.size();
 		
 	   	createAndsaveFlightPlan();
 		
 		isDone = true;
+		
 
 	}
 	
-	
+
 	
 	private void searchNeighbor() {
 		
@@ -298,6 +299,8 @@ public class CreateKmlFSPlan{
 				for(LegPoint point : legPoints){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
 					
+				//	System.out.println(Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N'));
+
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()){
 						selectedMountains.put(mountain.getName(),new Mountain(mountain));
 						if (dist.isLine()) {
@@ -308,6 +311,48 @@ public class CreateKmlFSPlan{
 				}
 			}
 		}
+		// search Vor
+		if (dist.isVorNdb()) {
+			for(Vor vor : vors){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
+				current++;
+				
+				for(LegPoint point : legPoints){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedVors.put(vor.getVorId(),new Vor(vor));
+						if (dist.isLine()) {
+							dataline.setData("vor",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+		//Search NDB
+		if (dist.isVorNdb()) {
+			for(Ndb ndb : ndbs){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
+				current++;
+				
+				for(LegPoint point : legPoints){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedNdbs.put(ndb.getNdbId(),new Ndb(ndb));
+						if (dist.isLine()) {
+							dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+		
+		
 		
 	}
 	
@@ -343,18 +388,14 @@ public class CreateKmlFSPlan{
  			writer.write("<Folder><name> Waypoints </name>");
 		    
 		    for (LegPoint legPoint : legPoints){
-		    	if ("1".equals(legPoint.getVisible())) {
-			    	writer.write(legPoint.buildPoint());
-		    	}
+		    	writer.write(legPoint.buildPoint());
 		    }
 
 		    //"+(altitude < 10000?"clampToGround":"absolute")+"
 			   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
 
 		    for (LegPoint legPoint : legPoints){
-		    	if ("1".equals(legPoint.getVisible())) {
-			    	writer.write(legPoint.getPosition()+"\n");
-		    	}
+		    	writer.write(legPoint.getPosition()+"\n");
 		    }
 
 		    writer.write("</coordinates></LineString></Placemark>");
@@ -388,6 +429,26 @@ public class CreateKmlFSPlan{
 			    
 			    for(Mountain mountain: selectedMountains.values()){
 			    	writer.write(createKML.buildMountainPlaceMark(mountain));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    if (dist.isVorNdb()){
+			    writer.write("<Folder><name> VOR found ("+selectedVors.size()+") </name>");
+			    
+			    
+			    for(Vor vor: selectedVors.values()){
+			    	writer.write(createKML.buildVorPlaceMark(vor));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    if (dist.isVorNdb()){
+			    writer.write("<Folder><name> NDB found ("+selectedNdbs.size()+") </name>");
+			    
+			    
+			    for(Ndb ndb: selectedNdbs.values()){
+			    	writer.write(createKML.buildNdbPlaceMark(ndb));
 			    }
 		    	
 			    writer.write("</Folder>"); 
@@ -493,11 +554,11 @@ public class CreateKmlFSPlan{
 		Distance dist = new Distance(10, 100, 20, true);
 		
 
-		new CreateKmlFSPlan(flightPlan, true,dist, 
-				manageXMLFile,true, 
-				selectCity.getCities(), true,
-				selectMountain.getMountains(),true);
-		
+	/*	new CreateKmlFSPlan(flightPlan, dist, 
+				manageXMLFile, 
+				selectCity.getCities(), 
+				selectMountain.getMountains());
+*/		
 	}
 	
 	public LinkedList<LegPoint> getLegPoints() {
@@ -613,6 +674,26 @@ public class CreateKmlFSPlan{
 
 	public double getAltitude() {
 		return altitude;
+	}
+
+
+	public int getNbVor() {
+		return nbVor;
+	}
+
+
+	public void setNbVor(int nbVor) {
+		this.nbVor = nbVor;
+	}
+
+
+	public int getNbNdb() {
+		return nbNdb;
+	}
+
+
+	public void setNbNdb(int nbNdb) {
+		this.nbNdb = nbNdb;
 	}
 
 

@@ -5,16 +5,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.cfg.util.Util;
 import com.model.City;
 import com.model.Mountain;
+import com.model.Ndb;
+import com.model.Vor;
 
 public class CreateKML {
 	private static String CASTEL_ICON ="http://maps.google.com/mapfiles/kml/shapes/ranger_station.png";
@@ -88,6 +88,9 @@ public class CreateKML {
         aMap.put("admin", "http://maps.google.com/mapfiles/kml/paddle/pink-stars.png" ); 
         aMap.put("primary", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
         aMap.put("volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" ); 
+        aMap.put("vor", "http://maps.google.com/mapfiles/kml/shapes/polygon.png" ); 
+        aMap.put("ndb", "http://maps.google.com/mapfiles/kml/shapes/triangle.png" ); 
+        
         aMap.put("mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
         ICON_MAP = Collections.unmodifiableMap(aMap);
     }
@@ -236,6 +239,64 @@ public class CreateKML {
 				+ "<description><![CDATA["+description+"]]></description>\n"
 				+ icone
 				+ "<Point><coordinates>"+city.getCoordinates()+"</coordinates></Point>\n"
+				+ "</Placemark>\n";
+	}
+	
+	
+	static public String buildVorPlaceMark(Vor vor){
+		
+		String description = "";
+		String icone = "";
+
+    	description += "<div>Ident: "+vor.getIdent()+"</div>";
+    	description += "<div>Name: "+vor.getName()+"</div>";
+    	description += "<div>Frequency: "+Util.formatVorFrequency(vor.getFrequency())+" MHz</div>";
+    	description += "<div>Range: "+vor.getRange()+"nm</div>";
+    	description += "<div>Mag. Var.: "+Util.formatMagvar(vor.getMagVar())+"</div>";
+    	description += "<div>Altitude: "+vor.getAltitude()+" ft ("+((int)Math.round(vor.getAltitude()/3.28084))+" m)</div>";
+    	description += "<div>Type: "+vor.getType()+"</div>";
+    	description += "<div>DME Only: "+(vor.getDmeOnly()==1?"Yes":"No")+"</div>";
+    	description += "<div>Region: "+vor.getRegion()+"</div>";
+		description += "<div>GPS: "+vor.getLaty()+","+vor.getLonx()+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		String coordinates = vor.getLonx()+","+vor.getLaty()+","+vor.getAltitude();
+		
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get("vor")+"</href></Icon></IconStyle></Style>";
+
+
+		return "<Placemark><name>VOR "+vor.getIdent()+"</name>\n"
+				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ icone
+				+ "<Point><coordinates>"+vor.getCoordinates()+"</coordinates></Point>\n"
+				+ "</Placemark>\n";
+	}
+	
+	static public String buildNdbPlaceMark(Ndb ndb){
+		
+		String description = "";
+		String icone = "";
+
+    	description += "<div>Ident: "+ndb.getIdent()+"</div>";
+    	description += "<div>Name: "+ndb.getName()+"</div>";
+    	description += "<div>Frequency: "+Util.formatNdbFrequency(ndb.getFrequency())+" kHz</div>";
+    	description += "<div>Range: "+ndb.getRange()+"nm</div>";
+    	description += "<div>Mag. Var.: "+Util.formatMagvar(ndb.getMagVar())+"</div>";
+    	description += "<div>Altitude: "+((int)Math.round(ndb.getAltitude()*3.28084))+"ft ("+ndb.getAltitude()+"m)</div>";
+    	description += "<div>Type: "+ndb.getType()+"</div>";
+    	description += "<div>Region: "+ndb.getRegion()+"</div>";
+		description += "<div>GPS: "+ndb.getLaty()+","+ndb.getLonx()+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		String coordinates = ndb.getLonx()+","+ndb.getLaty()+","+ndb.getAltitude();
+		
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get("ndb")+"</href></Icon></IconStyle></Style>";
+
+
+		return "<Placemark><name>NDB "+ndb.getIdent()+"</name>\n"
+				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ icone
+				+ "<Point><coordinates>"+ndb.getCoordinates()+"</coordinates></Point>\n"
 				+ "</Placemark>\n";
 	}
 

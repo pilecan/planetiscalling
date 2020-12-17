@@ -8,8 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +34,16 @@ import net.CreateKmlFSPlan.NoPoints;
 import net.SelectAiport;
 import net.SelectCity;
 import net.SelectMountain;
+import net.SelectNdb;
+import net.SelectVor;
 
 public class ReadData implements Info{
 	private ManageXMLFile manageXMLFile;
 	private SelectAiport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
+	private SelectVor selectVor;
+	private SelectNdb selectNdb;
 	private String kmlFlightPlanFile;
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
@@ -64,11 +66,14 @@ public class ReadData implements Info{
 	private boolean isMountain = true;
 	private boolean isDistance = true;
 	
-	public ReadData(JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectCity selectCity, SelectMountain selectMountain, Distance dist){
+	public ReadData(JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
+		this.selectVor =selectVor;
+		this.selectNdb	= selectNdb;
+		
 		this.panelResult = panelResult;
 		this.dataline = new Dataline();
 		selectFlightplan(dist);
@@ -134,10 +139,12 @@ public class ReadData implements Info{
 		
 		try {
 
-			CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, true, dist, 
-					manageXMLFile,true, 
-					selectCity.getCities(), true,
-					selectMountain.getMountains(),true);
+			CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, dist, 
+					manageXMLFile,
+					selectCity.getCities(), 
+					selectMountain.getMountains(),
+					selectVor.getVors(),
+					selectNdb.getNdbs());
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
 
@@ -145,6 +152,8 @@ public class ReadData implements Info{
 					+ "Flightplan: "+new File(flightplan).getName()+"<br>"
 					+ "Distance: "+Math.round(createKmlFSPlan.getDistanceBetween())+" nm<br>"
 					+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude()*3.28084)+" ft<br>"
+				    + "VORs: "+createKmlFSPlan.getNbVor()+"<br>"
+				    + "NDBs: "+createKmlFSPlan.getNbNdb()+"<br>"
 					+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
 					+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
 				    + "Mountains: "+createKmlFSPlan.getNbMountain()

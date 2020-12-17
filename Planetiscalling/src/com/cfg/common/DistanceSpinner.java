@@ -17,9 +17,11 @@ public class DistanceSpinner implements Info {
 	private SpinnerModel distanceCity;
 	private SpinnerModel distanceMountain;
 	private SpinnerModel distanceAirport;
+	private SpinnerModel distanceVorNdb;
 	public JSpinner citySpinner;
 	public JSpinner mountainSpinner;
 	public JSpinner airportSpinner;
+	public JSpinner vorNdbSpinner;
 	
 	public JCheckBox checkLinedist;
 	
@@ -27,6 +29,7 @@ public class DistanceSpinner implements Info {
 	protected JPanel panelCity;
 	private JPanel panelMountain;
 	private JPanel panelAirport;
+	private JPanel panelVorNdb;
 	private JPanel panelLineDistance;
 	
 	
@@ -52,10 +55,17 @@ public class DistanceSpinner implements Info {
 		distanceAirport =  new SpinnerNumberModel(10, 
       		  0, //min
       		  1000, //max
-      	      10);               
+      	      10);     
+		
+		distanceVorNdb =  new SpinnerNumberModel(10, 
+	      		  0, //min
+	      		  100, //max
+	      	      10);               
+
         
         panelMountain = new JPanel();
         panelAirport = new JPanel();
+        panelVorNdb = new JPanel();
         panelLineDistance = new JPanel();
         
         spinnerPanel = new JPanel();
@@ -90,6 +100,14 @@ public class DistanceSpinner implements Info {
             panelAirport = new JPanel();
             panelAirport.add(airportSpinner, BorderLayout.WEST);
             formUtility.addLastField(panelAirport, spinnerPanel);
+        }
+        if ("plan".equals(topic)) {
+            vorNdbSpinner =new JSpinner(distanceVorNdb);
+            vorNdbSpinner.setToolTipText("Vor/NDB distances in Nautical Miles");
+            formUtility.addLabel("Vor/NDB (nm)",spinnerPanel, Color.BLACK,new Font("arial", Font.BOLD, 12));
+            panelVorNdb= new JPanel();
+            panelVorNdb.add(vorNdbSpinner, BorderLayout.WEST);
+            formUtility.addLastField(panelVorNdb, spinnerPanel);
         }
 
         
@@ -144,6 +162,14 @@ public class DistanceSpinner implements Info {
 
 	public void setCheckLinedist(JCheckBox checkLinedist) {
 		this.checkLinedist = checkLinedist;
+	}
+
+	public JSpinner getVorNdbSpinner() {
+		return vorNdbSpinner;
+	}
+
+	public void setVorNdbSpinner(JSpinner vorNdbSpinner) {
+		this.vorNdbSpinner = vorNdbSpinner;
 	}
 	
 	
