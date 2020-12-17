@@ -1,14 +1,19 @@
 package com.panels;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
@@ -43,7 +48,10 @@ public class PanelPlan {
 		JPanel panelFlightplan = new JPanel();
 		panelFlightplan.setLayout(null);
 		
-		JPanel panelResult = new JPanel();
+		
+		JPanel panelResult = new JPanel(new BorderLayout());
+		panelResult.setBorder(new TitledBorder("Search Result"));
+
 		JPanel panel = new JPanel();
 		
 		panel.add(new JLabel("allo"));
@@ -60,7 +68,11 @@ public class PanelPlan {
 	    	  labelResult.setText("one moment please");
 
 	    	  readData =  new ReadData(labelResult, manageXMLFile, selectAiport, selectCity, selectMountain, selectVor, selectNdb,
-		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(),(int)distanceSpin.getVorNdbSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
+		        				 (int)distanceSpin.getAirportSpinner().getValue(),
+		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				 distanceSpin.getCheckTocTod().isSelected()));
 	    	  
 		      manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 			  buttonReload.setVisible(true); 
@@ -76,22 +88,28 @@ public class PanelPlan {
 	      {
 	    	  labelResult.setText("one moment please");
 
-	    	 readData.createFlightplan(new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), (int)distanceSpin.getAirportSpinner().getValue(),(int)distanceSpin.getVorNdbSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected())); 
+	    	 readData.createFlightplan(
+	    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+	    			 (int)distanceSpin.getMountainSpinner().getValue(), 
+	    			 (int)distanceSpin.getAirportSpinner().getValue(),
+	    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+	    			 distanceSpin.getCheckTocTod().isSelected())); 
 	    	 manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 	        
 	      }
 	    });
 		buttonReload.setVisible(false); 
 		
-		
-		buttonFP.setBounds(10, 20, 120, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 50, 170, 200);
-    	buttonReload.setBounds(10, 250, 120, 23);
+		buttonFP.setBounds(10, 20, 200, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 50, 260, 200);
+    	buttonReload.setBounds(10, 250, 200, 23);
 
-		labelResult.setBounds(300, 20, 300, 200);		
+    	panelResult.setBounds(300, 20, 280, 200);	
+		panelResult.add(labelResult);
+
 	
      	panelFlightplan.add(buttonFP);
-		panelFlightplan.add(labelResult);
+		panelFlightplan.add(panelResult);
 		panelFlightplan.add(distanceSpin.getSpinnerPanel());
      	panelFlightplan.add(buttonReload);
 
@@ -107,6 +125,7 @@ public class PanelPlan {
 
 		
 		labelResult.setBounds(300, 40, 89, 63);
+		
 		
 		JButton btn1 = new JButton("Get Airports");
 		btn1.setBounds(10, 20, 120, 23);

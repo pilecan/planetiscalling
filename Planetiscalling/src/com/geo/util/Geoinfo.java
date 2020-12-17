@@ -132,7 +132,7 @@ public class Geoinfo {
     	return coordinates;
     }
     
-	public static void removeInvisiblePointAndInitialiseDist( LinkedList<LegPoint> legPoints) {
+	public static LinkedList<LegPoint> removeInvisiblePointAndInitialiseDist( LinkedList<LegPoint> legPoints) {
 		//remove intermediate point
 		for (int i = 0; i < legPoints.size(); i++) {
 			if ("0".equals(legPoints.get(i).getVisible())) {
@@ -141,6 +141,8 @@ public class Geoinfo {
 				legPoints.get(i).setDistFrom(0);
 			}
 		}
+		
+		return legPoints;
 		
 	}
 	

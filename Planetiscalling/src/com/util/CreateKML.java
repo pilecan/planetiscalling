@@ -96,68 +96,7 @@ public class CreateKML {
     }
 
 	
-	
 
-/*	private static Map<String, String> ICON_MAP = new HashMap<String, String>();
-	static {
-		COUNTRY_MAP.put("dominican depublic", "dominicanrepublic");
-		COUNTRY_MAP.put("new zealand", "newzealand");
-		COUNTRY_MAP.put("australia", "australia");
-		COUNTRY_MAP.put("denmark", "denmark");
-		COUNTRY_MAP.put("czech republic", "czech");
-		COUNTRY_MAP.put("alaska", "alaska");
-		COUNTRY_MAP.put("costa rica", "costarica");
-		COUNTRY_MAP.put("south Africa", "southafrica");
-		COUNTRY_MAP.put("north Korea", "northkorea");
-		COUNTRY_MAP.put("korea", "southkorea");
-		COUNTRY_MAP.put("united kingom", "uk");
-		COUNTRY_MAP.put("united states", "us");
-		COUNTRY_MAP.put("spain", "spain");
-		COUNTRY_MAP.put("antilles", "antilles");
-		COUNTRY_MAP.put("argentina", "argentina");
-		COUNTRY_MAP.put("austria", "austria");
-		COUNTRY_MAP.put("bahamas", "bahamas");
-		COUNTRY_MAP.put("belgium", "belgium");
-		COUNTRY_MAP.put("brazil", "brazil");
-		COUNTRY_MAP.put("canada", "canada");
-		COUNTRY_MAP.put("chile", "chile");
-		COUNTRY_MAP.put("china", "china");
-		COUNTRY_MAP.put("colombia", "colombia");
-		COUNTRY_MAP.put("denmark", "denmark");
-		COUNTRY_MAP.put("dominicanrepublic", "dominicanrepublic");
-		COUNTRY_MAP.put("estonia", "estonia");
-		COUNTRY_MAP.put("finland", "finland");
-		COUNTRY_MAP.put("france", "france");
-		COUNTRY_MAP.put("germany", "germany");
-		COUNTRY_MAP.put("greece", "greece");
-		COUNTRY_MAP.put("guatemala", "guatemala");
-		COUNTRY_MAP.put("hawaii", "hawaii");
-		COUNTRY_MAP.put("hungary", "hungary");
-		COUNTRY_MAP.put("india", "india");
-		COUNTRY_MAP.put("indonesia", "indonesia");
-		COUNTRY_MAP.put("ireland", "ireland");
-		COUNTRY_MAP.put("israel", "israel");
-		COUNTRY_MAP.put("italy", "italy");
-		COUNTRY_MAP.put("japan", "japan");
-		COUNTRY_MAP.put("mexico", "mexico");
-		COUNTRY_MAP.put("netherlands", "netherlands");
-		COUNTRY_MAP.put("newzealand", "newzealand");
-		COUNTRY_MAP.put("norway", "norway");
-		COUNTRY_MAP.put("poland", "poland");
-		COUNTRY_MAP.put("portugal", "portugal");
-		COUNTRY_MAP.put("russia", "russia");
-		COUNTRY_MAP.put("spain", "spain");
-		COUNTRY_MAP.put("sweden", "sweden");
-		COUNTRY_MAP.put("switzerland", "switzerland");
-		COUNTRY_MAP.put("turkey", "turkey");
-		COUNTRY_MAP.put("ukraine", "ukraine");
-		COUNTRY_MAP.put("venezuela", "venezuela");
-		COUNTRY_MAP.put("puerto rico", "puertorico");
-
-		Collections.unmodifiableMap(COUNTRY_MAP);
-	}
-
-*/	
 	
 	public CreateKML() {
 		super();

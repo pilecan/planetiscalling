@@ -1,5 +1,6 @@
 package com.panels;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,9 +15,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.TitledBorder;
 
 import com.cfg.common.Dataline;
 import com.cfg.common.DistanceSpinner;
+import com.cfg.common.Info;
 import com.cfg.file.ManageXMLFile;
 import com.model.Distance;
 import com.util.ReadData;
@@ -26,7 +29,7 @@ import net.SelectCity;
 import net.SelectDB;
 import net.SelectMountain;
 
-public class PanelLandmarks {
+public class PanelLandmarks implements Info {
 
 	/**
 	 * 
@@ -36,7 +39,7 @@ public class PanelLandmarks {
 	private Map<String, Map<String,List<String>>> mapAll = new TreeMap<>();
 	private Map<String, List<String>> mapState = new TreeMap<>();
 
-	private JPanel panelResult;
+	private JPanel panelLandMark;
 	private JPanel panelCombo;
 
 	
@@ -76,9 +79,12 @@ public class PanelLandmarks {
 		distanceSpin.initPanelDistances("airport");
 		
 		labelHeader = new JLabel("Select Airport cities to find their surrounding Cities and Mountains :");
-		panelResult = new JPanel();
+		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
-		panelResult.setLayout(null);
+		panelLandMark.setLayout(null);
+		JPanel panelResult = new JPanel(new BorderLayout());
+		panelResult.setBorder(new TitledBorder("Search Result"));
+
 
 		selectDB = new SelectDB();
 		selectDB.selectAirportTableNew();
@@ -146,7 +152,9 @@ public class PanelLandmarks {
 		
 		clearButton.setBounds(120, 245, 90, 23);
   	    searchButton.setBounds(10, 245, 90, 23);
-  	  	labelResult.setBounds(260, 200, 200, 63);
+    	panelResult.setBounds(300, 20, 280, 200);	
+		panelResult.add(labelResult);
+
 
 		searchButton.addActionListener(new ActionListener()
 		    {
@@ -165,14 +173,14 @@ public class PanelLandmarks {
 	      }
 	    });
 		
-		panelResult.add(labelHeader);
-		panelResult.add(panelCombo);
-		panelResult.add(distanceSpin.getSpinnerPanel());
-		panelResult.add(searchButton);
-		panelResult.add(clearButton);
-		panelResult.add(labelResult);
+		panelLandMark.add(labelHeader);
+		panelLandMark.add(panelCombo);
+		panelLandMark.add(distanceSpin.getSpinnerPanel());
+		panelLandMark.add(searchButton);
+		panelLandMark.add(clearButton);
+		panelLandMark.add(labelResult);
 		
-		return panelResult;
+		return panelLandMark;
 	
 	}
 	
@@ -199,9 +207,9 @@ public class PanelLandmarks {
 		distanceSpin.initPanelDistances("city");
 
 		labelHeader = new JLabel("Select Cities or States to find their surrounding Airports and Mountains :");
-		panelResult = new JPanel();
+		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
-		panelResult.setLayout(null);
+		panelLandMark.setLayout(null);
 
 		selectDB = new SelectDB();
 		selectDB.selectAirportTableNew();
@@ -298,14 +306,14 @@ public class PanelLandmarks {
 	      }
 	    });
 		
-		panelResult.add(labelHeader);
-		panelResult.add(panelCombo);
- 		panelResult.add(distanceSpin.getSpinnerPanel());
-		panelResult.add(searchButton);
-		panelResult.add(clearButton);
-		panelResult.add(labelResult);
+		panelLandMark.add(labelHeader);
+		panelLandMark.add(panelCombo);
+ 		panelLandMark.add(distanceSpin.getSpinnerPanel());
+		panelLandMark.add(searchButton);
+		panelLandMark.add(clearButton);
+		panelLandMark.add(labelResult);
 		
-		return panelResult;
+		return panelLandMark;
 	
 	}
 	 /**
@@ -321,9 +329,9 @@ public class PanelLandmarks {
 		distanceSpin.initPanelDistances("mountain");
 		
 		labelHeader = new JLabel("Mountain to find their surrounding Airports and Cities:");
-		panelResult = new JPanel();
+		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
-		panelResult.setLayout(null);
+		panelLandMark.setLayout(null);
 
 		selectDB = new SelectDB();
 		selectDB.selectAirportTableNew();
@@ -335,13 +343,10 @@ public class PanelLandmarks {
 		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryMountain());
 		final JComboBox<String> comboMountain = new JComboBox<>(selectDB.getMountain("Afghanistan"));
 		comboMountain.addItem(" All");
+		
+		comboCountry.setPreferredSize(new Dimension(240,25));
+		comboMountain.setPreferredSize(new Dimension(240,25));
 
-//        selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboMountain.getSelectedItem(), comboMountain.getItemCount());
-
-
-		comboCountry.setPreferredSize(new Dimension(200,25));
-        comboMountain.setPreferredSize(new Dimension(200,25));
-        
         
 		comboCountry.addItemListener(new ItemListener() {
 			@Override
@@ -368,7 +373,7 @@ public class PanelLandmarks {
 		JButton clearButton = new JButton("Reset");
 			
 		labelHeader.setBounds(10, 5, 330, 23);
-		panelCombo.setBounds(5, 30, 240, 60);
+		panelCombo.setBounds(10, 30, 240, 60);
 		
 		distanceSpin.getSpinnerPanel().setBounds(10, 95, 320, 100);
 		
@@ -393,14 +398,14 @@ public class PanelLandmarks {
 	      }
 	    });
 		
-		panelResult.add(labelHeader);
-		panelResult.add(panelCombo);
- 		panelResult.add(distanceSpin.getSpinnerPanel());
-		panelResult.add(searchButton);
-		panelResult.add(clearButton);
-		panelResult.add(labelResult);
+		panelLandMark.add(labelHeader);
+		panelLandMark.add(panelCombo);
+ 		panelLandMark.add(distanceSpin.getSpinnerPanel());
+		panelLandMark.add(searchButton);
+		panelLandMark.add(clearButton);
+		panelLandMark.add(labelResult);
 		
-		return panelResult;
+		return panelLandMark;
 	
 	}
 	

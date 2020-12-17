@@ -79,6 +79,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 		selectAiport.selectAll("", airports);
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
+		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
 		
 		selectCity.selectAll("");
 		selectMountain.selectAll("");

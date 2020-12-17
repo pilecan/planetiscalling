@@ -26,6 +26,7 @@ import com.cfg.model.Placemark;
 import com.cfg.plan.ReadFs9Plan;
 import com.cfg.plan.ReadFsxPlan;
 import com.cfg.plan.ReadPlanGPlan;
+import com.cfg.util.Util;
 import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
@@ -40,7 +41,7 @@ public class CreateKmlFSPlan{
 	
 	private static String flightPlan = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
 
-	private Map<String, Placemark> selectedPlacemarks ;
+	private Map<String, Placemark> selectedAirports ;
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
 	private Map<String, Placemark> addonPlacemarks ;
@@ -106,7 +107,7 @@ public class CreateKmlFSPlan{
 		this.flightPlan = flightPlan;
 		this.dist = dist;
 		this.manageXMLFile = xmlfile;
-		this.selectedPlacemarks = new HashMap<>();
+		this.selectedAirports = new HashMap<>();
 		this.selectedCities = new HashMap<>();
 		this.selectedMountains = new HashMap<>();
 		this.selectedNdbs = new HashMap<>();
@@ -214,29 +215,34 @@ public class CreateKmlFSPlan{
 
 		}
 		
-		
 
 		// search airports
-		searchNeighbor() ;
+		searchNeighbor();
 
-		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		System.out.println(legPoints.size());
 
-		Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
-				legPoints);
-		Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
-				legPoints);
+		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		System.out.println(legPoints.size());
+
+		if (dist.isLine()) {
+			Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
+					legPoints);
+			Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
+					legPoints);
+		}
 
 		totalPlacemarks = manageXMLFile.getPlacemarks().size();
-		totalFsxPlacemarks = selectedPlacemarks.size();
-
+		
+		totalFsxPlacemarks = selectedAirports.size();
+		
 		System.out.println("Seconds = "+(System.currentTimeMillis()-start)/1000);
 		System.out.println("Total waypoints = "+legPoints.size() );
-		System.out.println("Total Airports = "+selectedPlacemarks.size());
+		System.out.println("Total Airports = "+selectedAirports.size());
 		System.out.println("Total selectedCities = "+selectedCities.size());
 		System.out.println("Total selectedMountains = "+selectedMountains.size());
 		System.out.println("Total selectedVors = "+selectedVors.size());
 
-		nbAirport = selectedPlacemarks.size();
+		nbAirport = selectedAirports.size();
 		nbCity = selectedCities.size();
 		nbMountain = selectedMountains.size();
 		nbVor = selectedVors.size();
@@ -262,14 +268,19 @@ public class CreateKmlFSPlan{
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()){
-						selectedPlacemarks.put(placemark.getName(),new Placemark(placemark));
+						selectedAirports.put(placemark.getName(),new Placemark(placemark));
 						if (dist.isLine()) {
-							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+							//dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
 					}
 				}
 			}
+		} else if (!dist.isAirport()) { //Load the last and first for the flightplan
+			selectedAirports.put(legPoints.get(0).getId(),manageXMLFile.getHashPlacemark().get(legPoints.get(0).getId()));
+			selectedAirports.put(legPoints.get(legPoints.size()-1).getId(),manageXMLFile.getHashPlacemark().get(legPoints.get(legPoints.size()-1).getId()));
+			dist.setAirportDist(selectedAirports.size());
 		}
+
 		
 		// search cities
 		if (dist.isCity()) {
@@ -283,7 +294,7 @@ public class CreateKmlFSPlan{
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
 						selectedCities.put(city.getCityName(),new City(city));
 						if (dist.isLine()) {
-							dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+							//dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
 					}
 				}
@@ -304,7 +315,7 @@ public class CreateKmlFSPlan{
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()){
 						selectedMountains.put(mountain.getName(),new Mountain(mountain));
 						if (dist.isLine()) {
-							dataline.setData("mountain",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+							//dataline.setData("mountain",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
 						
 					}
@@ -323,7 +334,7 @@ public class CreateKmlFSPlan{
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
 						selectedVors.put(vor.getVorId(),new Vor(vor));
 						if (dist.isLine()) {
-							dataline.setData("vor",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+							//dataline.setData("vor",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
 						
 					}
@@ -343,7 +354,7 @@ public class CreateKmlFSPlan{
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
 						selectedNdbs.put(ndb.getNdbId(),new Ndb(ndb));
 						if (dist.isLine()) {
-							dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+							//dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
 						
 					}
@@ -388,14 +399,20 @@ public class CreateKmlFSPlan{
  			writer.write("<Folder><name> Waypoints </name>");
 		    
 		    for (LegPoint legPoint : legPoints){
-		    	writer.write(legPoint.buildPoint());
+				if ("1".equals(legPoint.getVisible())) {
+			    	writer.write(legPoint.buildPoint());
+				}
+		    	
 		    }
 
 		    //"+(altitude < 10000?"clampToGround":"absolute")+"
 			   writer.write("<Placemark> <styleUrl>#msn_ylw-pushpin</styleUrl><LineString><extrude>1</extrude><tessellate>1</tessellate><altitudeMode>absolute</altitudeMode><coordinates>"); 
 
 		    for (LegPoint legPoint : legPoints){
-		    	writer.write(legPoint.getPosition()+"\n");
+				if ("1".equals(legPoint.getVisible())) {
+			    	writer.write(legPoint.getPosition()+"\n");
+				}
+
 		    }
 
 		    writer.write("</coordinates></LineString></Placemark>");
@@ -404,9 +421,9 @@ public class CreateKmlFSPlan{
 		    writer.write("</Folder>");
 		    
 		    if (dist.isAirport()){
-			    writer.write("<Folder><name> FS2020 Airports found ("+selectedPlacemarks.size()+") </name>");
+			    writer.write("<Folder><name> FS2020 Airports found ("+selectedAirports.size()+") </name>");
 			    
-			    for(Placemark placemark:selectedPlacemarks.values()){
+			    for(Placemark placemark:selectedAirports.values()){
 			    	writer.write(placemark.buildXML("fsx_airport"));
 			    }
 		    	
