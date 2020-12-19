@@ -28,6 +28,7 @@ import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
 import com.model.Mountain;
+import com.model.Result;
 
 import net.CreateKmlFSPlan;
 import net.CreateKmlFSPlan.NoPoints;
@@ -51,12 +52,11 @@ public class ReadData implements Info{
 	
 	private CreateKML createKML;
 	
-	private JLabel panelResult;
-	
 	private String flightplan ;
 	
 	private String flightplanName;
 	
+	private Result result;
 	
 	private Dataline dataline;
 	private Distance dist;
@@ -66,7 +66,7 @@ public class ReadData implements Info{
 	private boolean isMountain = true;
 	private boolean isDistance = true;
 	
-	public ReadData(JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
+	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
@@ -74,7 +74,7 @@ public class ReadData implements Info{
 		this.selectVor =selectVor;
 		this.selectNdb	= selectNdb;
 		
-		this.panelResult = panelResult;
+		this.result = result;
 		this.dataline = new Dataline();
 		selectFlightplan(dist);
 		
@@ -83,7 +83,6 @@ public class ReadData implements Info{
 	public ReadData(String icaos, JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectMountain selectMountain){
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
-		this.panelResult = panelResult;
 		this.selectMountain = selectMountain;
 		
 		
@@ -92,10 +91,10 @@ public class ReadData implements Info{
 
 	}
 	
-	public ReadData(JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectMountain selectMountain){
+	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectMountain selectMountain){
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
-		this.panelResult = panelResult;
+		this.result = result;
 		this.selectMountain = selectMountain;
 		
 		creatIcaoAirports();
@@ -148,16 +147,14 @@ public class ReadData implements Info{
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
 
-			panelResult.setText("<html>"
-					+ "Flightplan: "+new File(flightplan).getName()+"<br>"
-					+ "Distance: "+Math.round(createKmlFSPlan.getDistanceBetween())+" nm<br>"
-					+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude()*3.28084)+" ft<br>"
-				    + "VORs: "+createKmlFSPlan.getNbVor()+"<br>"
-				    + "NDBs: "+createKmlFSPlan.getNbNdb()+"<br>"
-					+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
-					+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
-				    + "Mountains: "+createKmlFSPlan.getNbMountain()
-				    +" </html>");
+			result.setFlightplan(new File(flightplan).getName()); 
+			result.setDistance(Math.round(createKmlFSPlan.getDistanceBetween())); 
+			result.setAltitude(Math.round(createKmlFSPlan.getAltitude()*3.28084)); 
+			result.setVors(createKmlFSPlan.getNbVor()); 
+			result.setNdbs(createKmlFSPlan.getNbNdb()); 
+			result.setAirports(createKmlFSPlan.getNbAirport()); 
+			result.setCities(createKmlFSPlan.getNbCity()); 
+			result.setMountains(createKmlFSPlan.getNbMountain());
 			
 			
 		} catch (NullPointerException | NoPoints | IOException e) {
@@ -260,10 +257,7 @@ public class ReadData implements Info{
 
 			
 	    }
-		panelResult.setText("<html>"
-				+ "Airports found: "+placemarks.size()+"<br>"
-			    +" </html>");
- 	
+		
     }
     
     private void searchAiportNeighbor(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
@@ -739,6 +733,14 @@ public class ReadData implements Info{
 
 	public String getKmlFlightPlanFile() {
 		return kmlFlightPlanFile;
+	}
+
+	public Result getResult() {
+		return result;
+	}
+
+	public void setResult(Result result) {
+		this.result = result;
 	}
 
 }

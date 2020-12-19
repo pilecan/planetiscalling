@@ -126,17 +126,19 @@ public class CreateKmlFSPlan{
 		
 		String text = new String(Files.readAllBytes(Paths.get(flightPlan)), StandardCharsets.UTF_8);
 		
-		if (text.contains("[flightplan]")){
-			fs9Plan = new ReadFs9Plan(flightPlan);
-			legPoints = fs9Plan.getLegPoints();
-		} else if (text.contains("<ATCWaypoint")){
+		
 			fsxPlan = new ReadFsxPlan(flightPlan);
 			legPoints = fsxPlan.getLegPoints();
-		} else if (text.contains("<Waypoint>")){
-			planGPlan = new ReadPlanGPlan(flightPlan);
-			legPoints = planGPlan.getLegPoints();
+		
+			if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(fsxPlan.getCruisingAlt())) {
+				fsxPlan.modifyAltitude(legPoints, Double.parseDouble(fsxPlan.getCruisingAlt()), dist.getAltitude());
+				fsxPlan.setCruisingAlt(dist.getAltitude()+"");
+
+			} else {
+				System.out.println();
+			}
 			
-		}
+
 		
 		if (legPoints.size() > 0){
 			makeFlightPlan();
@@ -168,13 +170,14 @@ public class CreateKmlFSPlan{
 		boolean isfinish = false;
 		String[] begin;
 		String[] end;
+			
 		
 		altitude = Double.parseDouble(fsxPlan.getCruisingAlt())/3.28084;
 	    while (!isfinish) {
 			for (int i = 0; i < legPoints.size()-1; i++) {
 				isfound = false;
 			
-				System.out.println(legPoints.get(i));
+			//	System.out.println(legPoints.get(i));
 				begin = legPoints.get(i).getPosition().split(",");
 				end = legPoints.get(i+1).getPosition().split(",");
 				
@@ -182,12 +185,8 @@ public class CreateKmlFSPlan{
 				if (distanceBetween > 15) {
 					
 					 String midpoint = Geoinfo.midpoint(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]));
-/*						System.out.println(Double.parseDouble(begin[1])+","+ Double.parseDouble(begin[0]));
-						System.out.println(Double.parseDouble(end[1])+","+Double.parseDouble(end[0]));
-						System.out.println("midpoint - > "+midpoint);
-*/					 LegPoint legPoint = new LegPoint("MID"+(cptNew++),"VOR",midpoint+","+legPoints.get(i+1).getPosition().split(",")[2],"0"); 
+				     LegPoint legPoint = new LegPoint("MID"+(cptNew++),"VOR",midpoint+","+legPoints.get(i+1).getPosition().split(",")[2],"0"); 
 					 
-					//System.out.println(legPoint.toString());
 				   legPoints.add(i+1,legPoint);
 					 
 				   i++;

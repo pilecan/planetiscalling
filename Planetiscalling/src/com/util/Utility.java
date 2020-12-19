@@ -5,12 +5,16 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,6 +27,7 @@ import java.util.Properties;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import com.cfg.util.Util;
 import com.main.PlanetIsCalling;
 
 
@@ -209,6 +214,75 @@ public class Utility {
 		
 		return flightplanName;
     }
+    
+    
+	public void changeAltitude(String filePlan, Double cruzeAltitude, Double newAltitude) throws IOException {
+		
+		String flightplan = new String(Files.readAllBytes(Paths.get(filePlan)), StandardCharsets.UTF_8);
+		boolean isLastWpAirport = false;
+		String[] row = flightplan.split("\\r\\n");
+		
+		for (int i = 0; i < row.length; i++) {
+			
+			if (row[i].contains("ATCWaypointType")) {
+				isLastWpAirport = (row[i].contains("Airport"));
+			}
+
+			if (row[i].contains("CruisingAlt")) {
+			
+				row[i] = row[i].replace(cruzeAltitude.intValue()+"", newAltitude.intValue()+"");
+			}
+
+			if (row[i].contains("WorldPosition") && !isLastWpAirport) {
+				String[] line = row[i].split(",");
+				String strAltitude = line[2].replace("</WorldPosition>", "");
+				System.out.println(strAltitude +" -> "+Util.formatAltitude(Util.modifyAltitude(cruzeAltitude, Double.parseDouble(strAltitude), newAltitude)));
+				row[i] = row[i].replace(strAltitude, Util.formatAltitude(Util.modifyAltitude(cruzeAltitude, Double.parseDouble(strAltitude), newAltitude)));
+			}
+		}
+		
+		System.out.println(row.length);
+		
+		saveNewFlightPlan(filePlan, row);
+		
+		//System.out.println(Util.formatAltitude(Util.modifyAltitude(cruzeAltitude, +002257.00, newAltitude)));
+
+	}
+	
+	
+	public void saveNewFlightPlan(String flightPlanFile, String[] row){
+		Writer writer = null;
+		
+ 			
+			try {
+
+				writer = new BufferedWriter(new OutputStreamWriter(
+				      new FileOutputStream(flightPlanFile), "utf-8"));
+				for (int i = 0; i < row.length; i++) {
+					writer.write(row[i]+"\n");
+				}
+				
+				//Create KML Header
+				
+				
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} finally {
+				   try {writer.close();} catch (Exception ex) {}
+			}		
+		    
+		    
+		    
+ 		}
+
+  
 
 	
 

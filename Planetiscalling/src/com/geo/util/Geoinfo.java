@@ -237,11 +237,8 @@ public class Geoinfo {
     		legPoints.add(i+1,legPoint);
 
  		}
-		
-	
 	}
 
-    
 	public static void setTocTod(double altitude, LinkedList<LegPoint> legPoints) {
 		removeInvisiblePointAndInitialiseDist(legPoints);
 			

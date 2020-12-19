@@ -19,6 +19,7 @@ public class DistanceSpinner implements Info {
 	private SpinnerModel distanceMountain;
 	private SpinnerModel distanceAirport;
 	private SpinnerModel distanceVorNdb;
+	
 	public JSpinner citySpinner;
 	public JSpinner mountainSpinner;
 	public JSpinner airportSpinner;
@@ -64,7 +65,6 @@ public class DistanceSpinner implements Info {
 	      		  100, //max
 	      	      10);               
 
-        
         panelMountain = new JPanel();
         panelAirport = new JPanel();
         panelVorNdb = new JPanel();
@@ -74,7 +74,7 @@ public class DistanceSpinner implements Info {
         spinnerPanel.setLayout(new GridBagLayout());
         FormUtility formUtility = new FormUtility();
 
-        
+
         if (!"city".equals(topic)) {
 	        citySpinner=new JSpinner(distanceCity);
 	        citySpinner.setPreferredSize( new Dimension (80,25) );
@@ -96,6 +96,7 @@ public class DistanceSpinner implements Info {
             formUtility.addLastField(panelMountain, spinnerPanel);
 
         }
+        
         if (!"airport".equals(topic)) {
             airportSpinner=new JSpinner(distanceAirport);
             airportSpinner.setPreferredSize( new Dimension (80,25) );
@@ -115,8 +116,6 @@ public class DistanceSpinner implements Info {
             panelVorNdb.add(vorNdbSpinner, BorderLayout.WEST);
             formUtility.addLastField(panelVorNdb, spinnerPanel);
         }
-
-        
                 
         if (!"plan".equals(topic)) {
             checkLinedist = new JCheckBox();
@@ -133,13 +132,12 @@ public class DistanceSpinner implements Info {
         	checkTocTod.setSelected(true);
         	checkTocTod.setToolTipText("Top of Climb and Top of Descent to the Flightplan");
 
-            formUtility.addLabel("Top of Climb or Descent",spinnerPanel, Color.BLACK,fontText);
+            formUtility.addLabel("Top of Climb and Descent",spinnerPanel, Color.BLACK,fontText);
             panelCheckbox = new JPanel();
             panelCheckbox.add(checkTocTod, BorderLayout.WEST);
             formUtility.addLastField(panelCheckbox, spinnerPanel);
      	
-        }
-      
+        } 
 		
 	}
 
