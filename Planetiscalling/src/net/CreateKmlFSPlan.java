@@ -49,10 +49,6 @@ public class CreateKmlFSPlan{
 	private Map<Integer, Ndb> selectedNdbs;
 	private List <String> addonList;
 	
-	private int totalFsxPlacemarks;
-	private int totalPlacemarks;
-	private int totalAddonPlacemarks;
-
 	private String kmlFlightPlanFile = "/data/last_flightplan.kml";
 
 	private ManageXMLFile manageXMLFile;
@@ -95,6 +91,9 @@ public class CreateKmlFSPlan{
 	private int nbNdb;
 	private double distanceBetween = 0;
 	private double altitude = 0;
+	private String departure;
+	private String destination;
+
 
 	
 	
@@ -122,21 +121,17 @@ public class CreateKmlFSPlan{
 		this.dataline = new Dataline();
 		
 		current = 0;
-		
-		
-		String text = new String(Files.readAllBytes(Paths.get(flightPlan)), StandardCharsets.UTF_8);
-		
-		
-			fsxPlan = new ReadFsxPlan(flightPlan);
-			legPoints = fsxPlan.getLegPoints();
-		
-			if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(fsxPlan.getCruisingAlt())) {
-				fsxPlan.modifyAltitude(legPoints, Double.parseDouble(fsxPlan.getCruisingAlt()), dist.getAltitude());
-				fsxPlan.setCruisingAlt(dist.getAltitude()+"");
+	
+		fsxPlan = new ReadFsxPlan(flightPlan);
+		legPoints = fsxPlan.getLegPoints();
+	
+		//check if altitude as been changed 
+		if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(fsxPlan.getCruisingAlt())) {
+			fsxPlan.modifyAltitude(legPoints, Double.parseDouble(fsxPlan.getCruisingAlt()), dist.getAltitude());
+			fsxPlan.setCruisingAlt(dist.getAltitude()+"");
 
-			} else {
-				System.out.println();
-			}
+		} else {
+		}
 			
 
 		
@@ -196,6 +191,7 @@ public class CreateKmlFSPlan{
 			isfinish = !isfound;
 		}
 		
+	    //Search distance of flightplan
 		distanceBetween = 0;
 		for (int i = 0; i < legPoints.size()-1; i++) {
 			begin = legPoints.get(i).getPosition().split(",");
@@ -210,36 +206,56 @@ public class CreateKmlFSPlan{
 			end = legPoints.get(i+1).getPosition().split(",");
 
 			distanceBetween += Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
-		//	altitude = (altitude < Double.parseDouble(begin[2])?Double.parseDouble(begin[2]):altitude);
 
 		}
 		
-
+		
 		// search airports
 		searchNeighbor();
 
-		System.out.println(legPoints.size());
-
 		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
-		System.out.println(legPoints.size());
 
+		
+		//dist.isLine = isTocTod
 		if (dist.isLine()) {
 			Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
 					legPoints);
 			Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
 					legPoints);
+
+			int toc = 0;
+			int tod = 0;
+			for (int i = 0; i < legPoints.size(); i++) {
+				if ("TOC".equals(legPoints.get(i).getId())){
+					toc = i;
+				}
+				if ("TOD".equals(legPoints.get(i).getId())){
+					tod = i;
+				}
+			}
+			
+			System.out.println(legPoints.get(toc).toString());
+			double dist1 = Geoinfo.distance(legPoints.get(toc).getLaty(), legPoints.get(0).getLaty(), legPoints.get(toc).getLonx(), legPoints.get(0).getLonx());
+			System.out.println(legPoints.get(tod).toString());
+			double dist2 = Geoinfo.distance(legPoints.get(tod).getLaty(), legPoints.get(legPoints.size()-1).getLaty(), legPoints.get(tod).getLonx(), legPoints.get(legPoints.size()-1).getLonx());
+
+			double diffElev1 =  legPoints.get(toc).getAltitude()-legPoints.get(0).getAltitude();
+			double diffElev2 =  legPoints.get(tod).getAltitude()-legPoints.get(legPoints.size()-1).getAltitude();
+		    System.out.println(dist1+" - "+diffElev1);
+		    System.out.println(dist2+" - "+diffElev2);
+		    
+		    System.out.println();
+		 
 		}
 
-		totalPlacemarks = manageXMLFile.getPlacemarks().size();
 		
-		totalFsxPlacemarks = selectedAirports.size();
 		
-		System.out.println("Seconds = "+(System.currentTimeMillis()-start)/1000);
-		System.out.println("Total waypoints = "+legPoints.size() );
-		System.out.println("Total Airports = "+selectedAirports.size());
-		System.out.println("Total selectedCities = "+selectedCities.size());
-		System.out.println("Total selectedMountains = "+selectedMountains.size());
-		System.out.println("Total selectedVors = "+selectedVors.size());
+
+		
+		
+
+		this.departure = selectedAirports.get(legPoints.get(0).getId()).getName();
+		this.destination = selectedAirports.get(legPoints.get(legPoints.size()-1).getId()).getName();
 
 		nbAirport = selectedAirports.size();
 		nbCity = selectedCities.size();
@@ -365,15 +381,6 @@ public class CreateKmlFSPlan{
 		
 		
 	}
-	
-	public boolean done(){
-		return isDone;
-	}
-	
-	
-
-	
-
 	
 	public  synchronized void createAndsaveFlightPlan(){
 		Writer writer = null;
@@ -610,29 +617,6 @@ public class CreateKmlFSPlan{
 		this.addonList = addonList;
 	}
 
-	public int getTotalFsxPlacemarks() {
-		return totalFsxPlacemarks;
-	}
-
-	public void setTotalFsxPlacemarks(int totalFsxPlacemarks) {
-		this.totalFsxPlacemarks = totalFsxPlacemarks;
-	}
-
-	public int getTotalAddonPlacemarks() {
-		return totalAddonPlacemarks;
-	}
-
-	public void setTotalAddonPlacemarks(int totalAddonPlacemarks) {
-		this.totalAddonPlacemarks = totalAddonPlacemarks;
-	}
-
-	public int getTotalPlacemarks() {
-		return totalPlacemarks;
-	}
-
-	public void setTotalPlacemarks(int totalPlacemarks) {
-		this.totalPlacemarks = totalPlacemarks;
-	}
 
 	public int getCurrent() {
 		return current;
@@ -710,6 +694,26 @@ public class CreateKmlFSPlan{
 
 	public void setNbNdb(int nbNdb) {
 		this.nbNdb = nbNdb;
+	}
+
+
+	public String getDeparture() {
+		return departure;
+	}
+
+
+	public void setDeparture(String departure) {
+		this.departure = departure;
+	}
+
+
+	public String getDestination() {
+		return destination;
+	}
+
+
+	public void setDestination(String destination) {
+		this.destination = destination;
 	}
 
 
