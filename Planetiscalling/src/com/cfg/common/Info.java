@@ -14,6 +14,8 @@ public interface Info {
 	Color[] colorBackArea = {new Color(247,247,255),new Color(247,247,255),new Color(247,247,255)};
 	Color[] colorBlueText = {new Color(11,40,117),new Color(11,40,117),new Color(11,40,117)};
     Font fontText 	= new Font("arial", Font.BOLD, 12);
+    Font fontTextItalic 	= new Font("arial", Font.BOLD+Font.ITALIC, 13);
+
     Font fontList 	= new Font("arial", Font.BOLD, 12);
     Font fontTitle 	= new Font("arial", Font.BOLD, 13);
     

@@ -1,15 +1,25 @@
 package com.model;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.cfg.common.Info;
+import com.cfg.model.Placemark;
 import com.cfg.util.FormUtility;
 
 public class Result implements Info{
@@ -21,14 +31,19 @@ public class Result implements Info{
 	private int airports;
 	private int cities;
 	private int mountains;
+	private String departure;
+	private String destination;
 	
 	private SpinnerModel altitudeModel;
 	public JSpinner altitudeSpinner;
 	private JPanel panelAltitude;
 	private JPanel resultPanel; 
     private FormUtility formUtility;
+	private JPanel panel;
+	private JLabel label;
 
-	
+    private JList list;
+    private DefaultListModel listAirport;
 	
 	public Result() {
 		super();
@@ -51,19 +66,26 @@ public class Result implements Info{
 	}
 
 	public JPanel getResultPanel() {
-		JPanel panel;
-		JLabel label;
       panelAltitude = new JPanel();
       resultPanel = new JPanel();
       resultPanel.setLayout(new GridBagLayout());
+      
+      JTextField textField = new JTextField();
+        
+      
       formUtility = new FormUtility();
 	
       formUtility.addLabel("FlightPlan:",resultPanel,colorForground[0],fontText);
-      label = new JLabel(this.flightplan);
-      label.setToolTipText(this.flightplan);
+      textField.setToolTipText(this.flightplan);
+      textField.setText(this.flightplan);
+      textField.setColumns(15);
+      textField.setEditable(false);
+      textField.setBackground(Color.lightGray);
+      textField.getCaret().setDot(0);
+ 
       panel = new JPanel();
       panel.setLayout(new BorderLayout());
-      panel.add(label, BorderLayout.WEST);
+      panel.add(textField, BorderLayout.WEST);
       formUtility.addLastField(panel, resultPanel);
 		
       formUtility.addLabel("Distance:",resultPanel,colorForground[0],fontText);
@@ -72,6 +94,14 @@ public class Result implements Info{
       panel.setLayout(new BorderLayout());
       panel.add(label, BorderLayout.WEST);
       formUtility.addLastField(panel, resultPanel);
+      
+      formUtility.addLabel("Departure/Destinaton:",resultPanel,colorForground[0],fontText);
+      label = new JLabel(this.departure+" -> "+this.destination);
+      panel = new JPanel();
+      panel.setLayout(new BorderLayout());
+      panel.add(label, BorderLayout.WEST);
+      formUtility.addLastField(panel, resultPanel);
+
 
 	  altitudeModel =  new SpinnerNumberModel(altitude, 
       		  500, //min
@@ -79,23 +109,42 @@ public class Result implements Info{
       	      500);     
 	  
 	  
-    // altitudeModel.setValue(altitude);
       altitudeSpinner=new JSpinner(altitudeModel);
+	  altitudeSpinner.setPreferredSize( new Dimension (80,10) );
       altitudeSpinner.setToolTipText("Change altitude of flightplan");
       formUtility.addLabel("Altitude:", resultPanel,colorForground[0],fontText);
-      panel = new JPanel();
-      panel.setLayout(new BorderLayout());
-      panel.add(altitudeSpinner, BorderLayout.WEST);
-      formUtility.addLastField(panel, resultPanel);
+      JPanel panelSpin = new JPanel();
+      panelSpin.setLayout(new BorderLayout());
+      panelSpin.add(altitudeSpinner, BorderLayout.WEST);
+      formUtility.addLastField(panelSpin, resultPanel);
+      
+      altitudeSpinner.addChangeListener(new ChangeListener() {
+
+          @Override
+          public void stateChanged(ChangeEvent e) {
+/*              JSpinner s = (JSpinner) e.getSource();
+              System.out.println("spiner value "+s.getValue().toString());
+              altitude = Double.valueOf(s.getValue().toString()).longValue();
+*/
+
+          }
+      });    
+      
    
-      formUtility.addLabel("Found on the route:",resultPanel,colorForground[0],fontText);
+      formUtility.addLabel("Nearest on the route       ",resultPanel,colorForground[0],fontTextItalic);
       label = new JLabel("");
       panel = new JPanel();
       panel.setLayout(new BorderLayout());
       panel.add(label, BorderLayout.WEST);
       formUtility.addLastField(panel, resultPanel);
 
-      
+      formUtility.addLabel("Airports:",resultPanel,colorForground[0],fontText);
+      label = new JLabel(this.airports+"");
+      panel = new JPanel();
+      panel.setLayout(new BorderLayout());
+      panel.add(label, BorderLayout.WEST);
+      formUtility.addLastField(panel, resultPanel);
+     
       formUtility.addLabel("VORs:",resultPanel,colorForground[0],fontText);
       label = new JLabel(this.vors+"");
       panel = new JPanel();
@@ -109,14 +158,7 @@ public class Result implements Info{
       panel.setLayout(new BorderLayout());
       panel.add(label, BorderLayout.WEST);
       formUtility.addLastField(panel, resultPanel);
-     
-      formUtility.addLabel("Airports:",resultPanel,colorForground[0],fontText);
-      label = new JLabel(this.ndbs+"");
-      panel = new JPanel();
-      panel.setLayout(new BorderLayout());
-      panel.add(label, BorderLayout.WEST);
-      formUtility.addLastField(panel, resultPanel);
-     
+      
       formUtility.addLabel("Cities:",resultPanel,colorForground[0],fontText);
       label = new JLabel(this.cities+"");
       panel = new JPanel();
@@ -130,19 +172,14 @@ public class Result implements Info{
       panel.setLayout(new BorderLayout());
       panel.add(label, BorderLayout.WEST);
       formUtility.addLastField(panel, resultPanel);
+      
      
-		
+      resultPanel.validate();
+      
       return resultPanel;
 	}
 	
 	
-
-	@Override
-	public String toString() {
-		return "Result [flightplan=" + flightplan + ", distance=" + distance + ", altitude=" + altitude + ", vors="
-				+ vors + ", ndbs=" + ndbs + ", airports=" + airports + ", cities=" + cities + ", mountains=" + mountains
-				+ "]";
-	}
 
 
 	public String getFlightplan() {
@@ -264,23 +301,44 @@ public class Result implements Info{
 	public void setFormUtility(FormUtility formUtility) {
 		this.formUtility = formUtility;
 	}
-	
-	
 
-/*	panelResult.setText("<html>"
-			+ "Flightplan: "+new File(flightplan).getName()+"<br>"
-			+ "Distance: "+Math.round(createKmlFSPlan.getDistanceBetween())+" nm<br>"
-			+ "Altitude: "+Math.round(createKmlFSPlan.getAltitude()*3.28084)+" ft<br>"
-		    + "VORs: "+createKmlFSPlan.getNbVor()+"<br>"
-		    + "NDBs: "+createKmlFSPlan.getNbNdb()+"<br>"
-			+ "Airports: "+createKmlFSPlan.getNbAirport()+"<br>"
-			+ "Cities: "+createKmlFSPlan.getNbCity()+"<br>"
-		    + "Mountains: "+createKmlFSPlan.getNbMountain()
-		    +" </html>");
-*/
-	
-/*	panelResult.setText("<html>"
-			+ "Airports found: "+placemarks.size()+"<br>"
-		    +" </html>");
-*/
+
+	public String getDeparture() {
+		return departure;
+	}
+
+
+	public void setDeparture(String departure) {
+		this.departure = departure;
+	}
+
+
+	public String getDestination() {
+		return destination;
+	}
+
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Result [flightplan=" + flightplan + ", distance=" + distance + ", altitude=" + altitude + ", vors="
+				+ vors + ", ndbs=" + ndbs + ", airports=" + airports + ", cities=" + cities + ", mountains=" + mountains
+				+ ", departure=" + departure + ", destination=" + destination + "]";
+	}
+
+
+	public DefaultListModel getListAirport() {
+		return listAirport;
+	}
+
+
+	public void setListAirport(List<Placemark> placemarks) {
+		
+		//this.listAirport.addElement(airport);
+	}
+
 }

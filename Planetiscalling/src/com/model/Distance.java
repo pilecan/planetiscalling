@@ -1,6 +1,8 @@
 package com.model;
 
 public class Distance {
+	
+
 	private int mountainDist;
 	private int cityDist;
 	private int airportDist;
@@ -10,6 +12,12 @@ public class Distance {
 
 	
 		
+	
+	public Distance() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	/**
 	 * @param mountainDist
 	 * @param cityDist

@@ -220,29 +220,11 @@ public class CreateKmlFSPlan{
 		if (dist.isLine()) {
 			Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
 					legPoints);
+			
 			Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
 					legPoints);
 
-			int toc = 0;
-			int tod = 0;
-			for (int i = 0; i < legPoints.size(); i++) {
-				if ("TOC".equals(legPoints.get(i).getId())){
-					toc = i;
-				}
-				if ("TOD".equals(legPoints.get(i).getId())){
-					tod = i;
-				}
-			}
 			
-			System.out.println(legPoints.get(toc).toString());
-			double dist1 = Geoinfo.distance(legPoints.get(toc).getLaty(), legPoints.get(0).getLaty(), legPoints.get(toc).getLonx(), legPoints.get(0).getLonx());
-			System.out.println(legPoints.get(tod).toString());
-			double dist2 = Geoinfo.distance(legPoints.get(tod).getLaty(), legPoints.get(legPoints.size()-1).getLaty(), legPoints.get(tod).getLonx(), legPoints.get(legPoints.size()-1).getLonx());
-
-			double diffElev1 =  legPoints.get(toc).getAltitude()-legPoints.get(0).getAltitude();
-			double diffElev2 =  legPoints.get(tod).getAltitude()-legPoints.get(legPoints.size()-1).getAltitude();
-		    System.out.println(dist1+" - "+diffElev1);
-		    System.out.println(dist2+" - "+diffElev2);
 		    
 		    System.out.println();
 		 

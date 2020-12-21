@@ -80,11 +80,14 @@ public class ReadData implements Info{
 		
 	}
 	
-	public ReadData(String icaos, JLabel panelResult, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectMountain selectMountain){
+	public ReadData(String icaos, Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
-		this.selectMountain = selectMountain;
-		
+		this.selectVor =selectVor;
+		this.selectNdb	= selectNdb;
+		this.result = result;
+		this.dataline = new Dataline();
+
 		
 		this.icaos = icaos;
 		creatIcaoAirports();
@@ -155,6 +158,8 @@ public class ReadData implements Info{
 			result.setAirports(createKmlFSPlan.getNbAirport()); 
 			result.setCities(createKmlFSPlan.getNbCity()); 
 			result.setMountains(createKmlFSPlan.getNbMountain());
+			result.setDeparture(createKmlFSPlan.getDeparture());
+			result.setDestination(createKmlFSPlan.getDestination());
 			
 			
 		} catch (NullPointerException | NoPoints | IOException e) {

@@ -19,7 +19,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import com.cfg.common.Info;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
-import com.panels.PanelAiport;
+import com.panels.PaneIcaolAiport;
 import com.panels.PanelLandmarks;
 import com.panels.PanelManage;
 import com.panels.PanelPlan;
@@ -88,7 +88,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(600, 400);
+		setSize(620, 420);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 		
@@ -134,12 +134,12 @@ public class PlanetIsCalling extends JFrame implements Info {
 		
 		PanelPlan panelPlan = new PanelPlan();
 		
-		PanelAiport panelAiport = new PanelAiport();
+		PaneIcaolAiport panelAiport = new PaneIcaolAiport();
 		PanelLandmarks panelLandmarks = new PanelLandmarks();
 
 		JTabbedPane tabPane = new JTabbedPane();
 		tabPane.addTab( "Fightplan", panelPlan.getFlightplan(manageXMLFile,selectAiport,selectCity,selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "ICAO", panelAiport.getIcao(manageXMLFile,selectAiport,selectCity,selectMountain));
+		tabPane.addTab( "ICAO", panelAiport.getPanel(manageXMLFile,selectAiport,selectVor, selectNdb));
 		tabPane.addTab( "Airport", panelLandmarks.getAirportWorld(manageXMLFile,selectAiport,selectCity,selectMountain));
 		tabPane.addTab( "City", panelLandmarks.getCityWorld(manageXMLFile));
 		tabPane.addTab( "Mountain",panelLandmarks.getMountainWorld(manageXMLFile));

@@ -17,48 +17,46 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 
+import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
+import com.model.Distance;
+import com.model.Result;
 import com.util.ReadData;
 
 import net.SelectAiport;
 import net.SelectCity;
 import net.SelectMountain;
+import net.SelectNdb;
+import net.SelectVor;
 
-public class PanelAiport extends JFrame {
+public class PaneIcaolAiport extends JFrame {
 
+	private Result result;
 	private ManageXMLFile manageXMLFile;
 	private SelectAiport selectAiport;
 
 	private List<Placemark> airports ;
 	private JLabel labelHeader;
 	private JScrollPane jScrollPane1;
-	//private JTextArea textArea;
-
-	public PanelAiport() {
-		/*		
-		manageXMLFile = new ManageXMLFile("");
-		selectAiport = new SelectAiport();
-		airports = new ArrayList<>();
-		selectAiport.selectAll("", airports);
-		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
-		
-*/		// TODO Auto-generated constructor stub
-	}
+	private SelectVor selectVor;
+	private SelectNdb selectNdb;
+	private DistanceSpinner distanceSpin; 
 
 	
-	public JPanel getIcao(final ManageXMLFile manageXMLFile,final SelectAiport selectAiport,SelectCity selectCity,final SelectMountain selectMountain) {
+	public JPanel getPanel(final ManageXMLFile manageXMLFile, final SelectAiport selectAiport, final SelectVor selectVor,  final SelectNdb selectNdb) {
+		this.setManageXMLFile(manageXMLFile);
+		this.selectAiport = selectAiport;
+		this.selectVor = selectVor;
+		this.selectNdb = selectNdb;
 		
+		distanceSpin = new DistanceSpinner();
+		distanceSpin.initPanelDistances("icao");
+	
 		JPanel panelSearch = new JPanel();
 		panelSearch.setLayout(null);
 		
-		JPanel panelResult = new JPanel();
-		
 		final JLabel labelResult = new JLabel();
-		
-		
-		JButton searchButton = new JButton("Search");
-		JButton clearButton = new JButton("Clear");
 		
 		final JTextArea textArea = new JTextArea(500, 500);
 
@@ -80,21 +78,19 @@ public class PanelAiport extends JFrame {
 		content.setPreferredSize(new Dimension(300,500));
 
 		
-		labelHeader.setBounds(10, 5, 300, 23);
-		content.setBounds(10, 30, 250, 160);
-		clearButton.setBounds(140, 200, 90, 23);
-  	    searchButton.setBounds(10, 200, 90, 23);
-  	  	labelResult.setBounds(270, 40, 120, 63);
-
+	
+		JButton searchButton = new JButton("Search");
 		searchButton.addActionListener(new ActionListener()
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
-		    	  new ReadData(textArea.getText(),labelResult, manageXMLFile, selectAiport,selectMountain);
+		    	  result = new Result();
+		    	  new ReadData(textArea.getText(),result, manageXMLFile, selectAiport, selectVor,selectNdb,new Distance());
 		      }
 		    });
 
-		clearButton.addActionListener(new ActionListener()
+		JButton clearButton = new JButton("Clear");
+	    clearButton.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
@@ -103,13 +99,32 @@ public class PanelAiport extends JFrame {
 	      }
 	    });
 		
+
+		labelHeader.setBounds(10, 5, 300, 23);
+		content.setBounds(10, 30, 250, 160);
+		distanceSpin.getSpinnerPanel().setBounds(10, 200, 320, 40);
+		clearButton.setBounds(160, 250, 90, 23);
+  	    searchButton.setBounds(10, 250, 90, 23);
+  	  	labelResult.setBounds(270, 40, 120, 63);
+	
 		panelSearch.add(labelHeader);
 		panelSearch.add(content);
+		panelSearch.add(distanceSpin.getSpinnerPanel());
 		panelSearch.add(searchButton);
 		panelSearch.add(clearButton);
 		panelSearch.add(labelResult);
 		
 		return panelSearch;
+	}
+
+
+	public ManageXMLFile getManageXMLFile() {
+		return manageXMLFile;
+	}
+
+
+	public void setManageXMLFile(ManageXMLFile manageXMLFile) {
+		this.manageXMLFile = manageXMLFile;
 	}
  
 	 
