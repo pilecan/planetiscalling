@@ -44,7 +44,6 @@ public class PlanetIsCalling extends JFrame implements Info {
 	private	JPanel	panel6;
 
 	private ManageXMLFile manageXMLFile;
-	private SelectAiport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
 	private SelectVor selectVor;
@@ -70,16 +69,11 @@ public class PlanetIsCalling extends JFrame implements Info {
 	 */
 	public PlanetIsCalling() {
 		manageXMLFile = new ManageXMLFile("");
-		selectAiport = new SelectAiport();
 		selectCity = new SelectCity();
 		selectMountain = new SelectMountain();
 		selectVor = new SelectVor();
 		selectNdb = new SelectNdb();
 		airports = new ArrayList<>();
-
-		selectAiport.selectAll("", airports);
-		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
-		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
 		
 		selectCity.selectAll("");
 		selectMountain.selectAll("");
@@ -132,17 +126,12 @@ public class PlanetIsCalling extends JFrame implements Info {
 		itemTabPanel5();
 		itemTabPanel6();
 		
-		PanelPlan panelPlan = new PanelPlan();
-		
-		PaneIcaolAiport panelAiport = new PaneIcaolAiport();
-		PanelLandmarks panelLandmarks = new PanelLandmarks();
-
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", panelPlan.getFlightplan(manageXMLFile,selectAiport,selectCity,selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "ICAO", panelAiport.getPanel(manageXMLFile,selectAiport,selectVor, selectNdb));
-		tabPane.addTab( "Airport", panelLandmarks.getAirportWorld(manageXMLFile,selectAiport,selectCity,selectMountain));
-		tabPane.addTab( "City", panelLandmarks.getCityWorld(manageXMLFile));
-		tabPane.addTab( "Mountain",panelLandmarks.getMountainWorld(manageXMLFile));
+		tabPane.addTab( "Fightplan", new PanelPlan().getFlightplan(manageXMLFile,selectCity,selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(manageXMLFile,selectVor, selectNdb, selectMountain, selectCity));
+		tabPane.addTab( "Airport", new PanelLandmarks().getAirportWorld(manageXMLFile,selectCity,selectMountain));
+		tabPane.addTab( "City", new PanelLandmarks().getCityWorld(manageXMLFile));
+		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainWorld(manageXMLFile));
 		tabPane.addTab( "Setting", new PanelManage().getSettingPanel());
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);

@@ -16,19 +16,21 @@ import java.util.Map;
 import javax.swing.Action;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Dataline;
 import com.cfg.common.Info;
 import com.cfg.file.ManageXMLFile;
+import com.cfg.model.LegPoint;
 import com.cfg.model.Placemark;
 import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
 import com.model.Mountain;
+import com.model.Ndb;
 import com.model.Result;
+import com.model.Vor;
 
 import net.CreateKmlFSPlan;
 import net.CreateKmlFSPlan.NoPoints;
@@ -49,6 +51,9 @@ public class ReadData implements Info{
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
 	private Map<String, Placemark> selectedAirports ;
+	private Map<Integer, Vor> selectedVors;
+	private Map<Integer, Ndb> selectedNdbs;
+
 	
 	private CreateKML createKML;
 	
@@ -66,9 +71,8 @@ public class ReadData implements Info{
 	private boolean isMountain = true;
 	private boolean isDistance = true;
 	
-	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
+	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
 		this.manageXMLFile = manageXMLFile;
-		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor =selectVor;
@@ -80,27 +84,18 @@ public class ReadData implements Info{
 		
 	}
 	
-	public ReadData(String icaos, Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
+	public ReadData(String icaos, Result result, ManageXMLFile manageXMLFile, SelectVor selectVor, SelectNdb selectNdb, SelectMountain selectMountain, SelectCity selectCity, Distance dist){
 		this.manageXMLFile = manageXMLFile;
-		this.selectAiport = selectAiport;
 		this.selectVor =selectVor;
 		this.selectNdb	= selectNdb;
+		this.selectCity = selectCity;
+		this.selectMountain = selectMountain;
 		this.result = result;
 		this.dataline = new Dataline();
-
-		
+		this.dist = dist;
 		this.icaos = icaos;
-		creatIcaoAirports();
 
-	}
-	
-	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectAiport selectAiport, SelectMountain selectMountain){
-		this.manageXMLFile = manageXMLFile;
-		this.selectAiport = selectAiport;
-		this.result = result;
-		this.selectMountain = selectMountain;
-		
-		creatIcaoAirports();
+		creatIcaoAirports(dist);
 
 	}
 
@@ -186,7 +181,7 @@ public class ReadData implements Info{
     /**
      * 
      */
-    private void creatIcaoAirports() {
+    private void creatIcaoAirports(Distance dist) {
     	
     	
     	List<Placemark> placemarks = new ArrayList<>();
@@ -194,61 +189,34 @@ public class ReadData implements Info{
 		createKML = new CreateKML();
 		selectedMountains = new HashMap<>();
 		selectedCities = new HashMap<>();
-
+		selectedNdbs = new HashMap<>();
+		selectedVors = new HashMap<>();
 		
-		icaos = icaos.replaceAll("\\s+"," ");
-    	icaos = icaos.replaceAll("\\,", " ");
-    	icaos = icaos.replaceAll(">", " ");
-    	icaos = icaos.replaceAll("–", " ");
-    	icaos = icaos.replaceAll("-", " ");
-    	icaos = icaos.replaceAll("\\("," ");
-    	icaos = icaos.replaceAll("\\)", " ");
-    	icaos = icaos.replaceAll("\\["," ");
-    	icaos = icaos.replaceAll("\\]", " ");
-    	icaos = icaos.replaceAll("_", " ");
-    	icaos = icaos.replaceAll("\\.", " ");
-    	icaos = icaos.replaceAll("\\\\", " ");
-    	icaos = icaos.replaceAll("'", "");
-    	icaos = icaos.replaceAll("=", " ");
-    	icaos = icaos.replaceAll(",", " ");
-    	icaos = icaos.replaceAll(":", " ");
-    	icaos = icaos.replaceAll(";", " ");
-    	icaos = icaos.replaceAll("\\.", " ");
-    	icaos = icaos.replaceAll("\\|", " ");
-
-
-
-	    String[] list = icaos.split(" ");
-     	String search = "";		
-	    
-	    for (String str:list) {
-	    	str = str.trim();
-	    	
-	    	if (str.length()  == 4) {
-	    		search += str+" ";
-		    	//System.out.println(str);
-	    	}
-	    	
-	    }
-
+		String search = Utility.getInstance().valideIcao(icaos);
+		
 	    if (!"".equals(search)) {
 	     	search = search.toUpperCase();		
-			
-
-	    	SelectCity selectCity = new SelectCity();
-	    	selectCity.selectAll("");
-	    	
-	    	SelectAiport selectAiport = new SelectAiport();
-
-	    	SelectMountain selectMoutain = new SelectMountain();
-			selectMoutain.selectAll("");
 			
 			search = search.replaceAll("\\s+", "','");
 			String sql = "where ident in ('"+ search + "') ";
 
-		 	
+	    	SelectAiport selectAiport = new SelectAiport();
+	 	
 			selectAiport.selectAll(sql, placemarks);
 			placemarks = selectAiport.getPlacemarks();
+			
+			result.setListAirport(placemarks);
+
+			searchAiportNeighbor(placemarks,selectCity,selectMountain);
+			searchIcaoVorNdb(placemarks, selectVor, selectNdb);
+				
+			
+			result.setAirports(placemarks.size());
+			result.setVors(selectedVors.size()); 
+			result.setNdbs(selectedNdbs.size()); 
+			result.setCities(selectedCities.size()); 
+			result.setMountains(selectedMountains.size());
+
 			
 			search = search.replaceAll("\\s+", "");
 	    	
@@ -264,6 +232,48 @@ public class ReadData implements Info{
 	    }
 		
     }
+    
+    private void searchIcaoVorNdb(List<Placemark> placemarks,SelectVor selectVor,SelectNdb selectNdb) {
+		if (dist.isVorNdb()) {
+			for(Vor vor : selectVor.getVors()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
+				
+ 				for(Placemark airport : placemarks){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedVors.put(vor.getVorId(),new Vor(vor));
+						if (dist.isLine()) {
+							dataline.setData("vor",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+		//Search NDB
+		if (dist.isVorNdb()) {
+			for(Ndb ndb : selectNdb.getNdbs()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
+				
+ 				for(Placemark airport : placemarks){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedNdbs.put(ndb.getNdbId(),new Ndb(ndb));
+						if (dist.isLine()) {
+							dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+   	
+    }
+
     
     private void searchAiportNeighbor(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
  		if (dist.isCity()) {
@@ -691,11 +701,14 @@ public class ReadData implements Info{
  		    
  		    writer.write(manageXMLFile.createKMLHeader(placemarks.size()));
  		    
+			writer.write("<Folder><name> Airports found ("+placemarks.size()+") </name>");
+
  		    for(Placemark placemark:placemarks){
  		    	writer.write(placemark.buildXML("fsx_airport"));
  		    }
- 		    
-/* 		    if (isCity){
+			 writer.write("</Folder>"); 
+		    
+ 		    if (dist.isCity()){
  			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");
  			    
  			    for(City city: selectedCities.values()){
@@ -705,7 +718,7 @@ public class ReadData implements Info{
  			    writer.write("</Folder>"); 
  		    }
  		    
- 		    if (isMountain){
+ 		    if (dist.isMountain()){
  			    writer.write("<Folder><name> Mountains found ("+selectedMountains.size()+") </name>");
  			    
  			    
@@ -715,7 +728,49 @@ public class ReadData implements Info{
  		    	
  			    writer.write("</Folder>"); 
  		    }
-*/ 		    
+ 		    
+		    if (dist.isVorNdb()){
+			    writer.write("<Folder><name> VOR found ("+selectedVors.size()+") </name>");
+			    
+			    
+			    for(Vor vor: selectedVors.values()){
+			    	writer.write(createKML.buildVorPlaceMark(vor));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    if (dist.isVorNdb()){
+			    writer.write("<Folder><name> NDB found ("+selectedNdbs.size()+") </name>");
+			    
+			    
+			    for(Ndb ndb: selectedNdbs.values()){
+			    	writer.write(createKML.buildNdbPlaceMark(ndb));
+			    }
+		    	
+			    writer.write("</Folder>"); 
+		    }
+		    
+		    if (dist.isLine()){
+		    	for (String key: dataline.getMapData().keySet()) {
+			    	writer.write("<Folder><name>"+key+" distance </name>"
+			    			+ "<Placemark> "
+			    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+			    			+ " <Style>" + 
+			    			"  <LineStyle> " + 
+			    			"   <color>"+dataline.getColor(key)+"</color>"
+			    			+ "<width>2</width> " + 
+			    			"  </LineStyle>" + 
+			    			" </Style>"
+			    			+ "<LineString><extrude>1</extrude>"
+			    			+ "<tessellate>1</tessellate>"
+			    			+ "<altitudeMode>relativeToGround</altitudeMode>"
+			    			+ "<coordinates>\r\n");
+			    	writer.write(dataline.getMapData().get(key));
+			    	writer.write("</coordinates></LineString></Placemark></Folder>");
+		    		
+		    	}
+		    	
+		    }
 
  		    writer.write("</Folder></Document></kml>");
  	   

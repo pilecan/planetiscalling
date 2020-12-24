@@ -51,7 +51,7 @@ public class PanelPlan {
 	}
 
 	
-	public JPanel getFlightplan(final ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
+	public JPanel getFlightplan(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
@@ -81,7 +81,7 @@ public class PanelPlan {
 	      public void actionPerformed(ActionEvent e)
 	      {
 	    	  result = new Result();
-	    	  readData =  new ReadData(result, manageXMLFile, selectAiport, selectCity, selectMountain, selectVor, selectNdb,
+	    	  readData =  new ReadData(result, manageXMLFile, selectCity, selectMountain, selectVor, selectNdb,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 (int)distanceSpin.getAirportSpinner().getValue(),
@@ -90,8 +90,7 @@ public class PanelPlan {
 		        				 0.0));
     	  
 	  		 panelResult.removeAll();	
-	  		 panelResult.setBounds(290, 20, 300, 240);	
-			 panelResult.add(result.getResultPanel());
+			 panelResult.add(result.getFlightPlanPanel());
 			 panelResult.validate();
 
 			 panelFlightplan.add(panelResult);
@@ -117,7 +116,7 @@ public class PanelPlan {
 
 		  	 panelResult.setBounds(290, 20, 300, 240);	
 		
-	    	 panelResult.add(result.getResultPanel());
+	    	 panelResult.add(result.getFlightPlanPanel());
 			 panelResult.validate();
 			 panelFlightplan.add(panelResult);
 			 panelFlightplan.validate();

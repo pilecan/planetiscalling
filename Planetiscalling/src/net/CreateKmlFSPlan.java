@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,11 +154,17 @@ public class CreateKmlFSPlan{
 			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
 		} 
 		
+		List <Placemark> airports = new ArrayList<>();
+
+		SelectAiport selectAiport = new SelectAiport(); 
+		selectAiport.selectAll("", airports);
+		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
+		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
+		
 		
 //		System.out.println(manageXMLFile.getPlacemarks().size());
 //		System.out.println(legPoints.size());
 		
-		long start = System.currentTimeMillis();
 		
 		int cptNew = 0;
 		
@@ -214,7 +221,6 @@ public class CreateKmlFSPlan{
 		searchNeighbor();
 
 		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
-
 		
 		//dist.isLine = isTocTod
 		if (dist.isLine()) {
@@ -223,18 +229,9 @@ public class CreateKmlFSPlan{
 			
 			Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
 					legPoints);
-
-			
-		    
-		    System.out.println();
 		 
 		}
 
-		
-		
-
-		
-		
 
 		this.departure = selectedAirports.get(legPoints.get(0).getId()).getName();
 		this.destination = selectedAirports.get(legPoints.get(legPoints.size()-1).getId()).getName();
@@ -482,27 +479,6 @@ public class CreateKmlFSPlan{
 		    }
 		    
 		    
-/*		    if (dist.isLine()){
-		    	writer.write("<Folder><name> Distances </name>"
-		    			+ "<Placemark> "
-		    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
-		    			+ " <Style>" + 
-		    			"  <LineStyle> " + 
-		    			"   <color>"+dataline.getColor("mountain")+"</color>"
-		    			+ "<width>2</width> " + 
-		    			"  </LineStyle>" + 
-		    			" </Style>"
-		    			+ "<LineString><extrude>1</extrude>"
-		    			+ "<tessellate>1</tessellate>"
-		    			+ "<altitudeMode>relativeToGround</altitudeMode>"
-		    			+ "<coordinates>\r\n");
-		    	writer.write(dataline.getData("mountain"));
-		    	writer.write("</coordinates></LineString></Placemark></Folder>");
-		    }
-
-*/		    
-		    
-		    //Create KML Footer
 		    writer.write("</Document></kml>");
 	   
 		} catch (IOException ex) {

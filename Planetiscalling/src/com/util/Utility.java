@@ -281,6 +281,46 @@ public class Utility {
 		    
 		    
  		}
+	
+	public String valideIcao(String icaos) {
+		icaos = icaos.replaceAll("\\s+"," ");
+    	icaos = icaos.replaceAll("\\,", " ");
+    	icaos = icaos.replaceAll(">", " ");
+    	icaos = icaos.replaceAll("–", " ");
+    	icaos = icaos.replaceAll("-", " ");
+    	icaos = icaos.replaceAll("\\("," ");
+    	icaos = icaos.replaceAll("\\)", " ");
+    	icaos = icaos.replaceAll("\\["," ");
+    	icaos = icaos.replaceAll("\\]", " ");
+    	icaos = icaos.replaceAll("_", " ");
+    	icaos = icaos.replaceAll("\\.", " ");
+    	icaos = icaos.replaceAll("\\\\", " ");
+    	icaos = icaos.replaceAll("'", "");
+    	icaos = icaos.replaceAll("=", " ");
+    	icaos = icaos.replaceAll(",", " ");
+    	icaos = icaos.replaceAll(":", " ");
+    	icaos = icaos.replaceAll(";", " ");
+    	icaos = icaos.replaceAll("\\.", " ");
+    	icaos = icaos.replaceAll("\\|", " ");
+
+
+
+	    String[] list = icaos.split(" ");
+     	String search = "";		
+	    
+	    for (String str:list) {
+	    	str = str.trim();
+	    	
+	    	if (str.length()  == 4) {
+	    		search += str+" ";
+		    	//System.out.println(str);
+	    	}
+	    	
+	    }
+	    
+	    return search;
+
+	}
 
   
 

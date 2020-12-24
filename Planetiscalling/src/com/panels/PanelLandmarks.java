@@ -73,7 +73,7 @@ public class PanelLandmarks implements Info {
 	 * 
 	 * @return
 	 */
-	public JPanel getAirportWorld(final ManageXMLFile manageXMLFile,SelectAiport selectAiport,SelectCity selectCity,SelectMountain selectMountain) {
+	public JPanel getAirportWorld(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		
 		distanceSpin.initPanelDistances("airport");
@@ -155,13 +155,15 @@ public class PanelLandmarks implements Info {
     	panelResult.setBounds(300, 20, 280, 200);	
 		panelResult.add(labelResult);
 
-
 		searchButton.addActionListener(new ActionListener()
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
 		         new ReadData().createKMLAirport(manageXMLFile,selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), (int)distanceSpin.getMountainSpinner().getValue(), 0, distanceSpin.getCheckLinedist().isSelected()));
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
+		        				 0, 
+		        				 distanceSpin.getCheckLinedist().isSelected()));
 		      }
 		    });
 

@@ -18,13 +18,16 @@ public class Distance {
 		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param mountainDist
-	 * @param cityDist
-	 * @param airportDist
-	 * @param vorNdbDist
-	 * @param line
-	 */
+
+/**
+ * 
+ * @param cityDist
+ * @param mountainDist
+ * @param airportDist
+ * @param vorNdbDist
+ * @param line
+ * @param altitude
+ */
 	public Distance(int cityDist, int mountainDist,  int airportDist, int vorNdbDist, boolean line,double altitude) {
 		super();
 		this.mountainDist = mountainDist;
