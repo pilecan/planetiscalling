@@ -26,12 +26,14 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JList;
 
+import com.cfg.common.Info;
 import com.cfg.util.Util;
 import com.main.PlanetIsCalling;
 
 
-public class Utility {
+public class Utility implements Info{
 	private static Utility instance = new Utility();
     private Properties prefs;
     
@@ -320,6 +322,16 @@ public class Utility {
 	    
 	    return search;
 
+	}
+	
+	public String getIcaoFromListModel( JList listIcao) {
+		String result = "";
+
+		for (int i = 0; i < listIcao.getModel().getSize(); i++) {
+			result += listIcao.getModel().getElementAt(i).toString().substring(0,5);
+		}
+		
+		return result;
 	}
 
   

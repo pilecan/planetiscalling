@@ -36,11 +36,6 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 	private static final long serialVersionUID = 1L;
 	
-	private	JPanel	panelSearch;
-	private	JPanel	panel2;
-	private	JPanel	panel3;
-	private	JPanel	panel4;
-	private	JPanel	panel5;
 	private	JPanel	panel6;
 
 	private ManageXMLFile manageXMLFile;
@@ -114,16 +109,13 @@ public class PlanetIsCalling extends JFrame implements Info {
         Utility.getInstance().setIcon(this, imageLogo);
 
 	    
-		setTitle("The Planet Is Calling You and Me Too");
+		setTitle("The Planet Is Calling 0.7");
 	
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		getContentPane().add(mainPanel);
 		
-		itemTabPanel2();
-		itemTabPanel3();
-		itemTabPanel4();
-		itemTabPanel5();
+
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
@@ -139,73 +131,13 @@ public class PlanetIsCalling extends JFrame implements Info {
 	}
 	
 
-	
-	public void itemTabPanel2()
+	public void itemTabPanel6()
 	{
-		panel2 = new JPanel();
-		panel2.setLayout(null);
-		
-		JButton btn3 = new JButton("Button 3");
-		btn3.setBounds(19, 11, 89, 23);
-		panel2.add(btn3);
-		
-		JButton btn4 = new JButton("Button 4");
-		btn4.setBounds(10, 45, 89, 23);
-		panel2.add(btn4);	
-	}
-
-	public void itemTabPanel3()
-	{
-		panel3 = new JPanel();
-		panel3.setLayout(null);;
-		
-		JButton btn5 = new JButton("Button 5");
-		btn5.setBounds(10, 11, 89, 23);
-		panel3.add(btn5);
-		
-		JButton btn6 = new JButton("Button 6");
-		btn6.setBounds(10, 45, 89, 23);
-		panel3.add(btn6);		
-		
-	}
-	
-	public void itemTabPanel4()
-	{
-		panel4 = new JPanel();
-		panel4.setLayout(null);;
 		
 		JButton btn7 = new JButton("Button 7");
 		btn7.setBounds(10, 11, 89, 23);
-		panel4.add(btn7);
 		
 		JButton btn8 = new JButton("Button 8");
 		btn8.setBounds(10, 45, 89, 23);
-		panel4.add(btn8);	
-	}
-	
-	public void itemTabPanel5()
-	{
-		panel4 = new JPanel();
-		panel4.setLayout(null);;
-		
-		JButton btn7 = new JButton("Button 7");
-		btn7.setBounds(10, 11, 89, 23);
-		panel4.add(btn7);
-		
-		JButton btn8 = new JButton("Button 8");
-		btn8.setBounds(10, 45, 89, 23);
-		panel4.add(btn8);	
-	}	public void itemTabPanel6()
-	{
-		panel4 = new JPanel();
-		panel4.setLayout(null);;
-		
-		JButton btn7 = new JButton("Button 7");
-		btn7.setBounds(10, 11, 89, 23);
-		panel4.add(btn7);
-		
-		JButton btn8 = new JButton("Button 8");
-		btn8.setBounds(10, 45, 89, 23);
-		panel4.add(btn8);	
 	}
 }

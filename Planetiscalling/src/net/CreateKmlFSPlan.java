@@ -8,12 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,22 +22,22 @@ import com.cfg.file.ManageXMLFile;
 import com.cfg.model.LegPoint;
 import com.cfg.model.Placemark;
 import com.cfg.plan.ReadFs9Plan;
-import com.cfg.plan.ReadFsxPlan;
 import com.cfg.plan.ReadPlanGPlan;
-import com.cfg.util.Util;
 import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
+import com.model.Flightplan;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Vor;
 import com.util.CreateKML;
+import com.util.ReadFsxPlan;
 import com.util.Utility;
 
 public class CreateKmlFSPlan{
 	
 	
-	private static String flightPlan = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
+	private static String flightPlanFile = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
 
 	private Map<String, Placemark> selectedAirports ;
 	private Map<String, City> selectedCities ;
@@ -94,17 +91,18 @@ public class CreateKmlFSPlan{
 	private double altitude = 0;
 	private String departure;
 	private String destination;
+	private Flightplan flightplan;
 
 
 	
 	
-	public CreateKmlFSPlan(String flightPlan,  Distance dist, 
+	public CreateKmlFSPlan(String flightPlanFile,  Distance dist, 
 			ManageXMLFile xmlfile,
 			List<City> cities, 
 			List<Mountain> mountains,
 			List<Vor> vors,
 			List<Ndb> ndbs) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
-		this.flightPlan = flightPlan;
+		this.flightPlanFile = flightPlanFile;
 		this.dist = dist;
 		this.manageXMLFile = xmlfile;
 		this.selectedAirports = new HashMap<>();
@@ -123,13 +121,16 @@ public class CreateKmlFSPlan{
 		
 		current = 0;
 	
-		fsxPlan = new ReadFsxPlan(flightPlan);
+		fsxPlan = new ReadFsxPlan(flightPlanFile);
+		
+		this.flightplan = fsxPlan.getFlightplan();
+		
 		legPoints = fsxPlan.getLegPoints();
 	
 		//check if altitude as been changed 
-		if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(fsxPlan.getCruisingAlt())) {
-			fsxPlan.modifyAltitude(legPoints, Double.parseDouble(fsxPlan.getCruisingAlt()), dist.getAltitude());
-			fsxPlan.setCruisingAlt(dist.getAltitude()+"");
+		if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(flightplan.getCruisingAlt())) {
+			fsxPlan.modifyAltitude(legPoints, Double.parseDouble(flightplan.getCruisingAlt()), dist.getAltitude());
+			flightplan.setCruisingAlt(dist.getAltitude()+"");
 
 		} else {
 		}
@@ -137,7 +138,7 @@ public class CreateKmlFSPlan{
 
 		
 		if (legPoints.size() > 0){
-			makeFlightPlan();
+			makeFlightPlan(flightplan);
 		} else {
 			//System.out.println("points = "+points.size());
 			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
@@ -148,7 +149,7 @@ public class CreateKmlFSPlan{
 	}
 	
 	
-	public void makeFlightPlan() throws FileNotFoundException, NullPointerException, IOException, NoPoints{
+	public void makeFlightPlan(Flightplan flightplan) throws FileNotFoundException, NullPointerException, IOException, NoPoints{
 		
 		if (legPoints.size() == 0){
 			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
@@ -161,28 +162,25 @@ public class CreateKmlFSPlan{
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
 		
-		
-//		System.out.println(manageXMLFile.getPlacemarks().size());
-//		System.out.println(legPoints.size());
-		
+		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(0), true);
+		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(legPoints.size()-1), false);
 		
 		int cptNew = 0;
 		
 		boolean isfound = false;
 		boolean isfinish = false;
-		String[] begin;
-		String[] end;
-			
-		
-		altitude = Double.parseDouble(fsxPlan.getCruisingAlt())/3.28084;
+		String[] begin = null;
+		String[] end = null;
+
+		altitude = Double.parseDouble(flightplan.getCruisingAlt())/3.28084;
 	    while (!isfinish) {
 			for (int i = 0; i < legPoints.size()-1; i++) {
 				isfound = false;
-			
-			//	System.out.println(legPoints.get(i));
+
 				begin = legPoints.get(i).getPosition().split(",");
 				end = legPoints.get(i+1).getPosition().split(",");
-				
+
+
 				distanceBetween = Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
 				if (distanceBetween > 15) {
 					
@@ -219,22 +217,27 @@ public class CreateKmlFSPlan{
 		
 		// search airports
 		searchNeighbor();
-
-		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		
+		if (distanceBetween < 1000) {
+			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		}
 		
 		//dist.isLine = isTocTod
 		if (dist.isLine()) {
-			Geoinfo.createTOC(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(0).getAltitude(), 
-					legPoints);
-			
-			Geoinfo.createTOD(Double.parseDouble(fsxPlan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), 
-					legPoints);
-		 
+			int indexToc = Geoinfo.createTOC(Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(0).getAltitude(), legPoints);
+			int indexTod = Geoinfo.createTOD(Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), legPoints);
+			if ( indexToc >= indexTod) //Altitude too high
+			{
+				legPoints.remove(indexTod);
+				legPoints.remove(indexToc);
+			}
 		}
 
-
-		this.departure = selectedAirports.get(legPoints.get(0).getId()).getName();
-		this.destination = selectedAirports.get(legPoints.get(legPoints.size()-1).getId()).getName();
+		try {
+			this.departure = selectedAirports.get(legPoints.get(0).getIcaoIdent()).getName();
+			this.destination = selectedAirports.get(legPoints.get(legPoints.size()-1).getIcaoIdent()).getName();
+		} catch (NullPointerException e) {
+		}
 
 		nbAirport = selectedAirports.size();
 		nbCity = selectedCities.size();
@@ -270,9 +273,14 @@ public class CreateKmlFSPlan{
 				}
 			}
 		} else if (!dist.isAirport()) { //Load the last and first for the flightplan
-			selectedAirports.put(legPoints.get(0).getId(),manageXMLFile.getHashPlacemark().get(legPoints.get(0).getId()));
-			selectedAirports.put(legPoints.get(legPoints.size()-1).getId(),manageXMLFile.getHashPlacemark().get(legPoints.get(legPoints.size()-1).getId()));
-			dist.setAirportDist(selectedAirports.size());
+			try {
+				selectedAirports.put(legPoints.get(0).getIcaoIdent(),manageXMLFile.getHashPlacemark().get(legPoints.get(0).getIcaoIdent()));
+				selectedAirports.put(legPoints.get(legPoints.size()-1).getIcaoIdent(),manageXMLFile.getHashPlacemark().get(legPoints.get(legPoints.size()-1).getIcaoIdent()));
+				dist.setAirportDist(selectedAirports.size());
+			} catch (NullPointerException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+			}
 		}
 
 		
@@ -384,7 +392,8 @@ public class CreateKmlFSPlan{
  			writer.write("<Folder><name> Waypoints </name>");
 		    
 		    for (LegPoint legPoint : legPoints){
-				if ("1".equals(legPoint.getVisible())) {
+
+				if ("1".equals(legPoint.getVisible()) || distanceBetween > 1000) {
 			    	writer.write(legPoint.buildPoint());
 				}
 		    	
@@ -409,7 +418,12 @@ public class CreateKmlFSPlan{
 			    writer.write("<Folder><name> FS2020 Airports found ("+selectedAirports.size()+") </name>");
 			    
 			    for(Placemark placemark:selectedAirports.values()){
-			    	writer.write(placemark.buildXML("fsx_airport"));
+			    	try {
+						writer.write(placemark.buildXML("fsx_airport"));
+					} catch (NullPointerException e) {
+						// TODO Auto-generated catch block
+						//e.printStackTrace();
+					}
 			    }
 		    	
 			    writer.write("</Folder>"); 
@@ -505,7 +519,7 @@ public class CreateKmlFSPlan{
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">"	
 				+ "<Document>"
-				+ "<name>"+new File(flightPlan).getName()+"</name>"
+				+ "<name>"+new File(flightPlanFile).getName()+"</name>"
 				+ "<open>1</open><Style id=\"s_ylw-pushpin\"><IconStyle><color>b200ffff</color><Icon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle><LabelStyle><color>7fffff55</color></LabelStyle><ListStyle><ItemIcon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars-lv.png</href></ItemIcon></ListStyle></Style><StyleMap id=\"m_grn-pushpin\"><Pair><key>normal</key><styleUrl>#s_ylw-pushpin</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#s_ylw-pushpin_hl</styleUrl></Pair></StyleMap><StyleMap id=\"msn_ylw-pushpin\"><Pair><key>normal</key><styleUrl>#sn_ylw-pushpin</styleUrl></Pair><Pair><key>highlight</key><styleUrl>#sh_ylw-pushpin</styleUrl></Pair></StyleMap>"
 				+ "<Style id=\"sh_ylw-pushpin\"><IconStyle><scale>1.2</scale></IconStyle><LineStyle><color>7f0000ff</color><width>3</width></LineStyle><PolyStyle><color>7f00ff55</color></PolyStyle></Style>"
 				+ "<Style id=\"s_ylw-pushpin_hl\"><IconStyle><color>7fffffff</color><scale>1.18182</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png</href></Icon><hotSpot x=\"32\" y=\"1\" xunits=\"pixels\" yunits=\"pixels\"/></IconStyle><LabelStyle><color>7fffff55</color></LabelStyle><ListStyle><ItemIcon><href>http://maps.google.com/mapfiles/kml/paddle/ylw-stars-lv.png</href></ItemIcon></ListStyle></Style>"

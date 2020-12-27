@@ -95,7 +95,7 @@ public class ReadData implements Info{
 		this.dist = dist;
 		this.icaos = icaos;
 
-		creatIcaoAirports(dist);
+		creatIcaoAirports(icaos,dist);
 
 	}
 
@@ -181,9 +181,9 @@ public class ReadData implements Info{
     /**
      * 
      */
-    private void creatIcaoAirports(Distance dist) {
+    public void creatIcaoAirports(String icaos, Distance dist) {
     	
-    	
+    	this.dist = dist;
     	List<Placemark> placemarks = new ArrayList<>();
 		manageXMLFile = new ManageXMLFile("");
 		createKML = new CreateKML();
@@ -218,21 +218,18 @@ public class ReadData implements Info{
 			result.setMountains(selectedMountains.size());
 
 			
-			search = search.replaceAll("\\s+", "");
-	    	
-	    	flightplanName = Utility.getInstance().getFlightPlanName("icao_airports.kml");
-			
-			if (placemarks.size() > 0) {
-			  	//searchAiportNeighbor(placemarks,selectCity,selectMoutain);
-				saveKMLFileICAO(manageXMLFile, placemarks,flightplanName);
-				manageXMLFile.launchGoogleEarth(new File(flightplanName));
-			}
-
+			saveKMLFileICAO(manageXMLFile, placemarks,Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
+		
 			
 	    }
 		
     }
-    
+    /**
+     * 
+     * @param placemarks
+     * @param selectVor
+     * @param selectNdb
+     */
     private void searchIcaoVorNdb(List<Placemark> placemarks,SelectVor selectVor,SelectNdb selectNdb) {
 		if (dist.isVorNdb()) {
 			for(Vor vor : selectVor.getVors()){
@@ -274,7 +271,12 @@ public class ReadData implements Info{
    	
     }
 
-    
+    /**
+     * 
+     * @param airports
+     * @param selectCity
+     * @param selectMoutain
+     */
     private void searchAiportNeighbor(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
  		if (dist.isCity()) {
  			selectedCities = new HashMap<String, City>();
@@ -314,7 +316,12 @@ public class ReadData implements Info{
  		
      }	
 
-    
+    /**
+     * 
+     * @param airports
+     * @param selectCity
+     * @param selectMoutain
+     */
 	private void searchCityNeighbor(List<Placemark> airports, SelectCity selectCity, SelectMountain selectMoutain) {
 		if (dist.isAirport()) {
 			selectedAirports = new HashMap<String, Placemark>();
@@ -352,7 +359,12 @@ public class ReadData implements Info{
 		}
 
 	}
-	
+	/**
+	 * 
+	 * @param airports
+	 * @param selectCity
+	 * @param selectMoutain
+	 */
 	private void searchMountainNeighbor(List<Placemark> airports, SelectCity selectCity, SelectMountain selectMoutain) {
 		
 		if (dist.isAirport()) {
@@ -394,7 +406,12 @@ public class ReadData implements Info{
 
 	}
 	
-	
+	/**
+	 * 
+	 * @param airports
+	 * @param selectCity
+	 * @param selectMoutain
+	 */
     private void searchAiport(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
 				if (isCity) {
 					selectedCities = new HashMap<String, City>();
@@ -433,6 +450,14 @@ public class ReadData implements Info{
     	
     }
     
+    /**
+     * 
+     * @param manageXMLFile
+     * @param mapCities
+     * @param comboCountry
+     * @param comboMountain
+     * @param dist
+     */
 	public void createKMLMountain(ManageXMLFile manageXMLFile,Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboMountain,Distance dist) {
 		String sql = "";	
     	SelectCity selectCity = new SelectCity();
@@ -692,7 +717,7 @@ public class ReadData implements Info{
     }
     
 
-    public  synchronized void saveKMLFileICAO(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative){
+    public  synchronized void saveKMLFileICAO(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative, Distance dist){
  		Writer writer = null;
  						
   		try {

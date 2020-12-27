@@ -100,7 +100,7 @@ public class PanelPlan {
 	      }
 	    });
 		
-		buttonReload = new JButton("Update and Load KML File");
+		buttonReload = new JButton("See on Google Earth");
 		buttonReload.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -133,7 +133,7 @@ public class PanelPlan {
     	
 		buttonReload.setBounds(200, 270, 200, 23);
 
-	  	panelResult.setBounds(290, 20, 300, 240);	
+	  	panelResult.setBounds(290, 10, 300, 240);	
 
      	panelFlightplan.add(buttonFP);
 		panelFlightplan.add(panelResult);

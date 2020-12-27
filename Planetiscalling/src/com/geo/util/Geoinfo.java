@@ -146,7 +146,7 @@ public class Geoinfo {
 		
 	}
 	
-	public static  void createTOC(double altitude, LinkedList<LegPoint> legPoints) {
+	public static  int createTOC(double altitude, LinkedList<LegPoint> legPoints) {
 		double rate = 0.444;
 		if (altitude <= 10000) {
 			rate = 0.444;
@@ -158,90 +158,70 @@ public class Geoinfo {
 		
     	double distForAltitude = Math.round(altitude/rate/1000);
 		
-		int i = 0;
+		int index = 0;
 		boolean isfound = false;
-		legPoints.get(i).setDistFrom(0);
+		legPoints.get(index).setDistFrom(0);
 		double distCumulate = 0;
 		double currentDist = 0;
-		while (!isfound && i <= legPoints.size()-1) {
+		while (!isfound && index < legPoints.size()-1) {
 			
-			currentDist = distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLaty(), legPoints.get(i+1).getLonx(),'N');
+			currentDist = distance(legPoints.get(index).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index+1).getLaty(), legPoints.get(index+1).getLonx(),'N');
 			distCumulate += currentDist;
-			legPoints.get(i).setDistFrom(distCumulate+legPoints.get(i).getDistFrom());
+			legPoints.get(index).setDistFrom(distCumulate+legPoints.get(index).getDistFrom());
 		
 			if (distForAltitude < distCumulate) {
 				isfound = true;
-				legPoints.get(i).setDistFrom(legPoints.get(i).getDistFrom()-currentDist);
+				legPoints.get(index).setDistFrom(legPoints.get(index).getDistFrom()-currentDist);
 			}
 			
-			i++;
+			index++;
 
 		}
 		
 		if (isfound) {
-        	double angle = Geoinfo.calculateAngle(legPoints.get(i-1).getLonx(), legPoints.get(i-1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i).getLaty() );
+        	double angle = Geoinfo.calculateAngle(legPoints.get(index-1).getLonx(), legPoints.get(index-1).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index).getLaty() );
         	
-        	double distRest = distForAltitude -legPoints.get(i-1).getDistFrom();
+        	double distRest = distForAltitude -legPoints.get(index-1).getDistFrom();
 
         	double todKM = distRest*1.852/100;
-        	double todLon = todKM * Math.sin(Math.toRadians(angle))+legPoints.get(i-1).getLonx();  
-        	double todLat = todKM * Math.cos(Math.toRadians(angle))+legPoints.get(i-1).getLaty(); 
+        	double todLon = todKM * Math.sin(Math.toRadians(angle))+legPoints.get(index-1).getLonx();  
+        	double todLat = todKM * Math.cos(Math.toRadians(angle))+legPoints.get(index-1).getLaty(); 
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
     		LegPoint legPoint = new LegPoint("TOC","TOC",coordinates,"1"); 
-    		legPoints.add(i,legPoint);
-    	//	correctSlopeUp(legPoints, i, distForAltitude);
+    		legPoints.add(index,legPoint);
+    	     correctSlopeUp(legPoints, index, distForAltitude);
 
  		}
+		
+		return index;
 		
 	
 	}
 	
 	private static void correctSlopeUp(LinkedList<LegPoint> legPoints, int toc, double distForAltitude) {
-		System.out.println(legPoints.get(toc).toString());
-		//double dist1 = Geoinfo.distance(legPoints.get(toc).getLaty(), legPoints.get(0).getLaty(), legPoints.get(toc).getLonx(), legPoints.get(0).getLonx());
 		double diffElev1 =  legPoints.get(toc).getAltitude()-legPoints.get(0).getAltitude();
-	    System.out.println(distForAltitude+" - "+diffElev1);
-	    
-	    double factor = distForAltitude/diffElev1;
-	    
-	    for (int i = toc; i != 0; i--) {
-	    	double distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i-1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i-1).getLonx());
-	    	System.out.println(distance);
-	    	System.out.println("new elevation toc "+distance * factor);
-	
+	    double factorbase = diffElev1/distForAltitude;
+	    double distance = 0;
+
+	    for (int i = 0; i < toc; i++) {
+	    	distance += Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i+1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLonx());
+		    legPoints.get(i+1).setNewAltitude(legPoints.get(0).getAltitude()+(distance * factorbase));
+
 		}
 		
 	}
 	
 	private static void correctSlopeTOD(LinkedList<LegPoint> legPoints, int tod, double distForAltitude) {
-		System.out.println(legPoints.get(tod).toString());
-	//	double dist1 = Geoinfo.distance(legPoints.get(tod).getLaty(), legPoints.get(0).getLaty(), legPoints.get(tod).getLonx(), legPoints.get(0).getLonx());
 		double diffElev1 =  legPoints.get(tod).getAltitude()-legPoints.get(legPoints.size()-1).getAltitude();
-	    System.out.println(distForAltitude+" - "+diffElev1);
-	    
-	    double factorbase = distForAltitude/diffElev1;
-
+	    double factorbase = diffElev1/distForAltitude;
 	    double distance = 0;
-	    System.out.println("factor "+factorbase);
 	    
 	    for (int i = tod; i < legPoints.size()-2; i++) {
 	    	distance += Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i+1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLonx());
-	    	
-	    	System.out.println(legPoints.get(i+1).getId()+" new before elevation tod "+legPoints.get(i+1).getAltitude());
-	    	
-	    	legPoints.get(i+1).setNewAltitude(diffElev1-(distance * factorbase));
+		    legPoints.get(i+1).setNewAltitude(diffElev1-(distance * factorbase));
 
-/*	    	double newdistance = distance;//5.880040873807478;
-			double newelevation = elevation-(factor*newdistance) ;
-*/
-	    	
-	    	
-	    	
-	    	System.out.println(legPoints.get(i+1).getId()+" new after elevation tod "+legPoints.get(i+1).getAltitude());
-	    	System.out.println();
-	    	
 		}
 	   
 
@@ -249,48 +229,50 @@ public class Geoinfo {
 	}
 
 	
-	public static  void createTOD(double altitude, LinkedList<LegPoint> legPoints) {
-		
+	public static  int createTOD(double altitude, LinkedList<LegPoint> legPoints) {
 		double rate = 0.300;
 		
     	double distForAltitude = Math.round(altitude/rate/1000);
 		
-		int i = legPoints.size()-1;
+		int index = legPoints.size()-1;
 		boolean isfound = false;
 		double distCumulate = 0;
 		double currentDist = 0;
-		while (!isfound && i >= 0) {
+		while (!isfound && index >= 0) {
 			
-			currentDist = distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i-1).getLaty(), legPoints.get(i-1).getLonx(),'N');
+			currentDist = distance(legPoints.get(index).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index-1).getLaty(), legPoints.get(index-1).getLonx(),'N');
 			distCumulate += currentDist;
-			legPoints.get(i).setDistFrom(distCumulate+legPoints.get(i).getDistFrom());
+			legPoints.get(index).setDistFrom(distCumulate+legPoints.get(index).getDistFrom());
 		
 			if (distForAltitude < distCumulate) {
 				isfound = true;
-				legPoints.get(i).setDistFrom(legPoints.get(i).getDistFrom()-currentDist);
+				legPoints.get(index).setDistFrom(legPoints.get(index).getDistFrom()-currentDist);
 			}
 			
-			i--;
+			index--;
 
 		}
 		
 		if (isfound) {
-        	double angle = Geoinfo.calculateAngle(legPoints.get(i+1).getLonx(), legPoints.get(i+1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i).getLaty() );
+        	double angle = Geoinfo.calculateAngle(legPoints.get(index+1).getLonx(), legPoints.get(index+1).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index).getLaty() );
         	
-        	double distRest = distForAltitude -legPoints.get(i+1).getDistFrom();
+        	double distRest = distForAltitude -legPoints.get(index+1).getDistFrom();
 
         	double todKM = distRest*1.852/100;
-        	double todLon = todKM * Math.sin(Math.toRadians(angle))+legPoints.get(i+1).getLonx();  
-        	double todLat = todKM * Math.cos(Math.toRadians(angle))+legPoints.get(i+1).getLaty(); 
+        	double todLon = todKM * Math.sin(Math.toRadians(angle))+legPoints.get(index+1).getLonx();  
+        	double todLat = todKM * Math.cos(Math.toRadians(angle))+legPoints.get(index+1).getLaty(); 
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
     		LegPoint legPoint = new LegPoint("TOD","TOD",coordinates,"1"); 
-    		legPoints.add(i+1,legPoint);
-    	  //  correctSlopeTOD(legPoints, i+1,distForAltitude);
+    		legPoints.add(index+1,legPoint);
+    		
+    	  correctSlopeTOD(legPoints, index+1,distForAltitude);
 
 
  		}
+		return index+1;
+
 	}
 
 	public static void setTocTod(double altitude, LinkedList<LegPoint> legPoints) {

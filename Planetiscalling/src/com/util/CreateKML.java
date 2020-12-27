@@ -245,7 +245,7 @@ public class CreateKML {
 		String icone = "";
 		String typeIcone;
 
-		description += "<div>Mountain Name: "+Util.createHref(mountain.getName(),mountain.getName()+" wikipedia", 0)+" ("
+		description += "<div>Mountain Name: "+Util.createHref(mountain.getName(),mountain.getName()+" "+mountain.getCountry()+" wikipedia", 0)+" ("
 				+Util.createHref("Weather",mountain.getName()+" "+mountain.getName()+ " "+mountain.getCountry()+" weather", 0)+ ")</div>";
 		if (!"no".equals(mountain.getAlt_name())) {
 			description += "<div>Alternate Name:"+Util.createHref(mountain.getAlt_name(),mountain.getAlt_name()+" "+mountain.getCountry()+" wikipedia", 0)+"</div>";

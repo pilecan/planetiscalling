@@ -28,7 +28,7 @@ public interface Info {
 	
 	String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 
-	
+	String flightplanName = "icao_airports.kml";
     String imageLogo = "/images/hello_here.jpg";
     String datadir  = "/data/";
 	

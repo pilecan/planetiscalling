@@ -3,19 +3,13 @@ package com.model;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -46,10 +40,7 @@ public class Result implements Info {
 	private JLabel label;
 	private List<Placemark> placemarks;
 
-	private DefaultListModel<String> listResultModel;
-
-	  private static final Insets EMPTY_INSETS = new Insets(0, 0, 0, 0);
-
+	private SortedListModel listResultModel;
 
 	public Result() {
 		super();
@@ -130,7 +121,7 @@ public class Result implements Info {
 			}
 		});
 
-		formUtility.addLabel("Nearest on the route                                                ", resultPanel, colorForground[0], fontTextItalic);
+		formUtility.addLabel("Nearest on the route         ", resultPanel, colorForground[0], fontTextItalic);
 		label = new JLabel("");
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -167,7 +158,7 @@ public class Result implements Info {
 		
 		formUtility = new FormUtility();
 
-		setformLine(resultPanel, "Airports found:                                                       ", this.airports);
+		setformLine(resultPanel, "Airports found:                                                     ", this.airports);
 		setformLine(resultPanel, "VORs:", this.vors);
 		setformLine(resultPanel, "NDBs:", this.ndbs);
 		
@@ -180,17 +171,21 @@ public class Result implements Info {
 		return resultPanel;
 
 	}
-
 	
-	
-	public DefaultListModel<String>  getListModel() {
-		listResultModel = new DefaultListModel();
+	public SortedListModel  getListModel() {
+		listResultModel = new SortedListModel();
 		String info = "";
 		for (int i = 0; i < placemarks.size(); i++) {
-			info = placemarks.get(i).getDescription().substring(placemarks.get(i).getDescription().indexOf("?q=") + 3,
-					placemarks.get(i).getDescription().indexOf("+wikipedia"));
-			listResultModel.addElement(info.replace("+", " "));
+			try {
+				info = placemarks.get(i).getDescription().substring(placemarks.get(i).getDescription().indexOf("?q=") + 3,
+						placemarks.get(i).getDescription().indexOf("+wikipedia"));
+				listResultModel.add(info.replace("+", " "));
+			} catch (StringIndexOutOfBoundsException e) {
+				// TODO Auto-generated catch block
+				//e.printStackTrace();
+			}
 		}
+		
 
 		return listResultModel;
 	}
