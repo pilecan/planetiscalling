@@ -22,7 +22,7 @@ import com.cfg.model.Placemark;
 import com.panels.PaneIcaolAiport;
 import com.panels.PanelLandmarks;
 import com.panels.PanelManage;
-import com.panels.PanelPlan;
+import com.panels.PanelFlightplan;
 import com.util.Utility;
 
 import net.SelectAiport;
@@ -77,7 +77,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(620, 420);
+		setSize(620, 480);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 		
@@ -119,7 +119,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", new PanelPlan().getFlightplan(manageXMLFile,selectCity,selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(manageXMLFile,selectCity,selectMountain,selectVor, selectNdb));
 		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(manageXMLFile,selectVor, selectNdb, selectMountain, selectCity));
 		tabPane.addTab( "Airport", new PanelLandmarks().getAirportWorld(manageXMLFile,selectCity,selectMountain));
 		tabPane.addTab( "City", new PanelLandmarks().getCityWorld(manageXMLFile));

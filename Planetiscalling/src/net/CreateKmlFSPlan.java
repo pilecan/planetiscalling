@@ -37,7 +37,7 @@ import com.util.Utility;
 public class CreateKmlFSPlan{
 	
 	
-	private static String flightPlanFile = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
+	private String flightPlanFile;// = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
 
 	private Map<String, Placemark> selectedAirports ;
 	private Map<String, City> selectedCities ;
@@ -92,7 +92,7 @@ public class CreateKmlFSPlan{
 	private String departure;
 	private String destination;
 	private Flightplan flightplan;
-
+	private String flightPlanTitle;
 
 	
 	
@@ -162,8 +162,8 @@ public class CreateKmlFSPlan{
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
 		
-		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(0), true);
-		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(legPoints.size()-1), false);
+		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(0), true, dist);
+		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(legPoints.size()-1), false, dist);
 		
 		int cptNew = 0;
 		
@@ -389,7 +389,7 @@ public class CreateKmlFSPlan{
 		    //Create KML Header
 		    writer.write(createKMLHeader());
 		    
- 			writer.write("<Folder><name> Waypoints </name>");
+ 			writer.write("<Folder><name> Waypoints ("+legPoints.size()+") </name>");
 		    
 		    for (LegPoint legPoint : legPoints){
 
@@ -686,6 +686,86 @@ public class CreateKmlFSPlan{
 
 	public void setDestination(String destination) {
 		this.destination = destination;
+	}
+
+
+	public String getFlightPlanFile() {
+		return flightPlanFile;
+	}
+
+
+/*	public static void setFlightPlanFile(String flightPlanFile) {
+		CreateKmlFSPlan.flightPlanFile = flightPlanFile;
+	}
+*/
+
+	public String getFlightPlanTitle() {
+		return flightPlanTitle;
+	}
+
+
+	public void setFlightPlanTitle(String flightPlanTitle) {
+		this.flightPlanTitle = flightPlanTitle;
+	}
+
+
+	public Flightplan getFlightplan() {
+		return flightplan;
+	}
+
+
+	public void setFlightplan(Flightplan flightplan) {
+		this.flightplan = flightplan;
+	}
+
+
+	public Map<String, Placemark> getSelectedAirports() {
+		return selectedAirports;
+	}
+
+
+	public void setSelectedAirports(Map<String, Placemark> selectedAirports) {
+		this.selectedAirports = selectedAirports;
+	}
+
+
+	public Map<String, City> getSelectedCities() {
+		return selectedCities;
+	}
+
+
+	public void setSelectedCities(Map<String, City> selectedCities) {
+		this.selectedCities = selectedCities;
+	}
+
+
+	public Map<String, Mountain> getSelectedMountains() {
+		return selectedMountains;
+	}
+
+
+	public void setSelectedMountains(Map<String, Mountain> selectedMountains) {
+		this.selectedMountains = selectedMountains;
+	}
+
+
+	public Map<Integer, Vor> getSelectedVors() {
+		return selectedVors;
+	}
+
+
+	public void setSelectedVors(Map<Integer, Vor> selectedVors) {
+		this.selectedVors = selectedVors;
+	}
+
+
+	public Map<Integer, Ndb> getSelectedNdbs() {
+		return selectedNdbs;
+	}
+
+
+	public void setSelectedNdbs(Map<Integer, Ndb> selectedNdbs) {
+		this.selectedNdbs = selectedNdbs;
 	}
 
 

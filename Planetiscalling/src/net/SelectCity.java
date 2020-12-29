@@ -36,14 +36,11 @@ public class SelectCity implements Info{
 
 		
 
-		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,admin_name,capital, population, region "
+		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region "
 				+ "FROM world_city_new ";
 		
 		if (!"".equals(search)) {
-			//search = search.replaceAll("\\s+", "','");
-
 			 sql += search;
-
 		}
 		try {
 			final PreparedStatement statement = this.connect().prepareStatement(sql);
@@ -52,9 +49,7 @@ public class SelectCity implements Info{
 				String lastAirport = "";
 
 				while (rs.next()) {
-				    city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"), rs.getString("admin_name"), rs.getString("capital").trim(), rs.getLong("population"));
-					//placemarks.add(new Placemark(city.getCityName(), city.getDescription(), city.getStyleUrl(), city.getPoint(), city.getCoordinates()));
-					//System.out.println(city.toString());
+				    city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital").trim(), rs.getLong("population"));
 				    cities.add(city);
 				    mapCities.put(rs.getString("city"), city);
 				}

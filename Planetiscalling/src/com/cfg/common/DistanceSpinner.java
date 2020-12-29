@@ -45,22 +45,22 @@ public class DistanceSpinner implements Info {
 	public void initPanelDistances(String topic) {
 		
 		
-		distanceCity =  new SpinnerNumberModel(0, 
+		distanceCity =  new SpinnerNumberModel(20, 
       		  0, //min
       		  200, //max
       	      10);               
 		
-		distanceMountain =  new SpinnerNumberModel(0, 
+		distanceMountain =  new SpinnerNumberModel(20, 
       		  0, //min
       		  200, //max
       	      10);               
 		
-		distanceAirport =  new SpinnerNumberModel(0, 
+		distanceAirport =  new SpinnerNumberModel(20, 
       		  0, //min
       		  1000, //max
       	      10);     
 		
-		distanceVorNdb =  new SpinnerNumberModel(0, 
+		distanceVorNdb =  new SpinnerNumberModel(20, 
 	      		  0, //min
 	      		  100, //max
 	      	      10);               

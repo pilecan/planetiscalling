@@ -145,7 +145,6 @@ public class ReadData implements Info{
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
 
-			result.setFlightplan(new File(flightplan).getName()); 
 			result.setDistance(Math.round(createKmlFSPlan.getDistanceBetween())); 
 			result.setAltitude(Math.round(createKmlFSPlan.getAltitude()*3.28084)); 
 			result.setVors(createKmlFSPlan.getNbVor()); 
@@ -155,6 +154,14 @@ public class ReadData implements Info{
 			result.setMountains(createKmlFSPlan.getNbMountain());
 			result.setDeparture(createKmlFSPlan.getDeparture());
 			result.setDestination(createKmlFSPlan.getDestination());
+			
+			result.setFlightplan(createKmlFSPlan.getFlightplan());
+			result.setLegPoints(createKmlFSPlan.getLegPoints());
+			result.setSelectedAirports(createKmlFSPlan.getSelectedAirports());
+			result.setSelectedCities(createKmlFSPlan.getSelectedCities());
+			result.setSelectedMountains(createKmlFSPlan.getSelectedMountains());
+			result.setSelectedNdbs(createKmlFSPlan.getSelectedNdbs());
+			result.setSelectedVors(createKmlFSPlan.getSelectedVors());
 			
 			
 		} catch (NullPointerException | NoPoints | IOException e) {

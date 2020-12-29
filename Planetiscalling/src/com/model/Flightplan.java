@@ -17,6 +17,7 @@ public class Flightplan {
     private String descr;
     private String departureName;
     private String destinationName;
+    private String flightplanFile;
     
     
     
@@ -27,12 +28,15 @@ public class Flightplan {
 	}
 
 	
-	public void validIcao(Map<String, Placemark> hashPlacemak, LegPoint legPoint,boolean isDeparture) {
+	public void validIcao(Map<String, Placemark> hashPlacemak, LegPoint legPoint,boolean isDeparture, Distance dist) {
 		Placemark placemark = hashPlacemak.get(legPoint.getId());
 		String field = null;
 		
 		if (placemark == null) {
-			placemark = hashPlacemak.get(legPoint.getIcaoIdent());
+			try {
+				placemark = hashPlacemak.get(legPoint.getIcaoIdent());
+			} catch (NullPointerException e) {
+			}
 			if (placemark == null) {
 				if (isDeparture) {
 					field = departureID;
@@ -44,9 +48,13 @@ public class Flightplan {
 				
 		}
 
-		legPoint.setIcaoIdent(placemark.getName());
-		legPoint.setPosition(placemark.getCoordinates());
-		legPoint.correctAltitude();
+		if (placemark != null) {
+			legPoint.setIcaoIdent(placemark.getName());
+			legPoint.setPosition(placemark.getCoordinates());
+			legPoint.correctAltitude();
+		} else {
+			dist.setLine(false);
+		}
 	}
 
 	public String getTitle() {
@@ -165,6 +173,16 @@ public class Flightplan {
 				+ cruisingAlt + ", departureID=" + departureID + ", departureLLA=" + departureLLA + ", destinationID="
 				+ destinationID + ", destinationLLA=" + destinationLLA + ", descr=" + descr + ", departureName="
 				+ departureName + ", destinationName=" + destinationName + "]";
+	}
+
+
+	public String getFlightplanFile() {
+		return flightplanFile;
+	}
+
+
+	public void setFlightplanFile(String flightplanFile) {
+		this.flightplanFile = flightplanFile;
 	}
 	
 	

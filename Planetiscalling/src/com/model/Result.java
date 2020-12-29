@@ -1,26 +1,40 @@
 package com.model;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.cfg.common.Info;
+import com.cfg.model.LegPoint;
 import com.cfg.model.Placemark;
 import com.cfg.util.FormUtility;
 
 public class Result implements Info {
-	private String flightplan;
 	private long distance;
 	private long altitude;
 	private int vors;
@@ -41,23 +55,42 @@ public class Result implements Info {
 	private List<Placemark> placemarks;
 
 	private SortedListModel listResultModel;
+	
+	private Map<String, Placemark> selectedAirports ;
+	private Map<String, City> selectedCities ;
+	private Map<String, Mountain> selectedMountains ;
+	private Map<String, Placemark> addonPlacemarks ;
+	private Map<Integer, Vor> selectedVors;
+	private Map<Integer, Ndb> selectedNdbs;
+	private LinkedList<LegPoint> legPoints;
+	private String flightPlanFile;
+	private Flightplan flightplan;
+	
+	private JList list;
+	private ListModel listModel;
+	private JPanel outputPanel;
+	
+    JRadioButton waypointBtn;
+    JRadioButton airportBtn;
+    JRadioButton vorBtn;
+    JRadioButton ndbBtn;
+    JRadioButton cityBtn;
+    JRadioButton mountainBtn;
+
+
+	
 
 	public Result() {
 		super();
+		waypointBtn   = new JRadioButton("", true);
+		airportBtn    = new JRadioButton();
+		vorBtn        = new JRadioButton();
+		ndbBtn        = new JRadioButton("");
+		cityBtn       = new JRadioButton("");
+		mountainBtn   = new JRadioButton("");
+
 	}
 
-	public Result(String flightplan, long distance, long altitude, int vors, int ndbs, int airports, int cities,
-			int mountains) {
-		super();
-		this.flightplan = flightplan;
-		this.distance = distance;
-		this.altitude = altitude;
-		this.vors = vors;
-		this.ndbs = ndbs;
-		this.airports = airports;
-		this.cities = cities;
-		this.mountains = mountains;
-	}
 
 	public JPanel getFlightPlanPanel() {
 		panelAltitude = new JPanel();
@@ -68,28 +101,17 @@ public class Result implements Info {
 
 		formUtility = new FormUtility();
 
-		formUtility.addLabel("FlightPlan:", resultPanel, colorForground[0], fontText);
-		textField.setToolTipText(this.flightplan);
-		textField.setText(this.flightplan);
-		textField.setColumns(15);
-		textField.setEditable(false);
-		textField.setBackground(Color.lightGray);
-		textField.getCaret().setDot(0);
-
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(textField, BorderLayout.WEST);
-		formUtility.addLastField(panel, resultPanel);
-
-		formUtility.addLabel("Distance:", resultPanel, colorForground[0], fontText);
-		label = new JLabel(this.distance + " nm");
+		formUtility.addLabel("Title:", resultPanel, colorForground[0], fontText);
+		label = new JLabel(this.flightplan.getTitle());
+		label.setToolTipText(this.flightplan.getDepartureName()+"/"+this.flightplan.getDestinationName());
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
 		formUtility.addLastField(panel, resultPanel);
 
-		formUtility.addLabel("Departure/Destinaton:", resultPanel, colorForground[0], fontText);
-		label = new JLabel(this.departure + " -> " + this.destination);
+
+		formUtility.addLabel("Distance:", resultPanel, colorForground[0], fontText);
+		label = new JLabel(this.distance + " nm");
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
@@ -100,7 +122,7 @@ public class Result implements Info {
 				500);
 
 		altitudeSpinner = new JSpinner(altitudeModel);
-		altitudeSpinner.setPreferredSize(new Dimension(80, 10));
+		altitudeSpinner.setPreferredSize(new Dimension(80, 25));
 		altitudeSpinner.setToolTipText("Change altitude of flightplan");
 		formUtility.addLabel("Altitude:", resultPanel, colorForground[0], fontText);
 		JPanel panelSpin = new JPanel();
@@ -121,33 +143,74 @@ public class Result implements Info {
 			}
 		});
 
-		formUtility.addLabel("Nearest on the route         ", resultPanel, colorForground[0], fontTextItalic);
-		label = new JLabel("");
-		panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(label, BorderLayout.WEST);
-		formUtility.addLastField(panel, resultPanel);
+        ButtonGroup bgroup = new ButtonGroup();
 
-
-		setformLine(resultPanel, "Airports:", this.airports);
-		setformLine(resultPanel, "VORs:", this.vors);
-		setformLine(resultPanel, "NDBs:", this.ndbs);
+        waypointBtn   = new JRadioButton("", true);
+        airportBtn    = new JRadioButton();
+        vorBtn = new JRadioButton();
+        ndbBtn   = new JRadioButton("");
+        cityBtn = new JRadioButton("");
+        mountainBtn = new JRadioButton("");
+        
+        bgroup.add(waypointBtn);
+        bgroup.add(airportBtn);
+        bgroup.add(vorBtn);
+        bgroup.add(ndbBtn);
+        bgroup.add(cityBtn);
+        bgroup.add(mountainBtn);
+        
+        // Register a listener for the radio buttons.
+        RadioListener myListener = new RadioListener();
+        waypointBtn.addActionListener(myListener);
+        airportBtn.addActionListener(myListener);
+        vorBtn.addActionListener(myListener);
+        ndbBtn.addActionListener(myListener);
+        cityBtn.addActionListener(myListener);
+        mountainBtn.addActionListener(myListener);
+        
+		setformLine(resultPanel, "Waypoints:", this.legPoints.size(),waypointBtn);
+		setformLine(resultPanel, "Airports:", this.airports,airportBtn);
+		setformLine(resultPanel, "VORs:", this.vors,vorBtn);
+		setformLine(resultPanel, "NDBs:", this.ndbs,ndbBtn);
+		setformLine(resultPanel, "Cities:", this.cities,cityBtn);
+		setformLine(resultPanel, "Mountains:", this.mountains,mountainBtn);
 		
-		setformLine(resultPanel, "Cities:", this.cities);
-		setformLine(resultPanel, "Mountains:", this.mountains);
+	
 
 		resultPanel.validate();
 
 		return resultPanel;
 	}
 	
-	private void setformLine(JPanel resultPanel, String strLabel,int number) {
+	  /** Listens to the radio buttons. */
+    class RadioListener implements ActionListener { 
+        public void actionPerformed(ActionEvent e) {
+        	if (e.getSource() == waypointBtn) {
+        		getWaypointListModel();
+        	} else if (e.getSource() == airportBtn) {
+        		getAirportListModel();
+        	}else if (e.getSource() == vorBtn) {
+        		getVorListModel();
+        	}else if (e.getSource() == ndbBtn) {
+        		geNdbListModel();
+        	}else if (e.getSource() == cityBtn) {
+        		getCityListModel();
+        	}else if (e.getSource() == mountainBtn) {
+        		getMountainListModel();
+        	}
+            
+        }
+    }
 	
-		formUtility.addLabel(strLabel, resultPanel, colorForground[0], fontText);
-		label = new JLabel(number + "");
+	private void setformLine(JPanel resultPanel, String strLabel,int number,  JRadioButton radioBtn) {
+	
+		formUtility.addLabel(strLabel+"                         ", resultPanel, colorForground[0], fontText);
+		label = new JLabel(String.format("%03d", number)+"                 ");
+ 
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
+		panel.add(radioBtn);
 		formUtility.addLastField(panel, resultPanel);
 	
 	}
@@ -157,14 +220,28 @@ public class Result implements Info {
 		resultPanel.setLayout(new GridBagLayout());
 		
 		formUtility = new FormUtility();
-
-		setformLine(resultPanel, "Airports found:                                                     ", this.airports);
-		setformLine(resultPanel, "VORs:", this.vors);
-		setformLine(resultPanel, "NDBs:", this.ndbs);
 		
-		setformLine(resultPanel, "Cities:", this.cities);
-		setformLine(resultPanel, "Mountains:", this.mountains);
+        ButtonGroup bgroup = new ButtonGroup();
+        
+        airportBtn    = new JRadioButton("", true);
+        vorBtn = new JRadioButton();
+        ndbBtn   = new JRadioButton("");
+        cityBtn = new JRadioButton("");
+        mountainBtn = new JRadioButton("");
+        
+        bgroup.add(airportBtn);
+        bgroup.add(vorBtn);
+        bgroup.add(ndbBtn);
+        bgroup.add(cityBtn);
+        bgroup.add(mountainBtn);
+         
+		setformLine(resultPanel, "Airports:", this.airports,airportBtn);
+		setformLine(resultPanel, "VORs:", this.vors,vorBtn);
+		setformLine(resultPanel, "NDBs:", this.ndbs,ndbBtn);
+		setformLine(resultPanel, "Cities:", this.cities,cityBtn);
+		setformLine(resultPanel, "Mountains:", this.mountains,mountainBtn);
 
+	
 		resultPanel.validate();
 		
 		
@@ -172,7 +249,7 @@ public class Result implements Info {
 
 	}
 	
-	public SortedListModel  getListModel() {
+	public SortedListModel  getListIcaoModel() {
 		listResultModel = new SortedListModel();
 		String info = "";
 		for (int i = 0; i < placemarks.size(); i++) {
@@ -189,15 +266,125 @@ public class Result implements Info {
 
 		return listResultModel;
 	}
+	
+	public void getWaypointListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		for (int i = 0; i < legPoints.size(); i++) {
+			info = legPoints.get(i).getId()+"   "+legPoints.get(i).getPosition();
+			((DefaultListModel) listModel).addElement(info);
+		}
+		
+		showList((DefaultListModel<String>) listModel);
+		
+	}
+	public void getAirportListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		
+		for (Placemark placemark : selectedAirports.values()) {
+			info = placemark.getDescription().substring(placemark.getDescription().indexOf("?q=") + 3,
+					placemark.getDescription().indexOf("+wikipedia"));
+			info = info.replaceAll("\\+", "  ");
+			((DefaultListModel) listModel).addElement(info);
+		}
 
-	public String getFlightplan() {
-		return flightplan;
+		showList((DefaultListModel<String>) listModel);
+		
+	}
+	
+	public void getVorListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		
+		for (Vor vor: selectedVors.values()) {
+			String cap = vor.getName();
+			 cap = cap.substring(0,1)+cap.substring(1).toLowerCase();
+
+			info = vor.getIdent()+"   "+cap+"-Region:"+vor.getRegion()+"-Type : "+vor.getType();
+			((DefaultListModel) listModel).addElement(info);
+		}
+
+		showList((DefaultListModel<String>) listModel);
+		
 	}
 
-	public void setFlightplan(String flightplan) {
-		this.flightplan = flightplan;
+	public void geNdbListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		
+		for (Ndb ndb: selectedNdbs.values()) {
+			String cap = ndb.getName();
+			 cap = cap.substring(0,1)+cap.substring(1).toLowerCase();
+			info = ndb.getIdent()+"   "+cap+"-Region:"+ndb.getRegion()+"-Type: "+ndb.getType();
+			((DefaultListModel) listModel).addElement(info);
+		}
+
+		showList((DefaultListModel<String>) listModel);
+		
+	}
+	
+	public void getCityListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		
+		for (City city: selectedCities.values()) {
+			info = city.getCityName()+"   Country: "+city.getCountry()+"-Population: "+city.getPopulation()+"-Region:"+city.getRegion();
+			((DefaultListModel) listModel).addElement(info);
+		}
+
+		showList((DefaultListModel<String>) listModel);
+		
+	}
+	
+	public void getMountainListModel() {
+		listModel = new  DefaultListModel<String>();
+		String info = "";
+		
+		for (Mountain mountains: selectedMountains.values()) {
+			info = mountains.getName()+"   Country: "+mountains.getCountry()+"-Elevation: "+mountains.getElevation();
+			((DefaultListModel) listModel).addElement(info);
+		}
+
+		showList((DefaultListModel<String>) listModel);
+		
 	}
 
+	
+	/**
+	 * 
+	 * @param listModel
+	 */
+	public void showList(DefaultListModel<String>  listModel) {
+
+		 outputPanel.setVisible(true);
+	     outputPanel.removeAll();	
+		 list = new JList(listModel);
+		 
+
+		 list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		 list.setVisibleRowCount(5);
+		 
+		 list.addListSelectionListener(new ListSelectionListener() {
+			  /**
+			  * {@inheritDoc}
+			  */
+			  @Override
+			  public void valueChanged(ListSelectionEvent e) {
+				 // deleteButton.setEnabled(!listIcao.isSelectionEmpty());
+			  }
+			});
+	
+		 outputPanel.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+		
+		  outputPanel.validate();
+
+	}
+	
+
+	
+	
 	public long getDistance() {
 		return distance;
 	}
@@ -315,4 +502,134 @@ public class Result implements Info {
 
 	}
 
+	public Map<String, Placemark> getSelectedAirports() {
+		return selectedAirports;
+	}
+
+	public void setSelectedAirports(Map<String, Placemark> selectedAirports) {
+		this.selectedAirports = selectedAirports;
+	}
+
+	public Map<String, City> getSelectedCities() {
+		return selectedCities;
+	}
+
+	public void setSelectedCities(Map<String, City> selectedCities) {
+		this.selectedCities = selectedCities;
+	}
+
+	public Map<String, Mountain> getSelectedMountains() {
+		return selectedMountains;
+	}
+
+	public void setSelectedMountains(Map<String, Mountain> selectedMountains) {
+		this.selectedMountains = selectedMountains;
+	}
+
+	public Map<Integer, Vor> getSelectedVors() {
+		return selectedVors;
+	}
+
+	public void setSelectedVors(Map<Integer, Vor> selectedVors) {
+		this.selectedVors = selectedVors;
+	}
+
+	public Map<Integer, Ndb> getSelectedNdbs() {
+		return selectedNdbs;
+	}
+
+	public void setSelectedNdbs(Map<Integer, Ndb> selectedNdbs) {
+		this.selectedNdbs = selectedNdbs;
+	}
+
+	public Map<String, Placemark> getAddonPlacemarks() {
+		return addonPlacemarks;
+	}
+
+	public void setAddonPlacemarks(Map<String, Placemark> addonPlacemarks) {
+		this.addonPlacemarks = addonPlacemarks;
+	}
+
+	public LinkedList<LegPoint> getLegPoints() {
+		return legPoints;
+	}
+
+	public void setLegPoints(LinkedList<LegPoint> legPoints) {
+		this.legPoints = legPoints;
+	}
+
+	public String getFlightPlanFile() {
+		return flightPlanFile;
+	}
+
+	public void setFlightPlanFile(String flightPlanFile) {
+		this.flightPlanFile = flightPlanFile;
+	}
+
+
+	public JPanel getResultPanel() {
+		return resultPanel;
+	}
+
+
+	public void setResultPanel(JPanel resultPanel) {
+		this.resultPanel = resultPanel;
+	}
+
+
+	public JPanel getPanel() {
+		return panel;
+	}
+
+
+	public void setPanel(JPanel panel) {
+		this.panel = panel;
+	}
+
+
+	public JLabel getLabel() {
+		return label;
+	}
+
+
+	public void setLabel(JLabel label) {
+		this.label = label;
+	}
+
+
+	public List<Placemark> getPlacemarks() {
+		return placemarks;
+	}
+
+
+	public void setPlacemarks(List<Placemark> placemarks) {
+		this.placemarks = placemarks;
+	}
+
+
+	public SortedListModel getListResultModel() {
+		return listResultModel;
+	}
+
+
+	public void setListResultModel(SortedListModel listResultModel) {
+		this.listResultModel = listResultModel;
+	}
+
+
+	public Flightplan getFlightplan() {
+		return flightplan;
+	}
+
+
+	public void setFlightplan(Flightplan flightplan) {
+		this.flightplan = flightplan;
+	}
+
+
+	public void setOutputPanel(JPanel outputPanel) {
+		this.outputPanel = outputPanel;
+	}
+
+	
 }

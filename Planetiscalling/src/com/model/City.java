@@ -10,6 +10,7 @@ public class City {
 	private String country;
 	private String iso2;
 	private String iso3;
+	private String region;
 	private String adminName;
 	private String capital;
 	private Long population;
@@ -24,7 +25,7 @@ public class City {
 	}
 
 	public City(Long id, String city, String cityAscii, Double lonx, Double laty, String country, String iso2,
-			String iso3, String adminName, String capital, Long population) {
+			String iso3, String region, String adminName, String capital, Long population) {
 		super();
 		this.id = id;
 		this.cityName = city;
@@ -34,6 +35,7 @@ public class City {
 		this.country = country;
 		this.iso2 = iso2;
 		this.iso3 = iso3;
+		this.region = region;
 		this.adminName = adminName;
 		this.capital = capital;
 		this.population = population;
@@ -48,6 +50,7 @@ public class City {
 		this.country = city.getCountry();
 		this.iso2 = city.getIso2();
 		this.iso3 = city.getIso3();
+		this.region = city.getRegion();
 		this.adminName = city.getAdminName();
 		this.capital = city.getCapital();
 		this.population = city.getPopulation();
@@ -246,6 +249,14 @@ public class City {
 		return "City [id=" + id + ", city=" + cityName + ", cityAscii=" + cityAscii + ", lonx=" + lonx + ", laty=" + laty
 				+ ", country=" + country + ", iso2=" + iso2 + ", iso3=" + iso3 + ", adminName=" + adminName
 				+ ", capital=" + capital + ", population=" + population + "]";
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
 	}
 
 }

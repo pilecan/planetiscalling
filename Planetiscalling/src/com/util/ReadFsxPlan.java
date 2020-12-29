@@ -50,6 +50,7 @@ public class ReadFsxPlan extends DefaultHandler{
 	public ReadFsxPlan(String flightPlanFile){
 		this.flightPlanFile = flightPlanFile;
 		flightplan = new Flightplan();
+		flightplan.setFlightplanFile(flightPlanFile);
 		parseDocument();
 	}
 	

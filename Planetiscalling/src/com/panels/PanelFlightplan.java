@@ -4,17 +4,20 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
 import com.model.Distance;
 import com.model.Result;
 import com.util.ReadData;
@@ -25,14 +28,14 @@ import net.SelectMountain;
 import net.SelectNdb;
 import net.SelectVor;
 
-public class PanelPlan {
+public class PanelFlightplan {
 
 	private ReadData readData;	
 	private Result result;
 	private JPanel panelFlightplan = new JPanel();
 	private JPanel panelResult;
 	
-	private JButton buttonReload;
+	private JButton buttonGoogle;
 	
 	private DistanceSpinner distanceSpin; 
 	
@@ -42,22 +45,25 @@ public class PanelPlan {
 	private SelectMountain selectMountain;
 	private SelectVor selectVor;
 	private SelectNdb selectNdb;
-
+	
+	private JPanel outputPanel;
+	
+	private String flightPlanFile;
 	private JButton buttonFP;
 
-	public PanelPlan() {
+	public PanelFlightplan() {
 		super();
 
 	}
 
-	
-	public JPanel getFlightplan(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
+	public JPanel getPanel(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
 		this.manageXMLFile = manageXMLFile;
 		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor = selectVor;
 		this.selectNdb = selectNdb;
+		this.flightPlanFile = "";
 
 		return createPanel();
 	}
@@ -73,14 +79,17 @@ public class PanelPlan {
 		panelFlightplan.setLayout(null);
 
 		panelResult = new JPanel(new BorderLayout());
-		panelResult.setBorder(new TitledBorder("Search Result"));
+		panelResult.setBorder(new TitledBorder(this.flightPlanFile));
+		outputPanel = new JPanel(new BorderLayout());
+		outputPanel.setBorder(new TitledBorder(""));
+		
+		result.setOutputPanel(outputPanel);
 		
 		buttonFP = new JButton("Select Flightplan");
 		buttonFP.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	  result = new Result();
 	    	  readData =  new ReadData(result, manageXMLFile, selectCity, selectMountain, selectVor, selectNdb,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -89,19 +98,24 @@ public class PanelPlan {
 		        				 distanceSpin.getCheckTocTod().isSelected(),
 		        				 0.0));
     	  
+	    	 flightPlanFile = new File(result.getFlightplan().getFlightplanFile()).getName();
+	 		 panelResult.setBorder(new TitledBorder(new File(flightPlanFile).getName()));
+
 	  		 panelResult.removeAll();	
 			 panelResult.add(result.getFlightPlanPanel());
 			 panelResult.validate();
+			 
+		  	 result.getWaypointListModel();
 
 			 panelFlightplan.add(panelResult);
 			 panelFlightplan.validate();
 
-			 buttonReload.setVisible(true); 
+			 buttonGoogle.setVisible(true); 
 	      }
 	    });
 		
-		buttonReload = new JButton("See on Google Earth");
-		buttonReload.addActionListener(new ActionListener()
+		buttonGoogle = new JButton("See on Google Earth");
+		buttonGoogle.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
@@ -114,7 +128,9 @@ public class PanelPlan {
 	    			 (double)result.getAltitudeModel().getValue())); 
 		  	panelResult.removeAll();	
 
-		  	 panelResult.setBounds(290, 20, 300, 240);	
+		  	 panelResult.setBounds(290, 20, 300, 260);	
+
+
 		
 	    	 panelResult.add(result.getFlightPlanPanel());
 			 panelResult.validate();
@@ -125,24 +141,24 @@ public class PanelPlan {
 	        
 	      }
 	    });
-		buttonReload.setVisible(false); 
+		buttonGoogle.setVisible(false); 
 		
 		buttonFP.setBounds(10, 20, 200, 23);
 		distanceSpin.getSpinnerPanel().setBounds(10, 50, 260, 200);
 
     	
-		buttonReload.setBounds(200, 270, 200, 23);
+		buttonGoogle.setBounds(10, 270, 200, 23);
 
 	  	panelResult.setBounds(290, 10, 300, 240);	
+	  	outputPanel.setBounds(290, 250, 300, 140);	
 
      	panelFlightplan.add(buttonFP);
 		panelFlightplan.add(panelResult);
+		panelFlightplan.add(outputPanel);
 		panelFlightplan.add(distanceSpin.getSpinnerPanel());
-     	panelFlightplan.add(buttonReload);
+     	panelFlightplan.add(buttonGoogle);
 
 		return panelFlightplan;					
 	}
-	
-	
 
 }

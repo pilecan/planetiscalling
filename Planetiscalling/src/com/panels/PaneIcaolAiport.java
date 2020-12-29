@@ -237,7 +237,7 @@ public class PaneIcaolAiport extends JFrame {
 	 */
 	private void setIcaoResult() {
 		
-		 listIcaoModel = result.getListModel();
+		 listIcaoModel = result.getListIcaoModel();
 
 		 outputIcaoPanel.setVisible(true);
 	     outputIcaoPanel.removeAll();	
