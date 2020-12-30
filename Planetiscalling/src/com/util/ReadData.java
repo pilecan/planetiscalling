@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -27,6 +28,7 @@ import com.cfg.model.Placemark;
 import com.geo.util.Geoinfo;
 import com.model.City;
 import com.model.Distance;
+import com.model.Flightplan;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Result;
@@ -53,13 +55,13 @@ public class ReadData implements Info{
 	private Map<String, Placemark> selectedAirports ;
 	private Map<Integer, Vor> selectedVors;
 	private Map<Integer, Ndb> selectedNdbs;
-
+	private CreateKmlFSPlan createKmlFSPlan;
 	
 	private CreateKML createKML;
 	
-	private String flightplan ;
+	private String flightplanName ;
 	
-	private String flightplanName;
+	private String KmlFlightplanName;
 	
 	private Result result;
 	
@@ -123,7 +125,7 @@ public class ReadData implements Info{
 			
 			if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
 				//System.out.println(chooser.getSelectedFile());
-				flightplan = chooser.getSelectedFile().toString();
+				flightplanName = chooser.getSelectedFile().toString();
 				createFlightplan(dist);
 		    } else {
 		    	kmlFlightPlanFile = "";
@@ -136,7 +138,7 @@ public class ReadData implements Info{
 		
 		try {
 
-			CreateKmlFSPlan createKmlFSPlan =  new CreateKmlFSPlan(flightplan, dist, 
+			this.createKmlFSPlan =  new CreateKmlFSPlan(flightplanName, dist, 
 					manageXMLFile,
 					selectCity.getCities(), 
 					selectMountain.getMountains(),
@@ -145,24 +147,9 @@ public class ReadData implements Info{
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
 
-			result.setDistance(Math.round(createKmlFSPlan.getDistanceBetween())); 
-			result.setAltitude(Math.round(createKmlFSPlan.getAltitude()*3.28084)); 
-			result.setVors(createKmlFSPlan.getNbVor()); 
-			result.setNdbs(createKmlFSPlan.getNbNdb()); 
-			result.setAirports(createKmlFSPlan.getNbAirport()); 
-			result.setCities(createKmlFSPlan.getNbCity()); 
-			result.setMountains(createKmlFSPlan.getNbMountain());
-			result.setDeparture(createKmlFSPlan.getDeparture());
-			result.setDestination(createKmlFSPlan.getDestination());
-			
-			result.setFlightplan(createKmlFSPlan.getFlightplan());
+			setResult();
 			result.setLegPoints(createKmlFSPlan.getLegPoints());
-			result.setSelectedAirports(createKmlFSPlan.getSelectedAirports());
-			result.setSelectedCities(createKmlFSPlan.getSelectedCities());
-			result.setSelectedMountains(createKmlFSPlan.getSelectedMountains());
-			result.setSelectedNdbs(createKmlFSPlan.getSelectedNdbs());
-			result.setSelectedVors(createKmlFSPlan.getSelectedVors());
-			
+
 			
 		} catch (NullPointerException | NoPoints | IOException e) {
 			// TODO Auto-generated catch block
@@ -171,14 +158,41 @@ public class ReadData implements Info{
 			
 	}
 	
+	private void setResult() {
+		result.setDistance(Math.round(createKmlFSPlan.getDistanceBetween())); 
+		result.setAltitude(Math.round(createKmlFSPlan.getAltitude()*3.28084)); 
+		result.setDeparture(createKmlFSPlan.getDeparture());
+		result.setDestination(createKmlFSPlan.getDestination());
+		
+		result.setFlightplan(createKmlFSPlan.getFlightplan());
+		result.setSelectedAirports(createKmlFSPlan.getSelectedAirports());
+		result.setSelectedCities(createKmlFSPlan.getSelectedCities());
+		result.setSelectedMountains(createKmlFSPlan.getSelectedMountains());
+		result.setSelectedNdbs(createKmlFSPlan.getSelectedNdbs());
+		result.setSelectedVors(createKmlFSPlan.getSelectedVors());
+		
+	}
+	
+	public void resetResult() {
+		
+		//Flightplan
+	    createKmlFSPlan.setAltitude(Math.round(Double.parseDouble(result.getFlightplan().getCruisingAlt())/3.28084));
+		createKmlFSPlan.setSelectedAirports(new HashMap<String, Placemark>() );
+		createKmlFSPlan.setSelectedCities(new HashMap<String, City>());
+		createKmlFSPlan.setSelectedMountains(new HashMap<String, Mountain>());
+		createKmlFSPlan.setSelectedNdbs(new HashMap<Integer, Ndb>());
+		createKmlFSPlan.setSelectedVors(new HashMap<Integer, Vor>());
+		setResult();
+	}
+	
     private JFileChooser selectDirectoryProgram(String title,String directory){
 		JFileChooser chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new java.io.File(directory));
 		chooser.setDialogTitle(title);
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		chooser.setAcceptAllFileFilterUsed(false);
-		String[] EXTENSION=new String[]{"plg","pln"};
-		 FileNameExtensionFilter filter=new FileNameExtensionFilter("FS2020/FSX/FS9 (.pln), Plan-G (.plg)",EXTENSION);
+		String[] EXTENSION=new String[]{"pln"};
+		 FileNameExtensionFilter filter=new FileNameExtensionFilter("FS2020/FSX (.pln)",EXTENSION);
 		 chooser.setFileFilter(filter);
 		 chooser.setMultiSelectionEnabled(false);
 	
@@ -207,7 +221,7 @@ public class ReadData implements Info{
 			search = search.replaceAll("\\s+", "','");
 			String sql = "where ident in ('"+ search + "') ";
 
-	    	SelectAiport selectAiport = new SelectAiport();
+	    	SelectAiport selectAiport = new SelectAiport();	
 	 	
 			selectAiport.selectAll(sql, placemarks);
 			placemarks = selectAiport.getPlacemarks();
@@ -218,11 +232,17 @@ public class ReadData implements Info{
 			searchIcaoVorNdb(placemarks, selectVor, selectNdb);
 				
 			
-			result.setAirports(placemarks.size());
+/*			result.setAirports(placemarks.size());
 			result.setVors(selectedVors.size()); 
 			result.setNdbs(selectedNdbs.size()); 
 			result.setCities(selectedCities.size()); 
 			result.setMountains(selectedMountains.size());
+*/			
+			result.setSelectedAirports(selectAiport.getMapPlacemark());
+			result.setSelectedCities(selectedCities);
+			result.setSelectedMountains(selectedMountains);
+			result.setSelectedNdbs(selectedNdbs);
+			result.setSelectedVors(selectedVors);
 
 			
 			saveKMLFileICAO(manageXMLFile, placemarks,Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
@@ -509,10 +529,10 @@ public class ReadData implements Info{
 		
 		selectedMountains = selectMountain.getMapMountains();
 		
-    	flightplanName = Utility.getInstance().getFlightPlanName("mountain_city_airport.kml");
+    	KmlFlightplanName = Utility.getInstance().getFlightPlanName("mountain_city_airport.kml");
 
-		saveKMLFile(manageXMLFile,airports,flightplanName);
-		manageXMLFile.launchGoogleEarth(new File(flightplanName));
+		saveKMLFile(manageXMLFile,airports,KmlFlightplanName);
+		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
 		System.out.println(airports.size());
 
@@ -577,11 +597,11 @@ public class ReadData implements Info{
 		
 		selectedCities = selectCity.getMapCities();
 		
-    	flightplanName = Utility.getInstance().getFlightPlanName("city_airport_mountain.kml");
+    	KmlFlightplanName = Utility.getInstance().getFlightPlanName("city_airport_mountain.kml");
     	
-		saveKMLFile(manageXMLFile,airports,flightplanName);
+		saveKMLFile(manageXMLFile,airports,KmlFlightplanName);
 		
-		manageXMLFile.launchGoogleEarth(new File(flightplanName));
+		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
 		System.out.println(airports.size());
 
@@ -645,11 +665,11 @@ public class ReadData implements Info{
 	
 		searchAiportNeighbor(placemarks,selectCity,selectMoutain);
 	
-    	flightplanName = Utility.getInstance().getFlightPlanName("airport_city_mountain.kml");
+    	KmlFlightplanName = Utility.getInstance().getFlightPlanName("airport_city_mountain.kml");
 		
-		saveKMLFile(manageXMLFile,placemarks,flightplanName);
+		saveKMLFile(manageXMLFile,placemarks,KmlFlightplanName);
 		
-		manageXMLFile.launchGoogleEarth(new File(flightplanName));
+		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
 		System.out.println("airports found = "+ placemarks.size());
 

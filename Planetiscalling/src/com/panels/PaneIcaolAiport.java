@@ -197,14 +197,14 @@ public class PaneIcaolAiport extends JFrame {
 		
 
 		inputIcaoPanel.setBounds(10, 8, 270, 120);
-		resultPanel.setBounds(290, 8, 300, 125);
-	  	outputIcaoPanel.setBounds(290, 132, 300, 149);	
+		resultPanel.setBounds(290, 8, 300, 139);
+	  	outputIcaoPanel.setBounds(290, 145, 300, 149);	
 
-		distanceSpin.getSpinnerPanel().setBounds(10, 130, 280, 140);
-  	    searchButton.setBounds(10, 280, 125, 23);
-		clearButton.setBounds(150, 280, 125, 23);
-		deleteButton.setBounds(290, 280, 130, 23);
-		googleButton.setBounds(450, 280, 130, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 130, 280, 190);
+  	    searchButton.setBounds(10, 330, 125, 23);
+		clearButton.setBounds(150, 330, 125, 23);
+		deleteButton.setBounds(290, 290, 130, 23);
+		googleButton.setBounds(450, 290, 130, 23);
 		
 
 //		icaoPanel.add(labelHeader);

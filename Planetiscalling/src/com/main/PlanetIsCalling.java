@@ -77,7 +77,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(620, 480);
+		setSize(620, 510);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 		
@@ -107,7 +107,6 @@ public class PlanetIsCalling extends JFrame implements Info {
 		});
 		
         Utility.getInstance().setIcon(this, imageLogo);
-
 	    
 		setTitle("The Planet Is Calling 0.7");
 	
@@ -115,15 +114,14 @@ public class PlanetIsCalling extends JFrame implements Info {
 		mainPanel.setLayout(new BorderLayout());
 		getContentPane().add(mainPanel);
 		
-
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
 		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(manageXMLFile,selectCity,selectMountain,selectVor, selectNdb));
 		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(manageXMLFile,selectVor, selectNdb, selectMountain, selectCity));
-		tabPane.addTab( "Airport", new PanelLandmarks().getAirportWorld(manageXMLFile,selectCity,selectMountain));
-		tabPane.addTab( "City", new PanelLandmarks().getCityWorld(manageXMLFile));
-		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainWorld(manageXMLFile));
+		tabPane.addTab( "Airport", new PanelLandmarks().getAirportPanel(manageXMLFile,selectCity,selectMountain));
+		tabPane.addTab( "City", new PanelLandmarks().getCityPanel(manageXMLFile));
+		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainPanel(manageXMLFile));
 		tabPane.addTab( "Setting", new PanelManage().getSettingPanel());
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);

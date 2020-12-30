@@ -73,7 +73,7 @@ public class PanelLandmarks implements Info {
 	 * 
 	 * @return
 	 */
-	public JPanel getAirportWorld(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain) {
+	public JPanel getAirportPanel(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		
 		distanceSpin.initPanelDistances("airport");
@@ -204,7 +204,7 @@ public class PanelLandmarks implements Info {
 	 * @param manageXMLFile
 	 * @return
 	 */
-	public JPanel getCityWorld(final ManageXMLFile manageXMLFile) {
+	public JPanel getCityPanel(final ManageXMLFile manageXMLFile) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("city");
 
@@ -325,7 +325,7 @@ public class PanelLandmarks implements Info {
 	  * @param manageXMLFile
 	  * @return
 	  */
-	public JPanel getMountainWorld(final ManageXMLFile manageXMLFile) {
+	public JPanel getMountainPanel(final ManageXMLFile manageXMLFile) {
 		
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");

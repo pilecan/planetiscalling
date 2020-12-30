@@ -185,7 +185,7 @@ public class CreateKmlFSPlan{
 				if (distanceBetween > 15) {
 					
 					 String midpoint = Geoinfo.midpoint(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]));
-				     LegPoint legPoint = new LegPoint("MID"+(cptNew++),"VOR",midpoint+","+legPoints.get(i+1).getPosition().split(",")[2],"0"); 
+				     LegPoint legPoint = new LegPoint("MID","MID",midpoint+","+legPoints.get(i+1).getPosition().split(",")[2],"0"); 
 					 
 				   legPoints.add(i+1,legPoint);
 					 
@@ -766,6 +766,11 @@ public class CreateKmlFSPlan{
 
 	public void setSelectedNdbs(Map<Integer, Ndb> selectedNdbs) {
 		this.selectedNdbs = selectedNdbs;
+	}
+
+
+	public void setAltitude(double altitude) {
+		this.altitude = altitude;
 	}
 
 

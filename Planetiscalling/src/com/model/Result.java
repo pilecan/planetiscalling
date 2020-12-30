@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
 import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -33,6 +35,7 @@ import com.cfg.common.Info;
 import com.cfg.model.LegPoint;
 import com.cfg.model.Placemark;
 import com.cfg.util.FormUtility;
+import com.geo.util.Geoinfo;
 
 public class Result implements Info {
 	private long distance;
@@ -70,16 +73,18 @@ public class Result implements Info {
 	private ListModel listModel;
 	private JPanel outputPanel;
 	
-    JRadioButton waypointBtn;
-    JRadioButton airportBtn;
-    JRadioButton vorBtn;
-    JRadioButton ndbBtn;
-    JRadioButton cityBtn;
-    JRadioButton mountainBtn;
+	private JRadioButton waypointBtn;
+	private JRadioButton airportBtn;
+	private JRadioButton vorBtn;
+	private JRadioButton ndbBtn;
+	private JRadioButton cityBtn;
+	private JRadioButton mountainBtn;
 
+	private JButton landMeBt;
+	private JButton askMeBt;
+	private JButton landAllBt;
 
 	
-
 	public Result() {
 		super();
 		waypointBtn   = new JRadioButton("", true);
@@ -89,6 +94,12 @@ public class Result implements Info {
 		cityBtn       = new JRadioButton("");
 		mountainBtn   = new JRadioButton("");
 
+	}
+	
+	public void setButtons(JButton landMeBt, JButton askMe, JButton landAllBt) {
+		this.landMeBt = landMeBt;
+		this.askMeBt = askMe;
+		this.landAllBt = landAllBt;
 	}
 
 
@@ -118,7 +129,7 @@ public class Result implements Info {
 		formUtility.addLastField(panel, resultPanel);
 
 		altitudeModel = new SpinnerNumberModel(altitude, 500, // min
-				60000, // max
+				100000, // max
 				500);
 
 		altitudeSpinner = new JSpinner(altitudeModel);
@@ -147,10 +158,10 @@ public class Result implements Info {
 
         waypointBtn   = new JRadioButton("", true);
         airportBtn    = new JRadioButton();
-        vorBtn = new JRadioButton();
-        ndbBtn   = new JRadioButton("");
-        cityBtn = new JRadioButton("");
-        mountainBtn = new JRadioButton("");
+        vorBtn        = new JRadioButton();
+        ndbBtn        = new JRadioButton("");
+        cityBtn       = new JRadioButton("");
+        mountainBtn   = new JRadioButton("");
         
         bgroup.add(waypointBtn);
         bgroup.add(airportBtn);
@@ -159,7 +170,6 @@ public class Result implements Info {
         bgroup.add(cityBtn);
         bgroup.add(mountainBtn);
         
-        // Register a listener for the radio buttons.
         RadioListener myListener = new RadioListener();
         waypointBtn.addActionListener(myListener);
         airportBtn.addActionListener(myListener);
@@ -169,14 +179,12 @@ public class Result implements Info {
         mountainBtn.addActionListener(myListener);
         
 		setformLine(resultPanel, "Waypoints:", this.legPoints.size(),waypointBtn);
-		setformLine(resultPanel, "Airports:", this.airports,airportBtn);
-		setformLine(resultPanel, "VORs:", this.vors,vorBtn);
-		setformLine(resultPanel, "NDBs:", this.ndbs,ndbBtn);
-		setformLine(resultPanel, "Cities:", this.cities,cityBtn);
-		setformLine(resultPanel, "Mountains:", this.mountains,mountainBtn);
+		setformLine(resultPanel, "Airports:", this.selectedAirports.size(),airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(),vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(),ndbBtn);
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(),cityBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(),mountainBtn);
 		
-	
-
 		resultPanel.validate();
 
 		return resultPanel;
@@ -234,13 +242,12 @@ public class Result implements Info {
         bgroup.add(ndbBtn);
         bgroup.add(cityBtn);
         bgroup.add(mountainBtn);
-         
-		setformLine(resultPanel, "Airports:", this.airports,airportBtn);
-		setformLine(resultPanel, "VORs:", this.vors,vorBtn);
-		setformLine(resultPanel, "NDBs:", this.ndbs,ndbBtn);
-		setformLine(resultPanel, "Cities:", this.cities,cityBtn);
-		setformLine(resultPanel, "Mountains:", this.mountains,mountainBtn);
-
+		
+		setformLine(resultPanel, "Airports:", this.selectedAirports.size(),airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(),vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(),ndbBtn);
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(),cityBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(),mountainBtn);
 	
 		resultPanel.validate();
 		
@@ -269,10 +276,21 @@ public class Result implements Info {
 	
 	public void getWaypointListModel() {
 		listModel = new  DefaultListModel<String>();
+		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 		String info = "";
+		double distance = 0.0;
+		double distanceCumul = 0.0;
 		for (int i = 0; i < legPoints.size(); i++) {
-			info = legPoints.get(i).getId()+"   "+legPoints.get(i).getPosition();
+			if (i < legPoints.size()-1) {
+				distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLaty(), legPoints.get(i+1).getLonx(),'N');
+				info = legPoints.get(i).getId()+"   "+Math.round(distance)+" - "+Math.round(distanceCumul)+" - "+Math.round(legPoints.get(i).getAltitude()*3.2808)+"ft";
+				distanceCumul += distance;
+		} else {
+				info = legPoints.get(legPoints.size()-1).getId()+"   "+0+" - "+Math.round(distanceCumul)+" - "+Math.round(legPoints.get(legPoints.size()-1).getAltitude()*3.2808)+"ft";
+			}
+	
 			((DefaultListModel) listModel).addElement(info);
+
 		}
 		
 		showList((DefaultListModel<String>) listModel);
@@ -361,6 +379,9 @@ public class Result implements Info {
 	     outputPanel.removeAll();	
 		 list = new JList(listModel);
 		 
+		 this.landAllBt.setEnabled(true);
+		 this.landMeBt.setEnabled(false);
+		 this.askMeBt.setEnabled(false);
 
 		 list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		 list.setVisibleRowCount(5);
@@ -371,7 +392,8 @@ public class Result implements Info {
 			  */
 			  @Override
 			  public void valueChanged(ListSelectionEvent e) {
-				 // deleteButton.setEnabled(!listIcao.isSelectionEmpty());
+				  askMeBt.setEnabled(!list.isSelectionEmpty());
+				  landMeBt.setEnabled(!list.isSelectionEmpty());
 			  }
 			});
 	
@@ -555,6 +577,7 @@ public class Result implements Info {
 	}
 
 	public void setLegPoints(LinkedList<LegPoint> legPoints) {
+		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 		this.legPoints = legPoints;
 	}
 

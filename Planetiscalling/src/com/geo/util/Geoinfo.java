@@ -189,7 +189,7 @@ public class Geoinfo {
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
-    		LegPoint legPoint = new LegPoint("TOC","TOC",coordinates,"1"); 
+    		LegPoint legPoint = new LegPoint("TOC","TOC",coordinates,"1",altitude/3.28084); 
     		legPoints.add(index,legPoint);
     	     correctSlopeUp(legPoints, index, distForAltitude);
 
@@ -264,7 +264,7 @@ public class Geoinfo {
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
-    		LegPoint legPoint = new LegPoint("TOD","TOD",coordinates,"1"); 
+    		LegPoint legPoint = new LegPoint("TOD","TOD",coordinates,"1",altitude/3.28084); 
     		legPoints.add(index+1,legPoint);
     		
     	  correctSlopeTOD(legPoints, index+1,distForAltitude);

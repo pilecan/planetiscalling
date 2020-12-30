@@ -13,6 +13,8 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import com.cfg.util.FormUtility;
 
@@ -65,8 +67,15 @@ public class DistanceSpinner implements Info {
 	      		  100, //max
 	      	      10);               
 
-         spinnerPanel = new JPanel();
+         //spinnerPanel = new JPanel();
+         
+         spinnerPanel = new JPanel(new BorderLayout());
+         spinnerPanel.setBorder(new TitledBorder("Search Criteria"));
+       //  spinnerPanel.setBorder(new EmptyBorder(1,1, 1, 1));
+
+         
         spinnerPanel.setLayout(new GridBagLayout());
+        
         formUtility = new FormUtility();
         
         if ("icao".equals(topic)) {

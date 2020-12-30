@@ -6,15 +6,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
@@ -35,7 +28,7 @@ public class PanelFlightplan {
 	private JPanel panelFlightplan = new JPanel();
 	private JPanel panelResult;
 	
-	private JButton buttonGoogle;
+	private JButton googleBt;
 	
 	private DistanceSpinner distanceSpin; 
 	
@@ -47,9 +40,17 @@ public class PanelFlightplan {
 	private SelectNdb selectNdb;
 	
 	private JPanel outputPanel;
+	private JPanel buttonLeftPanel;
+	private JPanel buttonRightPanel;
+	
 	
 	private String flightPlanFile;
-	private JButton buttonFP;
+	private JButton buttonBt;
+	private JButton refreshBt;
+	private JButton resetBt;
+	private JButton landMeBt;
+	private JButton askMeBt;
+	private JButton landAllBt;
 
 	public PanelFlightplan() {
 		super();
@@ -75,8 +76,12 @@ public class PanelFlightplan {
 		
 		result = new Result();
 		
+		
 		panelFlightplan = new JPanel();
 		panelFlightplan.setLayout(null);
+		
+		buttonLeftPanel = new JPanel();
+		buttonRightPanel = new JPanel();
 
 		panelResult = new JPanel(new BorderLayout());
 		panelResult.setBorder(new TitledBorder(this.flightPlanFile));
@@ -85,8 +90,8 @@ public class PanelFlightplan {
 		
 		result.setOutputPanel(outputPanel);
 		
-		buttonFP = new JButton("Select Flightplan");
-		buttonFP.addActionListener(new ActionListener()
+		buttonBt = new JButton("Select Flightplan");
+		buttonBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
@@ -110,54 +115,145 @@ public class PanelFlightplan {
 			 panelFlightplan.add(panelResult);
 			 panelFlightplan.validate();
 
-			 buttonGoogle.setVisible(true); 
+			 buttonLeftPanel.setVisible(true); 
 	      }
 	    });
 		
-		buttonGoogle = new JButton("See on Google Earth");
-		buttonGoogle.addActionListener(new ActionListener()
+		
+		refreshBt = new JButton("Update");
+		refreshBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	 readData.createFlightplan(
-	    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
-	    			 (int)distanceSpin.getMountainSpinner().getValue(), 
-	    			 (int)distanceSpin.getAirportSpinner().getValue(),
-	    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-	    			 distanceSpin.getCheckTocTod().isSelected(),
-	    			 (double)result.getAltitudeModel().getValue())); 
-		  	panelResult.removeAll();	
+		    	 readData.createFlightplan(
+		    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+		    			 (int)distanceSpin.getMountainSpinner().getValue(), 
+		    			 (int)distanceSpin.getAirportSpinner().getValue(),
+		    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		    			 distanceSpin.getCheckTocTod().isSelected(),
+		    			 (double)result.getAltitudeModel().getValue())); 
+			  	 panelResult.removeAll();	
+			  	 
+				  result.getWaypointListModel();
 
-		  	 panelResult.setBounds(290, 20, 300, 260);	
 
-
-		
-	    	 panelResult.add(result.getFlightPlanPanel());
-			 panelResult.validate();
-			 panelFlightplan.add(panelResult);
-			 panelFlightplan.validate();
-	    	 
-	    	 manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
-	        
+		    	 panelResult.add(result.getFlightPlanPanel());
+				 panelResult.validate();
+				 panelFlightplan.validate();
 	      }
 	    });
-		buttonGoogle.setVisible(false); 
 		
-		buttonFP.setBounds(10, 20, 200, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 50, 260, 200);
+		
+		
+		
+		resetBt = new JButton("Reset");
+		resetBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				distanceSpin.getCitySpinner().setValue(0);
+				distanceSpin.getAirportSpinner().setValue(0);
+				distanceSpin.getVorNdbSpinner().setValue(0);
+				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getCheckTocTod().setSelected(false);
 
-    	
-		buttonGoogle.setBounds(10, 270, 200, 23);
+				readData.resetResult();
+				panelResult.removeAll();
+				result.getFlightPlanPanel().validate();
+				result.getWaypointListModel();
+
+				panelResult.add(result.getFlightPlanPanel());
+
+				panelResult.validate();
+				panelFlightplan.validate();
+			}
+		});		
+
+		
+		googleBt = new JButton("Land on Google Earth");
+		googleBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
+						(int) distanceSpin.getMountainSpinner().getValue(),
+						(int) distanceSpin.getAirportSpinner().getValue(),
+						(int) distanceSpin.getVorNdbSpinner().getValue(), distanceSpin.getCheckTocTod().isSelected(),
+						(double) result.getAltitudeModel().getValue()));
+				panelResult.removeAll();
+
+				panelResult.add(result.getFlightPlanPanel());
+				panelResult.validate();
+				panelFlightplan.add(panelResult);
+				panelFlightplan.validate();
+
+				manageXMLFile.launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
+
+			}
+		});
+		
+		landMeBt = new JButton("Land Me");
+		landMeBt.setEnabled(false);
+		landMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});		
+
+		askMeBt = new JButton("Ask Me");
+		askMeBt.setEnabled(false);
+		askMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});	
+		
+		landAllBt = new JButton("Land All");
+		landAllBt.setEnabled(false);
+		landAllBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("land All");
+			}
+		});		
+		result.setButtons(landMeBt, askMeBt, landAllBt);
+
+		
+		buttonLeftPanel.setVisible(false); 
+
+		buttonLeftPanel.add(refreshBt);
+		buttonLeftPanel.add(resetBt);
+		buttonLeftPanel.add(googleBt);
+		
+		buttonRightPanel.add(askMeBt);
+		buttonRightPanel.add(landMeBt);
+		buttonRightPanel.add(landMeBt);
+		
+		buttonBt.setBounds(10, 20, 200, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 50, 260, 220);
+
+		buttonLeftPanel.setBounds(40, 280, 200, 100);
+		refreshBt.setBounds(10, 270, 200, 23);
+		resetBt.setBounds(10, 300, 200, 23);
+		googleBt.setBounds(10, 330, 200, 23);
+
+		landMeBt.setBounds(295, 395, 80, 23);
+		askMeBt.setBounds(395, 395, 80, 23);
+		landAllBt.setBounds(500, 395, 80, 23);
+		buttonRightPanel.setBounds(290, 380, 300, 23);
+		
+//		googleButton.setBounds(450, 290, 130, 23);
+
 
 	  	panelResult.setBounds(290, 10, 300, 240);	
 	  	outputPanel.setBounds(290, 250, 300, 140);	
+	  	
 
-     	panelFlightplan.add(buttonFP);
+     	panelFlightplan.add(buttonBt);
 		panelFlightplan.add(panelResult);
 		panelFlightplan.add(outputPanel);
-		panelFlightplan.add(distanceSpin.getSpinnerPanel());
-     	panelFlightplan.add(buttonGoogle);
+		panelFlightplan.add(askMeBt);
+		panelFlightplan.add(landMeBt);
+		panelFlightplan.add(landAllBt);
+		
+		//panelFlightplan.add(buttonRightPanel);
 
+		panelFlightplan.add(distanceSpin.getSpinnerPanel());
+     	panelFlightplan.add(buttonLeftPanel);
+  
 		return panelFlightplan;					
 	}
 
