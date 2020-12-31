@@ -3,6 +3,7 @@ package com.geo.util;
 import java.util.LinkedList;
 
 import com.cfg.model.LegPoint;
+import com.model.Flightplan;
 
 public class Geoinfo {
 	public static double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
@@ -146,7 +147,9 @@ public class Geoinfo {
 		
 	}
 	
-	public static  int createTOC(double altitude, LinkedList<LegPoint> legPoints) {
+	public static  int createTOC(Flightplan flightplan, LinkedList<LegPoint> legPoints) {
+		
+		double altitude = Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(0).getAltitude();
 		double rate = 0.444;
 		if (altitude <= 10000) {
 			rate = 0.444;
@@ -189,7 +192,7 @@ public class Geoinfo {
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
-    		LegPoint legPoint = new LegPoint("TOC","TOC",coordinates,"1",altitude/3.28084); 
+    		LegPoint legPoint = new LegPoint("TOC","TOC",coordinates,"1",Double.parseDouble(flightplan.getCruisingAlt())/3.28084); 
     		legPoints.add(index,legPoint);
     	     correctSlopeUp(legPoints, index, distForAltitude);
 
@@ -205,7 +208,7 @@ public class Geoinfo {
 	    double factorbase = diffElev1/distForAltitude;
 	    double distance = 0;
 
-	    for (int i = 0; i < toc; i++) {
+	    for (int i = 0; i < toc-1; i++) {
 	    	distance += Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i+1).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLonx());
 		    legPoints.get(i+1).setNewAltitude(legPoints.get(0).getAltitude()+(distance * factorbase));
 
@@ -229,7 +232,8 @@ public class Geoinfo {
 	}
 
 	
-	public static  int createTOD(double altitude, LinkedList<LegPoint> legPoints) {
+	public static  int createTOD(Flightplan flightplan, LinkedList<LegPoint> legPoints) {
+		double altitude = Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude();
 		double rate = 0.300;
 		
     	double distForAltitude = Math.round(altitude/rate/1000);
@@ -264,7 +268,7 @@ public class Geoinfo {
         	
         	String coordinates = todLon+","+todLat+","+Math.round(Math.round(altitude/3.28084));
 
-    		LegPoint legPoint = new LegPoint("TOD","TOD",coordinates,"1",altitude/3.28084); 
+    		LegPoint legPoint = new LegPoint("TOD","TOD",coordinates,"1",Double.parseDouble(flightplan.getCruisingAlt())/3.28084); 
     		legPoints.add(index+1,legPoint);
     		
     	  correctSlopeTOD(legPoints, index+1,distForAltitude);

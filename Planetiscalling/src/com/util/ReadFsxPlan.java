@@ -55,8 +55,8 @@ public class ReadFsxPlan extends DefaultHandler{
 	}
 	
 	public void modifyAltitude(LinkedList<LegPoint> legPoints, Double cruzeAltitude, Double newAltitude) {
-		cruzeAltitude = cruzeAltitude/3.2808;
-		newAltitude   = newAltitude/3.2808;
+		cruzeAltitude = cruzeAltitude/3.28084;
+		newAltitude   = newAltitude/3.28084;
 		for (int i = 1; i < legPoints.size()-1; i++) {
 			legPoints.get(i).setNewAltitude(Util.modifyAltitude(cruzeAltitude, legPoints.get(i).getAltitude(), newAltitude));
 		}

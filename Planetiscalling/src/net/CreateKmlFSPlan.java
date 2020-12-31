@@ -158,7 +158,7 @@ public class CreateKmlFSPlan{
 		List <Placemark> airports = new ArrayList<>();
 
 		SelectAiport selectAiport = new SelectAiport(); 
-		selectAiport.selectAll("", airports);
+		selectAiport.selectAll("");
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
 		
@@ -224,8 +224,8 @@ public class CreateKmlFSPlan{
 		
 		//dist.isLine = isTocTod
 		if (dist.isLine()) {
-			int indexToc = Geoinfo.createTOC(Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(0).getAltitude(), legPoints);
-			int indexTod = Geoinfo.createTOD(Double.parseDouble(flightplan.getCruisingAlt())-legPoints.get(legPoints.size()-1).getAltitude(), legPoints);
+			int indexToc = Geoinfo.createTOC(flightplan, legPoints);
+			int indexTod = Geoinfo.createTOD(flightplan, legPoints);
 			if ( indexToc >= indexTod) //Altitude too high
 			{
 				legPoints.remove(indexTod);
@@ -536,7 +536,7 @@ public class CreateKmlFSPlan{
 		List<Placemark> placemarks = new ArrayList<>();
 
 		SelectAiport selectAiport = new SelectAiport();
-		selectAiport.selectAll("", placemarks);
+		selectAiport.selectAll("");
 		
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		

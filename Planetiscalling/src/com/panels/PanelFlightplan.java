@@ -4,13 +4,23 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.file.ManageXMLFile;
+import com.cfg.util.Util;
 import com.model.Distance;
 import com.model.Result;
 import com.util.ReadData;
@@ -40,6 +50,7 @@ public class PanelFlightplan {
 	private SelectNdb selectNdb;
 	
 	private JPanel outputPanel;
+	private JPanel askMePanel;
 	private JPanel buttonLeftPanel;
 	private JPanel buttonRightPanel;
 	
@@ -51,10 +62,15 @@ public class PanelFlightplan {
 	private JButton landMeBt;
 	private JButton askMeBt;
 	private JButton landAllBt;
+	
+	private JEditorPane jEditorPane;
+	private HTMLEditorKit kit;
+	private Document doc;
+	
+	JScrollPane askmeScrollPan;
 
 	public PanelFlightplan() {
 		super();
-
 	}
 
 	public JPanel getPanel(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
@@ -74,6 +90,30 @@ public class PanelFlightplan {
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
 		
+		
+        jEditorPane = new JEditorPane();
+		jEditorPane.setEditable(false);
+		kit = new HTMLEditorKit();
+		jEditorPane.setEditorKit(kit);
+		
+	    //StyleSheet styleSheet = kit.getStyleSheet();
+		
+		jEditorPane.setVisible(false);
+        jEditorPane.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                HyperlinkEvent.EventType type = e.getEventType();
+                final URL url = e.getURL();
+                if (type == HyperlinkEvent.EventType.ENTERED) {
+                    // do desired highlighting
+                } else if (type == HyperlinkEvent.EventType.ACTIVATED) {
+                	Util.openURL(url.toString());
+                }
+            }
+          });
+
+		
 		result = new Result();
 		
 		
@@ -84,10 +124,20 @@ public class PanelFlightplan {
 		buttonRightPanel = new JPanel();
 
 		panelResult = new JPanel(new BorderLayout());
-		panelResult.setBorder(new TitledBorder(this.flightPlanFile));
+		panelResult.setBorder(new TitledBorder("Searh Result"));
+		
 		outputPanel = new JPanel(new BorderLayout());
 		outputPanel.setBorder(new TitledBorder(""));
 		
+		askMePanel = new JPanel(new BorderLayout());
+		askMePanel.setBorder(new TitledBorder(""));
+		
+		askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		askMePanel.add(askmeScrollPan);
+
+
 		result.setOutputPanel(outputPanel);
 		
 		buttonBt = new JButton("Select Flightplan");
@@ -104,7 +154,9 @@ public class PanelFlightplan {
 		        				 0.0));
     	  
 	    	 flightPlanFile = new File(result.getFlightplan().getFlightplanFile()).getName();
-	 		 panelResult.setBorder(new TitledBorder(new File(flightPlanFile).getName()));
+	    	
+	 		 panelResult.setBorder(new TitledBorder(flightPlanFile));
+	 		panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
 
 	  		 panelResult.removeAll();	
 			 panelResult.add(result.getFlightPlanPanel());
@@ -192,6 +244,8 @@ public class PanelFlightplan {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(result.getCurrentView());
+				System.out.println(result.getCurrentSelection());
 			}
 		});		
 
@@ -199,10 +253,17 @@ public class PanelFlightplan {
 		askMeBt.setEnabled(false);
 		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if ("waypoint".equals(result.getCurrentView())) {
+					manageWaypoint();
+				} else if ("airport".equals(result.getCurrentView())) {
+					manageAirport();
+				}
+				
+
 			}
 		});	
 		
-		landAllBt = new JButton("Land All");
+		landAllBt = new JButton("Land Those");
 		landAllBt.setEnabled(false);
 		landAllBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -230,9 +291,9 @@ public class PanelFlightplan {
 		resetBt.setBounds(10, 300, 200, 23);
 		googleBt.setBounds(10, 330, 200, 23);
 
-		landMeBt.setBounds(295, 395, 80, 23);
-		askMeBt.setBounds(395, 395, 80, 23);
-		landAllBt.setBounds(500, 395, 80, 23);
+		landMeBt.setBounds(295, 395, 94, 23);
+		askMeBt.setBounds(395, 395, 94, 23);
+		landAllBt.setBounds(500, 395, 94, 23);
 		buttonRightPanel.setBounds(290, 380, 300, 23);
 		
 //		googleButton.setBounds(450, 290, 130, 23);
@@ -240,11 +301,14 @@ public class PanelFlightplan {
 
 	  	panelResult.setBounds(290, 10, 300, 240);	
 	  	outputPanel.setBounds(290, 250, 300, 140);	
+	  	askMePanel.setBounds(290, 250, 300, 140);	
 	  	
 
      	panelFlightplan.add(buttonBt);
 		panelFlightplan.add(panelResult);
 		panelFlightplan.add(outputPanel);
+		panelFlightplan.add(askMePanel);
+		
 		panelFlightplan.add(askMeBt);
 		panelFlightplan.add(landMeBt);
 		panelFlightplan.add(landAllBt);
@@ -256,5 +320,66 @@ public class PanelFlightplan {
   
 		return panelFlightplan;					
 	}
+	
+	/**
+	 * 
+	 * 
+	 */
+	private void manageWaypoint() {
+	    if ("Ask Me".equals(askMeBt.getText())) {
+			outputPanel.setVisible(false);
+			jEditorPane.setVisible(true);
+			askMeBt.setText("Back");
+			//result.panelWaypoint(result.getCurrentSelection());
+	        doc = kit.createDefaultDocument();
+	        jEditorPane.setDocument(doc);
+	        jEditorPane.setText(result.panelWaypoint(result.getCurrentSelection()));
+	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	        	   public void run() { 
+	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+	        	   }
+	        	});
+	    	
+	    } else {
+			outputPanel.setVisible(true);
+			jEditorPane.setVisible(false);
+			askMeBt.setText("Ask Me");
+	    }
+	
+	}
+	
+	private void manageAirport() {
+	    if ("Ask Me".equals(askMeBt.getText())) {
+			outputPanel.setVisible(false);
+			jEditorPane.setVisible(true);
+			askMeBt.setText("Back");
+		//	result.panelAirport(result.getCurrentSelection());
+	        doc = kit.createDefaultDocument();
+	        jEditorPane.setDocument(doc);
+	        jEditorPane.setText(result.panelAirport(result.getCurrentSelection()));
+	        
+	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	        	   public void run() { 
+	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+	        	   }
+	        	});
+	      // askmeScrollPan.getVerticalScrollBar().setValue(0);
+	        
+/*	        try {
+	        	jEditorPane.setPage("http://www.lapresse.ca"); //Or Path/File destination
+	        } catch (IOException error) {
+	        	System.out.println(error);
+	        }   
+*/
+
+	    	
+	    } else {
+			outputPanel.setVisible(true);
+			jEditorPane.setVisible(false);
+			askMeBt.setText("Ask Me");
+	    }
+		
+	}
+
 
 }

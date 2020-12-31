@@ -199,7 +199,8 @@ public String getDescription() {
 	try {
 		result = (iata!=null?"|IATA: "+iata:"")
 				+ "|Airport Name: "+name.replace("&","&amp;")
-				+ "|City: "+Util.createHref(city ,city+" City", 0)+" ("+Util.createHref("Weather",city+" weather", 0)+ ")"
+				//+ "|Airport Name: "+Util.createHref(name ,name+"airport wiki", 0)+" ("+Util.createHref("Weather",name+" "+country+" weather", 0)+ ")"
+				+ "|City: "+Util.createHref(city ,city+" City", 0)+" ("+Util.createHref("Weather",city+" "+country+" weather", 0)+ ")"
 				+ (state!=null?"|State: "+state:"")
 				+ (country!=null?"|Country: "+country:"")
 				+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")

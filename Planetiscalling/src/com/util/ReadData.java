@@ -223,7 +223,7 @@ public class ReadData implements Info{
 
 	    	SelectAiport selectAiport = new SelectAiport();	
 	 	
-			selectAiport.selectAll(sql, placemarks);
+			selectAiport.selectAll(sql);
 			placemarks = selectAiport.getPlacemarks();
 			
 			result.setListAirport(placemarks);
@@ -520,7 +520,7 @@ public class ReadData implements Info{
 
     	List<Placemark> airports = new ArrayList<>();
     	SelectAiport selectAiport = new SelectAiport();
-		selectAiport.selectAll(sqlCountry, airports);
+		selectAiport.selectAll(sqlCountry);
 		airports = selectAiport.getPlacemarks();
 		
     	selectCity.selectAll(sqlCountry);
@@ -590,7 +590,7 @@ public class ReadData implements Info{
     	List<Placemark> airports = new ArrayList<>();
     	SelectAiport selectAiport = new SelectAiport();
     	sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
-		selectAiport.selectAll(sql, airports);
+		selectAiport.selectAll(sql);
 		airports = selectAiport.getPlacemarks();
 		
 		searchCityNeighbor(airports,selectCity,selectMoutain);
@@ -659,7 +659,7 @@ public class ReadData implements Info{
     	SelectAiport selectAiport = new SelectAiport();
 		
     	List<Placemark> placemarks = new ArrayList<>();
-		selectAiport.selectAll(sql, placemarks);
+		selectAiport.selectAll(sql);
 		placemarks = selectAiport.getPlacemarks();
 		selectedAirports = selectAiport.getMapPlacemark();
 	

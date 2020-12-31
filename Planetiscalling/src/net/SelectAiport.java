@@ -51,8 +51,11 @@ public class SelectAiport implements Info{
 	/**
 	 * select all rows in the warehouses table
 	 */
-	public void selectAll(String search, List<Placemark> placemarks) {
-		this.placemarks = placemarks;
+	public void selectAll(String search) {
+		//this.placemarks = placemarks;
+		
+    	placemarks = new ArrayList<>();
+
 
 		listRunways = new ArrayList<>();
 		airport = new Airport();
@@ -166,7 +169,7 @@ public class SelectAiport implements Info{
 		//selectAiport.setPlacemarks(placemarks);
 
 		 
-		selectAiport.selectAll(search, placemarks);
+		selectAiport.selectAll(search);
 		placemarks = selectAiport.getPlacemarks();
 		
 		 manageXMLFile.saveKMLFile(placemarks,kmlRelative);
@@ -188,6 +191,14 @@ public class SelectAiport implements Info{
 
 	public void setMapPlacemark(Map<String, Placemark> mapPlacemark) {
 		this.mapPlacemark = mapPlacemark;
+	}
+
+	public Airport getAirport() {
+		return airport;
+	}
+
+	public void setAirport(Airport airport) {
+		this.airport = airport;
 	}
 
 }
