@@ -36,7 +36,7 @@ import com.model.Vor;
 
 import net.CreateKmlFSPlan;
 import net.CreateKmlFSPlan.NoPoints;
-import net.SelectAiport;
+import net.SelectAirport;
 import net.SelectCity;
 import net.SelectMountain;
 import net.SelectNdb;
@@ -44,7 +44,7 @@ import net.SelectVor;
 
 public class ReadData implements Info{
 	private ManageXMLFile manageXMLFile;
-	private SelectAiport selectAiport;
+	private SelectAirport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
 	private SelectVor selectVor;
@@ -164,8 +164,11 @@ public class ReadData implements Info{
 		result.setDeparture(createKmlFSPlan.getDeparture());
 		result.setDestination(createKmlFSPlan.getDestination());
 		
+		
+		
 		result.setFlightplan(createKmlFSPlan.getFlightplan());
 		result.setSelectedAirports(createKmlFSPlan.getSelectedAirports());
+		result.setMapAirport(Utility.getInstance().creatMapAirport(createKmlFSPlan.getSelectedAirports()));
 		result.setSelectedCities(createKmlFSPlan.getSelectedCities());
 		result.setSelectedMountains(createKmlFSPlan.getSelectedMountains());
 		result.setSelectedNdbs(createKmlFSPlan.getSelectedNdbs());
@@ -221,24 +224,22 @@ public class ReadData implements Info{
 			search = search.replaceAll("\\s+", "','");
 			String sql = "where ident in ('"+ search + "') ";
 
-	    	SelectAiport selectAiport = new SelectAiport();	
+	    	SelectAirport selectAirport = new SelectAirport();	
 	 	
-			selectAiport.selectAll(sql);
-			placemarks = selectAiport.getPlacemarks();
+			selectAirport.selectAll(sql);
+			placemarks = selectAirport.getPlacemarks();
+			
+			selectAirport.select(sql);
+
+			result.setMapAirport(selectAirport.getMapAirport());
 			
 			result.setListAirport(placemarks);
 
 			searchAiportNeighbor(placemarks,selectCity,selectMountain);
 			searchIcaoVorNdb(placemarks, selectVor, selectNdb);
 				
-			
-/*			result.setAirports(placemarks.size());
-			result.setVors(selectedVors.size()); 
-			result.setNdbs(selectedNdbs.size()); 
-			result.setCities(selectedCities.size()); 
-			result.setMountains(selectedMountains.size());
-*/			
-			result.setSelectedAirports(selectAiport.getMapPlacemark());
+			result.setSelectedAirports(selectAirport.getMapPlacemark());
+			result.setMapAirport(selectAirport.getMapAirport());
 			result.setSelectedCities(selectedCities);
 			result.setSelectedMountains(selectedMountains);
 			result.setSelectedNdbs(selectedNdbs);
@@ -508,7 +509,7 @@ public class ReadData implements Info{
 		if (" All".equals(comboMountain.getSelectedItem())) {
 	    	sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
 		} else if (!" All".equals(comboMountain.getSelectedItem())) { 
-			System.out.println(comboMountain.getSelectedItem());
+			//System.out.println(comboMountain.getSelectedItem());
 	    	sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"' and name = '"+((String) comboMountain.getSelectedItem()).replace("'", "''") +"'";
 	
 		} else {
@@ -519,7 +520,7 @@ public class ReadData implements Info{
 		
 
     	List<Placemark> airports = new ArrayList<>();
-    	SelectAiport selectAiport = new SelectAiport();
+    	SelectAirport selectAiport = new SelectAirport();
 		selectAiport.selectAll(sqlCountry);
 		airports = selectAiport.getPlacemarks();
 		
@@ -534,7 +535,7 @@ public class ReadData implements Info{
 		saveKMLFile(manageXMLFile,airports,KmlFlightplanName);
 		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
-		System.out.println(airports.size());
+		//System.out.println(airports.size());
 
 	}
     
@@ -567,8 +568,8 @@ public class ReadData implements Info{
 			}
 			
 		} else if (" All".equals(comboCity.getSelectedItem())) { 
-			System.out.println(comboCity.getSelectedItem());
-			System.out.println(mapCities.get(comboCity.getSelectedItem()));
+		//	System.out.println(comboCity.getSelectedItem());
+		//	System.out.println(mapCities.get(comboCity.getSelectedItem()));
 			
 			if (" All".equals(comboState.getSelectedItem())){
 		    	sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
@@ -588,7 +589,7 @@ public class ReadData implements Info{
 		selectMoutain.selectAll("");
 
     	List<Placemark> airports = new ArrayList<>();
-    	SelectAiport selectAiport = new SelectAiport();
+    	SelectAirport selectAiport = new SelectAirport();
     	sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
 		selectAiport.selectAll(sql);
 		airports = selectAiport.getPlacemarks();
@@ -603,7 +604,7 @@ public class ReadData implements Info{
 		
 		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
-		System.out.println(airports.size());
+		//System.out.println(airports.size());
 
 	}
 	
@@ -635,8 +636,8 @@ public class ReadData implements Info{
 			}
 			
 		} else if (" All".equals(comboCity.getSelectedItem())) { 
-			System.out.println(comboCity.getSelectedItem());
-			System.out.println(mapCities.get(comboCity.getSelectedItem()));
+			//System.out.println(comboCity.getSelectedItem());
+			//System.out.println(mapCities.get(comboCity.getSelectedItem()));
 			
 			if (" All".equals(comboState.getSelectedItem())){
 		    	sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
@@ -656,7 +657,7 @@ public class ReadData implements Info{
 		
 		//selectedMountains = selectMoutain.getMapMountains();
 
-    	SelectAiport selectAiport = new SelectAiport();
+    	SelectAirport selectAiport = new SelectAirport();
 		
     	List<Placemark> placemarks = new ArrayList<>();
 		selectAiport.selectAll(sql);
@@ -671,7 +672,7 @@ public class ReadData implements Info{
 		
 		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
 		
-		System.out.println("airports found = "+ placemarks.size());
+		//System.out.println("airports found = "+ placemarks.size());
 
 	}
 

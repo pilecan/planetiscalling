@@ -29,16 +29,23 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 
 import com.cfg.common.Info;
+import com.cfg.model.Placemark;
 import com.cfg.util.Util;
 import com.main.PlanetIsCalling;
+import com.model.Airport;
+
+import net.SelectAirport;
 
 
 public class Utility implements Info{
 	private static Utility instance = new Utility();
     private Properties prefs;
     
-    List <String>listDirectories = null;
-
+    private List <String>listDirectories = null;
+    
+	private SelectAirport selectAiport;
+	
+	private StringBuilder builder;
 
 	public static Utility getInstance(){
 		return instance;
@@ -333,8 +340,44 @@ public class Utility implements Info{
 		
 		return result;
 	}
+	
+	public Map <String, Airport> creatMapAirport(Map<String, Placemark> selectedAirports){
+		String icaos = "(";
+		selectAiport = new SelectAirport();
+		
+		for (String key : selectedAirports.keySet()) {
+		    icaos += "'"+key+"',";
+		}
+		
+		icaos += "'') ";
 
-  
+		selectAiport.select("where ident in "+icaos+" ");
+		
+		return selectAiport.getMapAirport();
+	}
+	
+	
+	public StringBuilder buildLine (Object obj1,Object obj2,Object obj3) {
+		builder = new StringBuilder();
+		builder.append("<html><pre>");
+		builder.append(String.format("%s \t %s \t %s", obj1, obj2,obj3));
+		builder.append("</pre></html>");
+		return 	builder;
+	}
+
+	public String findFirst(String line) {
+		try {
+			line = (String) line.subSequence(0, line.indexOf("\t"));
+			line = line.replace("<html><pre>", "").trim();
+		} catch (StringIndexOutOfBoundsException e) {
+		}
+		
+		return line;
+	
+	}
+	 
+
+	
 
 	
 

@@ -24,7 +24,7 @@ import com.cfg.file.ManageXMLFile;
 import com.model.Distance;
 import com.util.ReadData;
 
-import net.SelectAiport;
+import net.SelectAirport;
 import net.SelectCity;
 import net.SelectDB;
 import net.SelectMountain;
@@ -44,7 +44,7 @@ public class PanelLandmarks implements Info {
 
 	
 	private SelectDB selectDB;
-	public SelectAiport selectAiport;
+	public SelectAirport selectAiport;
 	ManageXMLFile manageXMLFile;
 	
 	private JComboBox<String> comboCountry;

@@ -147,8 +147,26 @@ public class CreateKML {
 
 	static public String buildCityPlaceMark(City city){
 		
-		String description = "";
+		String description = buildCityDescription(city);
 		String icone = "";
+
+		String coordinates =city.getLonx()+","+city.getLaty();
+		
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(city.getCapital())+"</href></Icon></IconStyle></Style>";
+
+
+		return "<Placemark><name>"+city.getCityName()+"</name>\n"
+				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ icone
+				+ "<Point><coordinates>"+city.getCoordinates()+"</coordinates></Point>\n"
+				+ "</Placemark>\n";
+	}
+	
+
+	
+	static public String buildCityDescription(City city){
+		
+		String description = "";
 
 		description += "<div>City Name: "+Util.createHref(city.getCityName(),city.getCityName()+" "+city.getAdminName()+" "+city.getCountry()+" wikipedia", 0)+" ("
 				+Util.createHref("Weather",city.getCityName()+" "+city.getAdminName()+" "+city.getCountry()+" weather", 0)+ ")</div>";
@@ -165,39 +183,20 @@ public class CreateKML {
 			description += "<div>Capital: "+city.getCapital()+"</div>";
 		}
     	description += "<div>Abreviations: "+city.getIso2()+"/"+city.getIso3()+"</div>";
-		description += "<div>GPS: "+city.getLaty()+","+city.getLonx()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(city.getLaty()+","+city.getLonx())+"</div>";
 		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
 
-		String coordinates =city.getLonx()+","+city.getLaty();
+		return description;
 		
-		
-		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(city.getCapital())+"</href></Icon></IconStyle></Style>";
+		}
+	
 
-
-		return "<Placemark><name>"+city.getCityName()+"</name>\n"
-				+ "<description><![CDATA["+description+"]]></description>\n"
-				+ icone
-				+ "<Point><coordinates>"+city.getCoordinates()+"</coordinates></Point>\n"
-				+ "</Placemark>\n";
-	}
 	
 	
 	static public String buildVorPlaceMark(Vor vor){
 		
-		String description = "";
+		String description =  buildVorDescription(vor);
 		String icone = "";
-
-    	description += "<div>Ident: "+vor.getIdent()+"</div>";
-    	description += "<div>Name: "+vor.getName()+"</div>";
-    	description += "<div>Frequency: "+Util.formatVorFrequency(vor.getFrequency())+" MHz</div>";
-    	description += "<div>Range: "+vor.getRange()+"nm</div>";
-    	description += "<div>Mag. Var.: "+Util.formatMagvar(vor.getMagVar())+"</div>";
-    	description += "<div>Altitude: "+vor.getAltitude()+" ft ("+((int)Math.round(vor.getAltitude()/3.28084))+" m)</div>";
-    	description += "<div>Type: "+vor.getType()+"</div>";
-    	description += "<div>DME Only: "+(vor.getDmeOnly()==1?"Yes":"No")+"</div>";
-    	description += "<div>Region: "+vor.getRegion()+"</div>";
-		description += "<div>GPS: "+vor.getLaty()+","+vor.getLonx()+"</div>";
-		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
 
 		String coordinates = vor.getLonx()+","+vor.getLaty()+","+vor.getAltitude();
 		
@@ -211,21 +210,32 @@ public class CreateKML {
 				+ "</Placemark>\n";
 	}
 	
-	static public String buildNdbPlaceMark(Ndb ndb){
+	static public String buildVorDescription(Vor vor){
 		
 		String description = "";
-		String icone = "";
 
-    	description += "<div>Ident: "+ndb.getIdent()+"</div>";
-    	description += "<div>Name: "+ndb.getName()+"</div>";
-    	description += "<div>Frequency: "+Util.formatNdbFrequency(ndb.getFrequency())+" kHz</div>";
-    	description += "<div>Range: "+ndb.getRange()+"nm</div>";
-    	description += "<div>Mag. Var.: "+Util.formatMagvar(ndb.getMagVar())+"</div>";
-    	description += "<div>Altitude: "+((int)Math.round(ndb.getAltitude()*3.28084))+"ft ("+ndb.getAltitude()+"m)</div>";
-    	description += "<div>Type: "+ndb.getType()+"</div>";
-    	description += "<div>Region: "+ndb.getRegion()+"</div>";
-		description += "<div>GPS: "+ndb.getLaty()+","+ndb.getLonx()+"</div>";
+    	description += "<div>Ident: "+vor.getIdent()+"</div>";
+    	description += "<div>Name: "+vor.getName()+"</div>";
+    	description += "<div>Frequency: "+Util.formatVorFrequency(vor.getFrequency())+" MHz</div>";
+    	description += "<div>Range: "+vor.getRange()+"nm</div>";
+    	description += "<div>Mag. Var.: "+Util.formatMagvar(vor.getMagVar())+"</div>";
+    	description += "<div>Altitude: "+vor.getAltitude()+" ft ("+((int)Math.round(vor.getAltitude()/3.28084))+" m)</div>";
+    	description += "<div>Type: "+vor.getType()+"</div>";
+    	description += "<div>DME Only: "+(vor.getDmeOnly()==1?"Yes":"No")+"</div>";
+    	description += "<div>Region: "+vor.getRegion()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(vor.getLaty()+","+vor.getLonx())+"</div>";
 		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+
+		return description;
+			
+	}
+	
+
+	
+	static public String buildNdbPlaceMark(Ndb ndb){
+		String icone = "";
+		String description = buildNdbDescription(ndb);
 
 		String coordinates = ndb.getLonx()+","+ndb.getLaty()+","+ndb.getAltitude();
 		
@@ -238,30 +248,31 @@ public class CreateKML {
 				+ "<Point><coordinates>"+ndb.getCoordinates()+"</coordinates></Point>\n"
 				+ "</Placemark>\n";
 	}
+	
+	static public String buildNdbDescription(Ndb ndb){
+		String description = "";
+
+    	description += "<div>Ident: "+ndb.getIdent()+"</div>";
+    	description += "<div>Name: "+ndb.getName()+"</div>";
+    	description += "<div>Frequency: "+Util.formatNdbFrequency(ndb.getFrequency())+" kHz</div>";
+    	description += "<div>Range: "+ndb.getRange()+"nm</div>";
+    	description += "<div>Mag. Var.: "+Util.formatMagvar(ndb.getMagVar())+"</div>";
+    	description += "<div>Altitude: "+((int)Math.round(ndb.getAltitude()*3.28084))+"ft ("+ndb.getAltitude()+"m)</div>";
+    	description += "<div>Type: "+ndb.getType()+"</div>";
+    	description += "<div>Region: "+ndb.getRegion()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(ndb.getLaty()+","+ndb.getLonx())+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		
+		return description;
+	}
+
 
 	static public String buildMountainPlaceMark(Mountain mountain){
 		
-		String description = "";
+		String description = buildMountainDescription(mountain);
 		String icone = "";
 		String typeIcone;
-
-		description += "<div>Mountain Name: "+Util.createHref(mountain.getName(),mountain.getName()+" "+mountain.getCountry()+" wikipedia", 0)+" ("
-				+Util.createHref("Weather",mountain.getName()+" "+mountain.getName()+ " "+mountain.getCountry()+" weather", 0)+ ")</div>";
-		if (!"no".equals(mountain.getAlt_name())) {
-			description += "<div>Alternate Name:"+Util.createHref(mountain.getAlt_name(),mountain.getAlt_name()+" "+mountain.getCountry()+" wikipedia", 0)+"</div>";
-		}
-		description += "<div>Elevation: "+mountain.getElevation()+"m"+" ("+Math.round(mountain.getElevation()*3.28084)+"ft)</div>";
-		if (mountain.getProminence() > 0) {
-			description += "<div>Prominence: "+mountain.getProminence()+"m"+" ("+Math.round(mountain.getProminence()*3.28084)+"ft)"+Util.createHref(" (?)","prominence wikipedia", 0)+" </div>";
-		}
-
-		description += "<div>Country: "+mountain.getCountry()+"</div>";
-		if (!"no".equals(mountain.getComment())) {
-			description += "<div>Comment: "+mountain.getComment()+"</div>";
-		}
-    	description += "<div>Author: "+mountain.getAuthor()+"</div>";
-		description += "<div>GPS: "+mountain.getLaty()+","+mountain.getLonx()+"</div>";
-		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
 
 		String coordinates =mountain.getLonx()+","+mountain.getLaty();
 		//String coordinates =mountain.getLaty()+","+mountain.getLonx();
@@ -283,6 +294,31 @@ public class CreateKML {
 				+ "</Placemark>\n";
 	}
 
+	static public String buildMountainDescription(Mountain mountain){
+		
+		String description = "";
+
+		description += "<div>Mountain Name: "+Util.createHref(mountain.getName(),mountain.getName()+" "+mountain.getCountry()+" wikipedia", 0)+" ("
+				+Util.createHref("Weather",mountain.getName()+" "+mountain.getName()+ " "+mountain.getCountry()+" weather", 0)+ ")</div>";
+		if (!"no".equals(mountain.getAlt_name())) {
+			description += "<div>Alternate Name:"+Util.createHref(mountain.getAlt_name(),mountain.getAlt_name()+" "+mountain.getCountry()+" wikipedia", 0)+"</div>";
+		}
+		description += "<div>Elevation: "+mountain.getElevation()+"m"+" ("+Math.round(mountain.getElevation()*3.28084)+"ft)</div>";
+		if (mountain.getProminence() > 0) {
+			description += "<div>Prominence: "+mountain.getProminence()+"m"+" ("+Math.round(mountain.getProminence()*3.28084)+"ft)"+Util.createHref(" (?)","prominence wikipedia", 0)+" </div>";
+		}
+
+		description += "<div>Country: "+mountain.getCountry()+"</div>";
+		if (!"no".equals(mountain.getComment())) {
+			description += "<div>Comment: "+mountain.getComment()+"</div>";
+		}
+    	description += "<div>Author: "+mountain.getAuthor()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(mountain.getLaty()+","+mountain.getLonx())+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		
+		return description;
+	}
 
   public static void main(String argv[]) {
 	 // new WriteKML().read("g:\\addons\\work\\FR-Dordogne-Chateaux.kml","","");

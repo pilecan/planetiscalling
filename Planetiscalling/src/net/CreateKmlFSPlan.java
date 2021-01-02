@@ -24,6 +24,7 @@ import com.cfg.model.Placemark;
 import com.cfg.plan.ReadFs9Plan;
 import com.cfg.plan.ReadPlanGPlan;
 import com.geo.util.Geoinfo;
+import com.model.Airport;
 import com.model.City;
 import com.model.Distance;
 import com.model.Flightplan;
@@ -82,11 +83,6 @@ public class CreateKmlFSPlan{
 	
 	private int current;
 	
-	private int nbAirport;
-	private int nbCity;
-	private int nbMountain;
-	private int nbVor;
-	private int nbNdb;
 	private double distanceBetween = 0;
 	private double altitude = 0;
 	private String departure;
@@ -157,7 +153,7 @@ public class CreateKmlFSPlan{
 		
 		List <Placemark> airports = new ArrayList<>();
 
-		SelectAiport selectAiport = new SelectAiport(); 
+		SelectAirport selectAiport = new SelectAirport(); 
 		selectAiport.selectAll("");
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
@@ -239,12 +235,6 @@ public class CreateKmlFSPlan{
 		} catch (NullPointerException e) {
 		}
 
-		nbAirport = selectedAirports.size();
-		nbCity = selectedCities.size();
-		nbMountain = selectedMountains.size();
-		nbVor = selectedVors.size();
-		nbNdb = selectedNdbs.size();
-		
 	   	createAndsaveFlightPlan();
 		
 		isDone = true;
@@ -535,7 +525,7 @@ public class CreateKmlFSPlan{
 		ManageXMLFile manageXMLFile = new ManageXMLFile("");
 		List<Placemark> placemarks = new ArrayList<>();
 
-		SelectAiport selectAiport = new SelectAiport();
+		SelectAirport selectAiport = new SelectAirport();
 		selectAiport.selectAll("");
 		
 		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
@@ -599,34 +589,6 @@ public class CreateKmlFSPlan{
 	}
 
 
-	public int getNbAirport() {
-		return nbAirport;
-	}
-
-
-	public void setNbAirport(int nbAirport) {
-		this.nbAirport = nbAirport;
-	}
-
-
-	public int getNbCity() {
-		return nbCity;
-	}
-
-
-	public void setNbCity(int nbCity) {
-		this.nbCity = nbCity;
-	}
-
-
-	public int getNbMountain() {
-		return nbMountain;
-	}
-
-
-	public void setNbMountain(int nbMountain) {
-		this.nbMountain = nbMountain;
-	}
 
 
 	public String getKmlFlightPlanFile() {
@@ -646,26 +608,6 @@ public class CreateKmlFSPlan{
 
 	public double getAltitude() {
 		return altitude;
-	}
-
-
-	public int getNbVor() {
-		return nbVor;
-	}
-
-
-	public void setNbVor(int nbVor) {
-		this.nbVor = nbVor;
-	}
-
-
-	public int getNbNdb() {
-		return nbNdb;
-	}
-
-
-	public void setNbNdb(int nbNdb) {
-		this.nbNdb = nbNdb;
 	}
 
 

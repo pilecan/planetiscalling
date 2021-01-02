@@ -21,14 +21,15 @@ import com.model.Runway;
  *
  * @author sqlitetutorial.net
  */
-public class SelectAiport implements Info{
+public class SelectAirport implements Info{
 
 	private Airport airport;
 	private Runway runway;
 	private  List<Runway> listRunways;
 	private List<Placemark> placemarks; 
 	private Map<String, Placemark> mapPlacemark;
-
+	private Map<String, Airport> mapAirport;
+	
 
 	/**
 	 * Connect to the test.db database
@@ -61,10 +62,10 @@ public class SelectAiport implements Info{
 		airport = new Airport();
 		mapPlacemark = new TreeMap<String, Placemark>();
 		
-
 		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
 				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name, hour_zone, time_zone  "
 				+ "FROM v_airport_runway ";
+
 		
 		if (!"".equals(search)) {
 			sql += search;
@@ -154,6 +155,100 @@ public class SelectAiport implements Info{
 		
 		
 	}
+	public void select(String search) {
+		listRunways = new ArrayList<>();
+		airport = new Airport();
+		mapAirport = new TreeMap<String, Airport>();
+		
+		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
+				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name, hour_zone, time_zone  "
+				+ "FROM v_airport_runway ";
+
+		
+		if (!"".equals(search)) {
+			sql += search;
+		}
+				
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				String lastAirport = "";
+
+				while (rs.next()) {
+
+					if (!lastAirport.equals(rs.getString("ident"))) {
+						airport.setRunways(listRunways);
+						if (!"".equals(lastAirport)) {
+							mapAirport.put(airport.getIdent(), airport);
+						}
+						airport = new Airport();
+						listRunways = new ArrayList<>();
+
+						airport.setAirportId(rs.getInt("airport_id"));
+						airport.setIdent(rs.getString("ident"));
+						airport.setIata(rs.getString("iata"));
+						airport.setName(rs.getString("name"));
+						airport.setCity(rs.getString("city"));
+						airport.setState(rs.getString("state"));
+						airport.setCountry(rs.getString("country"));
+						airport.setRegion(rs.getString("region"));
+						airport.setAltitude(rs.getInt("altitude"));
+						airport.setAtisFrequency(rs.getInt("atis_frequency"));
+						airport.setTowerFrequency(rs.getInt("tower_frequency"));
+						airport.setLonx(rs.getDouble("lonx"));
+						airport.setLaty(rs.getDouble("laty"));
+						airport.setMagVar(rs.getDouble("mag_var"));
+						airport.setHourZone(rs.getDouble("hour_zone"));
+						airport.setTimeZone(rs.getString("time_zone"));
+
+
+						runway = new Runway();
+						runway.setRunwayName(rs.getString("runway_name"));
+						runway.setIlsName(rs.getString("ils_name"));
+						runway.setLength(rs.getInt("length"));
+						runway.setWidth(rs.getInt("width"));
+						runway.setSurface(rs.getString("surface"));
+						runway.setRunwayHeading(rs.getDouble("runway_heading"));
+						runway.setMagVar(rs.getDouble("mag_var"));
+						runway.setIlsIdent(rs.getString("ils_ident"));
+						runway.setIlsName(rs.getString("ils_name"));
+						runway.setIlsFrequency(rs.getInt("ils_frequency"));
+						listRunways.add(runway);
+						lastAirport = rs.getString("ident");
+					} else {
+						runway = new Runway();
+						runway.setRunwayName(rs.getString("runway_name"));
+						runway.setIlsName(rs.getString("ils_name"));
+						runway.setLength(rs.getInt("length"));
+						runway.setWidth(rs.getInt("width"));
+						runway.setSurface(rs.getString("surface"));
+						runway.setRunwayHeading(rs.getDouble("runway_heading"));
+						runway.setMagVar(rs.getDouble("mag_var"));
+						runway.setIlsIdent(rs.getString("ils_ident"));
+						runway.setIlsName(rs.getString("ils_name"));
+						runway.setIlsFrequency(rs.getInt("ils_frequency"));
+
+						listRunways.add(runway);
+
+					}
+				}
+
+				airport.setRunways(listRunways);
+				if (airport.getIdent() != null) {
+					mapAirport.put(airport.getIdent(), airport);
+				}
+
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		}
+		
+		
+	}
 
 	/**
 	 * @param args the command line arguments
@@ -165,7 +260,7 @@ public class SelectAiport implements Info{
 		
     	String kmlRelative = "data\\airport.kml";
 
-		SelectAiport selectAiport = new SelectAiport();
+		SelectAirport selectAiport = new SelectAirport();
 		//selectAiport.setPlacemarks(placemarks);
 
 		 
@@ -200,5 +295,15 @@ public class SelectAiport implements Info{
 	public void setAirport(Airport airport) {
 		this.airport = airport;
 	}
+
+	public Map<String, Airport> getMapAirport() {
+		return mapAirport;
+	}
+
+	public void setMapAirport(Map<String, Airport> mapAirport) {
+		this.mapAirport = mapAirport;
+	}
+
+	
 
 }

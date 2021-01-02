@@ -25,7 +25,7 @@ import com.panels.PanelManage;
 import com.panels.PanelFlightplan;
 import com.util.Utility;
 
-import net.SelectAiport;
+import net.SelectAirport;
 import net.SelectCity;
 import net.SelectMountain;
 import net.SelectNdb;
@@ -77,7 +77,7 @@ public class PlanetIsCalling extends JFrame implements Info {
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(620, 510);
+		setSize(700, 510);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 		

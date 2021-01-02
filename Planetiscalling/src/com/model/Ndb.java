@@ -1,5 +1,7 @@
 package com.model;
 
+import com.cfg.util.Util;
+
 public class Ndb {
     Integer ndbId;      
     Integer fileId;      
@@ -53,7 +55,21 @@ public class Ndb {
 		this.lonx = ndb.getLonx();
 		this.laty = ndb.getLaty();
 	}
-	
+	public String getDescription() {
+		
+		return "|Ident: "+ident
+				+"|Name: "+name
+				+"|Frequency: "+Util.formatNdbFrequency(frequency)
+				+"|Range: "+range+" nm"
+				+"|Magnetic Variation: "+Util.formatMagvar(magVar)
+				+"|Altitude: "+((int)Math.round(altitude*3.28084)+"ft ("+altitude+"m)") 
+				+"|Type: "+type
+				+"|Region: "+region
+				
+				+"";
+		
+	}
+
 	public String getCoordinates() {
 		return ""+lonx+","+laty+","+altitude;
 	}
@@ -135,5 +151,11 @@ public class Ndb {
 	}
 	public void setLaty(Double laty) {
 		this.laty = laty;
+	}
+	@Override
+	public String toString() {
+		return "Ndb [ndbId=" + ndbId + ", fileId=" + fileId + ", ident=" + ident + ", name=" + name + ", region="
+				+ region + ", airportId=" + airportId + ", type=" + type + ", frequency=" + frequency + ", range="
+				+ range + ", magVar=" + magVar + ", altitude=" + altitude + ", lonx=" + lonx + ", laty=" + laty + "]";
 	}  
 }

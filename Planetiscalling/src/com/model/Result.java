@@ -36,23 +36,21 @@ import com.cfg.common.Info;
 import com.cfg.model.LegPoint;
 import com.cfg.model.Placemark;
 import com.cfg.util.FormUtility;
+import com.cfg.util.Util;
 import com.geo.util.Geoinfo;
+import com.util.CreateKML;
+import com.util.Utility;
 
-import net.SelectAiport;
+import net.SelectAirport;
 
 public class Result implements Info {
 	private long distance;
 	private long altitude;
-	private int vors;
-	private int ndbs;
-	private int airports;
-	private int cities;
-	private int mountains;
 	private String departure;
 	private String destination;
 
-	private SelectAiport selectAiport;
-	
+	private SelectAirport selectAiport;
+
 	private SpinnerModel altitudeModel;
 	public JSpinner altitudeSpinner;
 	private JPanel panelAltitude;
@@ -63,23 +61,27 @@ public class Result implements Info {
 	private List<Placemark> placemarks;
 
 	private SortedListModel listResultModel;
-	
-	private Map<String, Placemark> selectedAirports ;
-	private Map<String, City> selectedCities ;
-	private Map<String, Mountain> selectedMountains ;
-	private Map<String, Placemark> addonPlacemarks ;
+
+	private Map<String, Placemark> selectedAirports;
+	private Map<String, City> selectedCities;
+	private Map<String, Mountain> selectedMountains;
+	private Map<String, Placemark> addonPlacemarks;
 	private Map<Integer, Vor> selectedVors;
 	private Map<Integer, Ndb> selectedNdbs;
 	private LinkedList<LegPoint> legPoints;
+	private Map<String, Airport> mapAirport;
+
+	private StringBuilder builder;
+	
 	private String flightPlanFile;
 	private Flightplan flightplan;
-	
+
 	private JList list;
 	private ListModel listModel;
 	private JPanel outputPanel;
 	private String currentView;
 	private String currentSelection;
-	
+
 	private JRadioButton waypointBtn;
 	private JRadioButton airportBtn;
 	private JRadioButton vorBtn;
@@ -90,26 +92,32 @@ public class Result implements Info {
 	private JButton leftBtn;
 	private JButton askMeBt;
 	private JButton landAllBt;
+	private JButton dellMeBt;
 
-	
 	public Result() {
 		super();
-		waypointBtn   = new JRadioButton("", true);
-		airportBtn    = new JRadioButton();
-		vorBtn        = new JRadioButton();
-		ndbBtn        = new JRadioButton("");
-		cityBtn       = new JRadioButton("");
-		mountainBtn   = new JRadioButton("");
-		selectAiport = new SelectAiport();
+		waypointBtn = new JRadioButton("", true);
+		airportBtn = new JRadioButton();
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+		cityBtn = new JRadioButton("");
+		mountainBtn = new JRadioButton("");
+		selectAiport = new SelectAirport();
 
 	}
-	
+
 	public void setButtons(JButton landMeBt, JButton askMe, JButton landAllBt) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
 		this.landAllBt = landAllBt;
 	}
 
+	public void setButtons(JButton dellMeBt, JButton landMeBt, JButton askMe, JButton landAllBt) {
+		this.leftBtn = landMeBt;
+		this.askMeBt = askMe;
+		this.landAllBt = landAllBt;
+		this.dellMeBt = dellMeBt;
+	}
 
 	public JPanel getFlightPlanPanel() {
 		panelAltitude = new JPanel();
@@ -122,12 +130,11 @@ public class Result implements Info {
 
 		formUtility.addLabel("Title:", resultPanel, colorForground[0], fontText);
 		label = new JLabel(this.flightplan.getTitle());
-		label.setToolTipText(this.flightplan.getDepartureName()+"/"+this.flightplan.getDestinationName());
+		label.setToolTipText(this.flightplan.getDepartureName() + "/" + this.flightplan.getDestinationName());
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
 		formUtility.addLastField(panel, resultPanel);
-
 
 		formUtility.addLabel("Distance:", resultPanel, colorForground[0], fontText);
 		label = new JLabel(this.distance + " nm");
@@ -162,325 +169,386 @@ public class Result implements Info {
 			}
 		});
 
-        ButtonGroup bgroup = new ButtonGroup();
+		ButtonGroup bgroup = new ButtonGroup();
 
-        waypointBtn   = new JRadioButton("", true);
-        airportBtn    = new JRadioButton();
-        vorBtn        = new JRadioButton();
-        ndbBtn        = new JRadioButton("");
-        cityBtn       = new JRadioButton("");
-        mountainBtn   = new JRadioButton("");
-        
-        bgroup.add(waypointBtn);
-        bgroup.add(airportBtn);
-        bgroup.add(vorBtn);
-        bgroup.add(ndbBtn);
-        bgroup.add(cityBtn);
-        bgroup.add(mountainBtn);
-        
-        RadioListener myListener = new RadioListener();
-        waypointBtn.addActionListener(myListener);
-        airportBtn.addActionListener(myListener);
-        vorBtn.addActionListener(myListener);
-        ndbBtn.addActionListener(myListener);
-        cityBtn.addActionListener(myListener);
-        mountainBtn.addActionListener(myListener);
+		waypointBtn = new JRadioButton("", true);
+		airportBtn = new JRadioButton();
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+		cityBtn = new JRadioButton("");
+		mountainBtn = new JRadioButton("");
 
- /*       MouseListener mouseListener = new MouseAdapter();
-        waypointBtn.addMouseListener(mouseListener );
-        airportBtn.addMouseListener(mouseListener );
-        vorBtn.addMouseListener(mouseListener );
-        ndbBtn.addMouseListener(mouseListener );
-        cityBtn.addMouseListener(mouseListener );
-        mountainBtn.addMouseListener(mouseListener );
+		bgroup.add(waypointBtn);
+		bgroup.add(airportBtn);
+		bgroup.add(vorBtn);
+		bgroup.add(ndbBtn);
+		bgroup.add(cityBtn);
+		bgroup.add(mountainBtn);
 
-*/        
-        
-		setformLine(resultPanel, "Waypoints:", this.legPoints.size(),waypointBtn);
-		setformLine(resultPanel, "Airports:", this.selectedAirports.size(),airportBtn);
-		setformLine(resultPanel, "VORs:", this.selectedVors.size(),vorBtn);
-		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(),ndbBtn);
-		setformLine(resultPanel, "Cities:", this.selectedCities.size(),cityBtn);
-		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(),mountainBtn);
+		RadioListener myListener = new RadioListener();
+		waypointBtn.addActionListener(myListener);
+		airportBtn.addActionListener(myListener);
+		vorBtn.addActionListener(myListener);
+		ndbBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
 		
+		setformLine(resultPanel, "Waypoints:", this.legPoints.size(), waypointBtn);
+		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+
 		resultPanel.validate();
 
 		return resultPanel;
 	}
-	
-	  /** Listens to the radio buttons. */
-    class RadioListener implements ActionListener { 
-        public void actionPerformed(ActionEvent e) {
-        	if (e.getSource() == waypointBtn) {
-        		getWaypointListModel();
-        	} else if (e.getSource() == airportBtn) {
-        		getAirportListModel();
-        	}else if (e.getSource() == vorBtn) {
-        		getVorListModel();
-        	}else if (e.getSource() == ndbBtn) {
-        		geNdbListModel();
-        	}else if (e.getSource() == cityBtn) {
-        		getCityListModel();
-        	}else if (e.getSource() == mountainBtn) {
-        		getMountainListModel();
-        	}
-            
-        }
-    }
-	
-	private void setformLine(JPanel resultPanel, String strLabel,int number,  JRadioButton radioBtn) {
-	
-		formUtility.addLabel(strLabel+"                         ", resultPanel, colorForground[0], fontText);
-		label = new JLabel(String.format("%03d", number)+"                 ");
- 
+
+	/** Listens to the radio buttons. */
+	class RadioListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			if (e.getSource() == waypointBtn) {
+				getWaypointListModel();
+			} else if (e.getSource() == airportBtn) {
+				getAirportListModel();
+			} else if (e.getSource() == vorBtn) {
+				getVorListModel();
+			} else if (e.getSource() == ndbBtn) {
+				geNdbListModel();
+			} else if (e.getSource() == cityBtn) {
+				getCityListModel();
+			} else if (e.getSource() == mountainBtn) {
+				getMountainListModel();
+			}
+
+		}
+	}
+
+	private void setformLine(JPanel resultPanel, String strLabel, int number, JRadioButton radioBtn) {
+
+		formUtility.addLabel(strLabel + "                         ", resultPanel, colorForground[0], fontText);
+		label = new JLabel(String.format("%03d", number) + "                 ");
+
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
 		panel.add(radioBtn);
 		formUtility.addLastField(panel, resultPanel);
-	
+
 	}
-	
+
 	public JPanel getIcaoPanel() {
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
-		
+
 		formUtility = new FormUtility();
-		
-        ButtonGroup bgroup = new ButtonGroup();
-        
-        airportBtn    = new JRadioButton("", true);
-        vorBtn = new JRadioButton();
-        ndbBtn   = new JRadioButton("");
-        cityBtn = new JRadioButton("");
-        mountainBtn = new JRadioButton("");
-        
-        bgroup.add(airportBtn);
-        bgroup.add(vorBtn);
-        bgroup.add(ndbBtn);
-        bgroup.add(cityBtn);
-        bgroup.add(mountainBtn);
-		
-		setformLine(resultPanel, "Airports:", this.selectedAirports.size(),airportBtn);
-		setformLine(resultPanel, "VORs:", this.selectedVors.size(),vorBtn);
-		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(),ndbBtn);
-		setformLine(resultPanel, "Cities:", this.selectedCities.size(),cityBtn);
-		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(),mountainBtn);
-	
+
+		ButtonGroup bgroup = new ButtonGroup();
+
+		airportBtn = new JRadioButton("", true);
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+		cityBtn = new JRadioButton("");
+		mountainBtn = new JRadioButton("");
+
+		bgroup.add(airportBtn);
+		bgroup.add(vorBtn);
+		bgroup.add(ndbBtn);
+		bgroup.add(cityBtn);
+		bgroup.add(mountainBtn);
+
+		RadioListener myListener = new RadioListener();
+		airportBtn.addActionListener(myListener);
+		vorBtn.addActionListener(myListener);
+		ndbBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
+
+		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+
 		resultPanel.validate();
-		
-		
 		return resultPanel;
 
 	}
-	
-	public SortedListModel  getListIcaoModel() {
+
+	public SortedListModel getListIcaoModel() {
 		listResultModel = new SortedListModel();
 		String info = "";
 		for (int i = 0; i < placemarks.size(); i++) {
 			try {
-				info = placemarks.get(i).getDescription().substring(placemarks.get(i).getDescription().indexOf("?q=") + 3,
+				//System.out.println(placemarks.get(i).getDescription());
+
+				info = placemarks.get(i).getDescription().substring(
+						placemarks.get(i).getDescription().indexOf("?q=") + 3,
 						placemarks.get(i).getDescription().indexOf("+wikipedia"));
 				listResultModel.add(info.replace("+", " "));
 			} catch (StringIndexOutOfBoundsException e) {
 				// TODO Auto-generated catch block
-				//e.printStackTrace();
+				// e.printStackTrace();
 			}
 		}
-		
+
 		currentView = "icao";
+
 		return listResultModel;
 	}
-	
-	public void getWaypointListModel() {
-		listModel = new  DefaultListModel<String>();
-		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
-		String info = "";
-		double distance = 0.0;
-		double distanceCumul = 0.0;
-		for (int i = 0; i < legPoints.size(); i++) {
-			if (i < legPoints.size()-1) {
-				distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(), legPoints.get(i+1).getLaty(), legPoints.get(i+1).getLonx(),'N');
-				info = legPoints.get(i).getId()+"   "+Math.round(distance)+" - "+Math.round(distanceCumul)+" - "+Math.round(legPoints.get(i).getAltitude()*3.28084)+"ft";
-				distanceCumul += distance;
-		} else {
-				info = legPoints.get(legPoints.size()-1).getId()+"   "+0+" - "+Math.round(distanceCumul)+" - "+Math.round(legPoints.get(legPoints.size()-1).getAltitude()*3.28084)+"ft";
-			}
-	
-			((DefaultListModel) listModel).addElement(info);
 
-		}
-		
-		currentView = "waypoint";
-	    showList((DefaultListModel<String>) listModel);
-		
-	}
+
 	public void getAirportListModel() {
-		listModel = new  DefaultListModel<String>();
+		listModel = new DefaultListModel<String>();
 		String info = "";
-		
-		for (Placemark placemark : selectedAirports.values()) {
-			info = placemark.getDescription().substring(placemark.getDescription().indexOf("?q=") + 3,
-					placemark.getDescription().indexOf("+wikipedia"));
-			info = info.replaceAll("\\+", "  ");
-			((DefaultListModel) listModel).addElement(info);
+
+		for (Airport airport : mapAirport.values()) {
+				builder = Utility.getInstance().buildLine(airport.getIdent() , airport.getName(), airport.getCountry());
+			((DefaultListModel) listModel).addElement(builder.toString());
 		}
 
 		currentView = "airport";
 		showList((DefaultListModel<String>) listModel);
-		
+
+	}
+	public void getWaypointListModel() {
+		listModel = new DefaultListModel<String>();
+		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		String info = "";
+		Double distance = 0.0;
+		Double distanceCumul = 0.0;
+		builder = new StringBuilder();
+
+		for (int i = 0; i < legPoints.size(); i++) {
+			builder = new StringBuilder();
+			if (i < legPoints.size() - 1) {
+
+				distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(),legPoints.get(i + 1).getLaty(), legPoints.get(i + 1).getLonx(), 'N');
+				info = legPoints.get(i).getId() + "   " + Math.round(distance) + " - " + Math.round(distanceCumul)+ " - " + Math.round(legPoints.get(i).getAltitude() * 3.28084) + "ft";
+				distanceCumul += distance;
+				builder = Utility.getInstance().buildLine(legPoints.get(i).getId(), Math.round(distance), Math.round(distanceCumul));
+			} else {
+				builder = Utility.getInstance().buildLine(legPoints.get(legPoints.size() - 1).getId(), 0, Math.round(distanceCumul));
+
+		}
+
+			((DefaultListModel) listModel).addElement(builder.toString());
+
+		}
+
+		currentView = "waypoint";
+		showList((DefaultListModel<String>) listModel);
+
 	}
 	
-	public void getVorListModel() {
-		listModel = new  DefaultListModel<String>();
-		String info = "";
-		
-		for (Vor vor: selectedVors.values()) {
-			String cap = vor.getName();
-			 cap = cap.substring(0,1)+cap.substring(1).toLowerCase();
+	
 
-			info = vor.getIdent()+"   "+cap+"-Region:"+vor.getRegion()+"-Type : "+vor.getType();
-			((DefaultListModel) listModel).addElement(info);
+	public void getVorListModel() {
+		listModel = new DefaultListModel<String>();
+		String info = "";
+
+		for (Vor vor : selectedVors.values()) {
+			String cap = vor.getName();
+			cap = cap.substring(0, 1) + cap.substring(1).toLowerCase();
+			
+			builder = Utility.getInstance().buildLine(vor.getIdent() , cap, Util.REGION_MAP.get(vor.getRegion()));
+
+			((DefaultListModel) listModel).addElement(builder.toString());
 		}
 
 		currentView = "vor";
 		showList((DefaultListModel<String>) listModel);
-		
+
 	}
 
 	public void geNdbListModel() {
-		listModel = new  DefaultListModel<String>();
+		listModel = new DefaultListModel<String>();
 		String info = "";
-		
-		for (Ndb ndb: selectedNdbs.values()) {
+
+		for (Ndb ndb : selectedNdbs.values()) {
 			String cap = ndb.getName();
-			 cap = cap.substring(0,1)+cap.substring(1).toLowerCase();
-			info = ndb.getIdent()+"   "+cap+"-Region:"+ndb.getRegion()+"-Type: "+ndb.getType();
-			((DefaultListModel) listModel).addElement(info);
+			cap = cap.substring(0, 1) + cap.substring(1).toLowerCase();
+			builder = Utility.getInstance().buildLine(ndb.getIdent() , cap, Util.REGION_MAP.get(ndb.getRegion()));
+
+			((DefaultListModel) listModel).addElement(builder.toString());
 		}
 
 		currentView = "ndb";
 		showList((DefaultListModel<String>) listModel);
-		
+
 	}
-	
+
 	public void getCityListModel() {
-		listModel = new  DefaultListModel<String>();
+		listModel = new DefaultListModel<String>();
 		String info = "";
-		
-		for (City city: selectedCities.values()) {
-			info = city.getCityName()+"   Country: "+city.getCountry()+"-Population: "+city.getPopulation()+"-Region:"+city.getRegion();
-			((DefaultListModel) listModel).addElement(info);
+
+		for (City city : selectedCities.values()) {
+			builder = Utility.getInstance().buildLine(city.getCityName() , city.getCountry(), city.getPopulation());
+			((DefaultListModel) listModel).addElement(builder.toString());
 		}
 
 		currentView = "city";
 		showList((DefaultListModel<String>) listModel);
-		
+
 	}
-	
+
 	public void getMountainListModel() {
-		listModel = new  DefaultListModel<String>();
+		listModel = new DefaultListModel<String>();
 		String info = "";
-		
-		for (Mountain mountains: selectedMountains.values()) {
-			info = mountains.getName()+"   Country: "+mountains.getCountry()+"-Elevation: "+mountains.getElevation();
-			((DefaultListModel) listModel).addElement(info);
+
+		for (Mountain mountain : selectedMountains.values()) {
+			//info = mountains.getName() + "   " + mountains.getCountry();
+			builder = Utility.getInstance().buildLine(mountain.getName() , mountain.getCountry(), mountain.getElevation());
+
+			((DefaultListModel) listModel).addElement(builder.toString());
 		}
 
 		currentView = "mountain";
 		showList((DefaultListModel<String>) listModel);
-		
+
 	}
 
-	
 	/**
 	 * 
 	 * @param listModel
 	 */
-	public void showList(DefaultListModel<String>  listModel) {
+	public void showList(DefaultListModel<String> listModel) {
 
-		 outputPanel.setVisible(true);
-	     outputPanel.removeAll();	
-		 list = new JList(listModel);
-		 
-		 this.landAllBt.setEnabled(true);
-		 this.leftBtn.setEnabled(false);
-		 this.askMeBt.setEnabled(false);
+		outputPanel.setVisible(true);
+		outputPanel.removeAll();
+		list = new JList(listModel);
+		list.setFixedCellHeight(18);
 
-		 list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		 list.setVisibleRowCount(5);
-		 
-		 
-		 MouseListener mouseListener = new MouseAdapter() {
-			    public void mouseClicked(MouseEvent e) {
 
-			        if (e.getClickCount() == 2) {
-						  currentSelection = (String) list.getSelectedValue();
-						  askMeBt.doClick();
+		this.landAllBt.setEnabled(true);
+		this.leftBtn.setEnabled(false);
+		this.askMeBt.setEnabled(false);
 
-			         }
-			    }
-			};		 
-			 list.addMouseListener(mouseListener);
+		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
-		 list.addListSelectionListener(new ListSelectionListener() {
-			  /**
-			  * {@inheritDoc}
-			  */
-			  @Override
-			  public void valueChanged(ListSelectionEvent evt) {
-				  askMeBt.setEnabled(!list.isSelectionEmpty());
-				  //System.out.println(leftBtn.getText());
-				  //System.out.println("--->"+list.getSelectedValue());
-				  currentSelection = (String) list.getSelectedValue();
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
 
-				  leftBtn.setEnabled(!list.isSelectionEmpty());
-			  }
-			});
-	
-		 outputPanel.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				if (e.getClickCount() == 2) {
+					currentSelection = (String) list.getSelectedValue();
+					askMeBt.doClick();
+
+				}
+			}
+		};
+		list.addMouseListener(mouseListener);
+
+		list.addListSelectionListener(new ListSelectionListener() {
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void valueChanged(ListSelectionEvent evt) {
+				askMeBt.setEnabled(!list.isSelectionEmpty());
+				currentSelection = (String) list.getSelectedValue();
+
+				leftBtn.setEnabled(!list.isSelectionEmpty());
+			}
+		});
+
+		outputPanel.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
-		
-		  outputPanel.validate();
+
+		outputPanel.validate();
 
 	}
-	
+
 	public String panelWaypoint(String line) {
 		String htmlString = null;
 		for (int i = 0; i < legPoints.size(); i++) {
-			if (legPoints.get(i).toString().contains(line.subSequence(0, line.indexOf("   ")))) {
+			
+			line = Utility.getInstance().findFirst(line);
+
+			if (legPoints.get(i).toString().contains(line)) {
 				htmlString = legPoints.get(i).getHmlString();
-			    if ("Airport".equals(legPoints.get(i).getType())) {
-			    	htmlString = panelAirport(legPoints.get(i).getIcaoIdent());
-			    }
+				if ("Airport".equals(legPoints.get(i).getType())) {
+					htmlString = panelAirport(legPoints.get(i).getIcaoIdent());
+				}
 
 				break;
 			}
 		}
-		
-		
+
 		return htmlString;
-		
-	}
-	
-	public String panelAirport(String line) {
-		String varStr = null;
-		    if (line.indexOf("   ") == -1) {
-		    	varStr = "where ident = '"+line+"'";
-		    } else {
-		    	varStr = "where ident = '"+line.subSequence(0, line.indexOf("   ")).toString().trim()+"'";
-		    }
-		    
-			selectAiport.selectAll(varStr);
-			
-			varStr = "<b>"+selectAiport.getAirport().getIdent()+" "+selectAiport.getAirport().getName()+"</b><br>";
-			varStr += selectAiport.getAirport().getDescription().replaceAll("\\|", "<br>");
-		return varStr;
-		
+
 	}
 
-	
-	
+	public String panelAirport(String line) {
+		String varStr = null;
+		line = Utility.getInstance().findFirst(line);
+		Airport airport = mapAirport.get(line);
+
+		varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
+		varStr += airport.getDescriptionAskme().replaceAll("\\|", "<br>");
+		return varStr;
+
+	}
+
+	public String panelVor(String line) {
+		String htmlString = null;
+
+		line = Utility.getInstance().findFirst(line);
+
+		for (Vor vor : selectedVors.values()) {
+			if (vor.getIdent().equals(line)) {
+				htmlString = CreateKML.buildVorDescription(vor).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
+			}
+		}
+
+		return htmlString;
+
+	}
+
+	public String panelNdb(String line) {
+		String htmlString = null;
+		line = Utility.getInstance().findFirst(line);
+
+		for (Ndb ndb : selectedNdbs.values()) {
+			if (ndb.getIdent().equals(line)) {
+				htmlString = CreateKML.buildNdbDescription(ndb).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
+			}
+		}
+
+		return htmlString;
+
+	}
+
+	public String panelCity(String line) {
+		String htmlString = null;
+		line = Utility.getInstance().findFirst(line);
+
+		for (City city : selectedCities.values()) {
+			if (city.getCityName().equals(line)) {
+				htmlString = CreateKML.buildCityDescription(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
+
+			}
+		}
+
+		return htmlString;
+
+	}
+
+	public String panelMountain(String line) {
+		String htmlString = null;
+		line = Utility.getInstance().findFirst(line);
+
+		for (Mountain mountain : selectedMountains.values()) {
+			if (mountain.getName().equals(line)) {
+				htmlString = CreateKML.buildMountainDescription(mountain).replaceAll("12px", "10px").replaceAll("\\|","<br>");
+
+			}
+		}
+
+		return htmlString;
+
+	}
+
 	public long getDistance() {
 		return distance;
 	}
@@ -495,46 +563,6 @@ public class Result implements Info {
 
 	public void setAltitude(long altitude) {
 		this.altitude = altitude;
-	}
-
-	public int getVors() {
-		return vors;
-	}
-
-	public void setVors(int vors) {
-		this.vors = vors;
-	}
-
-	public int getNdbs() {
-		return ndbs;
-	}
-
-	public void setNdbs(int ndbs) {
-		this.ndbs = ndbs;
-	}
-
-	public int getAirports() {
-		return airports;
-	}
-
-	public void setAirports(int airports) {
-		this.airports = airports;
-	}
-
-	public int getCities() {
-		return cities;
-	}
-
-	public void setCities(int cities) {
-		this.cities = cities;
-	}
-
-	public int getMountains() {
-		return mountains;
-	}
-
-	public void setMountains(int mountains) {
-		this.mountains = mountains;
 	}
 
 	public SpinnerModel getAltitudeModel() {
@@ -583,13 +611,6 @@ public class Result implements Info {
 
 	public void setDestination(String destination) {
 		this.destination = destination;
-	}
-
-	@Override
-	public String toString() {
-		return "Result [flightplan=" + flightplan + ", distance=" + distance + ", altitude=" + altitude + ", vors="
-				+ vors + ", ndbs=" + ndbs + ", airports=" + airports + ", cities=" + cities + ", mountains=" + mountains
-				+ ", departure=" + departure + ", destination=" + destination + "]";
 	}
 
 	public void setListAirport(List<Placemark> placemarks) {
@@ -651,7 +672,7 @@ public class Result implements Info {
 	}
 
 	public void setLegPoints(LinkedList<LegPoint> legPoints) {
-		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+		legPoints = Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 		this.legPoints = legPoints;
 	}
 
@@ -663,66 +684,53 @@ public class Result implements Info {
 		this.flightPlanFile = flightPlanFile;
 	}
 
-
 	public JPanel getResultPanel() {
 		return resultPanel;
 	}
-
 
 	public void setResultPanel(JPanel resultPanel) {
 		this.resultPanel = resultPanel;
 	}
 
-
 	public JPanel getPanel() {
 		return panel;
 	}
-
 
 	public void setPanel(JPanel panel) {
 		this.panel = panel;
 	}
 
-
 	public JLabel getLabel() {
 		return label;
 	}
-
 
 	public void setLabel(JLabel label) {
 		this.label = label;
 	}
 
-
 	public List<Placemark> getPlacemarks() {
 		return placemarks;
 	}
-
 
 	public void setPlacemarks(List<Placemark> placemarks) {
 		this.placemarks = placemarks;
 	}
 
-
 	public SortedListModel getListResultModel() {
 		return listResultModel;
 	}
-
 
 	public void setListResultModel(SortedListModel listResultModel) {
 		this.listResultModel = listResultModel;
 	}
 
-
 	public Flightplan getFlightplan() {
 		return flightplan;
 	}
 
-
 	public void setFlightplan(Flightplan flightplan) {
 		this.flightplan = flightplan;
 	}
-
 
 	public void setOutputPanel(JPanel outputPanel) {
 		this.outputPanel = outputPanel;
@@ -744,5 +752,29 @@ public class Result implements Info {
 		this.currentSelection = currentSelection;
 	}
 
-	
+	@Override
+	public String toString() {
+		return "Result [distance=" + distance + ", altitude=" + altitude + ", departure=" + departure + ", destination="
+				+ destination + ", selectAiport=" + selectAiport + ", altitudeModel=" + altitudeModel
+				+ ", altitudeSpinner=" + altitudeSpinner + ", panelAltitude=" + panelAltitude + ", resultPanel="
+				+ resultPanel + ", formUtility=" + formUtility + ", panel=" + panel + ", label=" + label
+				+ ", placemarks=" + placemarks + ", listResultModel=" + listResultModel + ", selectedAirports="
+				+ selectedAirports + ", selectedCities=" + selectedCities + ", selectedMountains=" + selectedMountains
+				+ ", addonPlacemarks=" + addonPlacemarks + ", selectedVors=" + selectedVors + ", selectedNdbs="
+				+ selectedNdbs + ", legPoints=" + legPoints + ", flightPlanFile=" + flightPlanFile + ", flightplan="
+				+ flightplan + ", list=" + list + ", listModel=" + listModel + ", outputPanel=" + outputPanel
+				+ ", currentView=" + currentView + ", currentSelection=" + currentSelection + ", waypointBtn="
+				+ waypointBtn + ", airportBtn=" + airportBtn + ", vorBtn=" + vorBtn + ", ndbBtn=" + ndbBtn
+				+ ", cityBtn=" + cityBtn + ", mountainBtn=" + mountainBtn + ", leftBtn=" + leftBtn + ", askMeBt="
+				+ askMeBt + ", landAllBt=" + landAllBt + "]";
+	}
+
+	public Map<String, Airport> getMapAirport() {
+		return mapAirport;
+	}
+
+	public void setMapAirport(Map<String, Airport> mapAirport) {
+		this.mapAirport = mapAirport;
+	}
+
 }

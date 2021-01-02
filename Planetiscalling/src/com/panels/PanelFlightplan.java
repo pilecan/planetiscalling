@@ -25,7 +25,7 @@ import com.model.Distance;
 import com.model.Result;
 import com.util.ReadData;
 
-import net.SelectAiport;
+import net.SelectAirport;
 import net.SelectCity;
 import net.SelectMountain;
 import net.SelectNdb;
@@ -43,7 +43,7 @@ public class PanelFlightplan {
 	private DistanceSpinner distanceSpin; 
 	
 	private ManageXMLFile manageXMLFile;
-	private SelectAiport selectAiport;
+	private SelectAirport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
 	private SelectVor selectVor;
@@ -75,7 +75,6 @@ public class PanelFlightplan {
 
 	public JPanel getPanel(final ManageXMLFile manageXMLFile,SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
 		this.manageXMLFile = manageXMLFile;
-		this.selectAiport = selectAiport;
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor = selectVor;
@@ -156,7 +155,7 @@ public class PanelFlightplan {
 	    	 flightPlanFile = new File(result.getFlightplan().getFlightplanFile()).getName();
 	    	
 	 		 panelResult.setBorder(new TitledBorder(flightPlanFile));
-	 		panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
+	 		 panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
 
 	  		 panelResult.removeAll();	
 			 panelResult.add(result.getFlightPlanPanel());
@@ -220,7 +219,7 @@ public class PanelFlightplan {
 		});		
 
 		
-		googleBt = new JButton("Land on Google Earth");
+		googleBt = new JButton("Land All on Google Earth");
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
@@ -253,17 +252,12 @@ public class PanelFlightplan {
 		askMeBt.setEnabled(false);
 		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if ("waypoint".equals(result.getCurrentView())) {
-					manageWaypoint();
-				} else if ("airport".equals(result.getCurrentView())) {
-					manageAirport();
-				}
-				
+				showAskMeAnswer(result.getCurrentView());
 
 			}
 		});	
 		
-		landAllBt = new JButton("Land Those");
+		landAllBt = new JButton("Land It");
 		landAllBt.setEnabled(false);
 		landAllBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -295,13 +289,10 @@ public class PanelFlightplan {
 		askMeBt.setBounds(395, 395, 94, 23);
 		landAllBt.setBounds(500, 395, 94, 23);
 		buttonRightPanel.setBounds(290, 380, 300, 23);
-		
-//		googleButton.setBounds(450, 290, 130, 23);
 
-
-	  	panelResult.setBounds(290, 10, 300, 240);	
-	  	outputPanel.setBounds(290, 250, 300, 140);	
-	  	askMePanel.setBounds(290, 250, 300, 140);	
+	  	panelResult.setBounds(290, 10, 380, 240);	
+	  	outputPanel.setBounds(290, 250, 380, 140);	
+	  	askMePanel.setBounds(290, 250, 380, 140);	
 	  	
 
      	panelFlightplan.add(buttonBt);
@@ -325,15 +316,31 @@ public class PanelFlightplan {
 	 * 
 	 * 
 	 */
-	private void manageWaypoint() {
+
+	private void showAskMeAnswer(String topic) {
 	    if ("Ask Me".equals(askMeBt.getText())) {
 			outputPanel.setVisible(false);
 			jEditorPane.setVisible(true);
 			askMeBt.setText("Back");
-			//result.panelWaypoint(result.getCurrentSelection());
 	        doc = kit.createDefaultDocument();
 	        jEditorPane.setDocument(doc);
-	        jEditorPane.setText(result.panelWaypoint(result.getCurrentSelection()));
+	        if ("waypoint".equals(topic)) {
+	        	topic = result.panelWaypoint(result.getCurrentSelection());
+	        } else if ("waypoint".equals(topic)) {
+	        	topic = result.panelWaypoint(result.getCurrentSelection());
+	        } else if ("airport".equals(topic)) {
+	        	topic = result.panelAirport(result.getCurrentSelection());
+	        }  else if ("vor".equals(topic)) {
+	        	topic = result.panelVor(result.getCurrentSelection());
+	        }   else if ("ndb".equals(topic)) {
+	        	topic = result.panelNdb(result.getCurrentSelection());
+	        }   else if ("city".equals(topic)) {
+	        	topic = result.panelCity(result.getCurrentSelection());
+	        }   else if ("mountain".equals(topic)) {
+	        	topic = result.panelMountain(result.getCurrentSelection());
+	        }  
+	        	
+	        jEditorPane.setText(topic);
 	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        	   public void run() { 
 	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
@@ -348,38 +355,8 @@ public class PanelFlightplan {
 	
 	}
 	
-	private void manageAirport() {
-	    if ("Ask Me".equals(askMeBt.getText())) {
-			outputPanel.setVisible(false);
-			jEditorPane.setVisible(true);
-			askMeBt.setText("Back");
-		//	result.panelAirport(result.getCurrentSelection());
-	        doc = kit.createDefaultDocument();
-	        jEditorPane.setDocument(doc);
-	        jEditorPane.setText(result.panelAirport(result.getCurrentSelection()));
-	        
-	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	        	   public void run() { 
-	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
-	        	   }
-	        	});
-	      // askmeScrollPan.getVerticalScrollBar().setValue(0);
-	        
-/*	        try {
-	        	jEditorPane.setPage("http://www.lapresse.ca"); //Or Path/File destination
-	        } catch (IOException error) {
-	        	System.out.println(error);
-	        }   
-*/
-
-	    	
-	    } else {
-			outputPanel.setVisible(true);
-			jEditorPane.setVisible(false);
-			askMeBt.setText("Ask Me");
-	    }
 		
 	}
 
 
-}
+
