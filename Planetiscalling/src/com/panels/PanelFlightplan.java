@@ -94,9 +94,6 @@ public class PanelFlightplan {
 		jEditorPane.setEditable(false);
 		kit = new HTMLEditorKit();
 		jEditorPane.setEditorKit(kit);
-		
-	    //StyleSheet styleSheet = kit.getStyleSheet();
-		
 		jEditorPane.setVisible(false);
         jEditorPane.addHyperlinkListener(new HyperlinkListener() {
 
@@ -183,9 +180,10 @@ public class PanelFlightplan {
 		    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
 		    			 distanceSpin.getCheckTocTod().isSelected(),
 		    			 (double)result.getAltitudeModel().getValue())); 
+		    	 
 			  	 panelResult.removeAll();	
 			  	 
-				  result.getWaypointListModel();
+				  result.getAirportListModel();
 
 
 		    	 panelResult.add(result.getFlightPlanPanel());

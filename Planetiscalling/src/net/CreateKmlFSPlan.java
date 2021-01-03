@@ -302,8 +302,6 @@ public class CreateKmlFSPlan{
 				for(LegPoint point : legPoints){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
 					
-				//	System.out.println(Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N'));
-
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()){
 						selectedMountains.put(mountain.getName(),new Mountain(mountain));
 						if (dist.isLine()) {

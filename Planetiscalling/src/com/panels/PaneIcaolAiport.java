@@ -102,16 +102,12 @@ public class PaneIcaolAiport extends JFrame {
 		
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("icao");
-  	    result = new Result();
 
 		
         jEditorPane = new JEditorPane();
 		jEditorPane.setEditable(false);
 		kit = new HTMLEditorKit();
 		jEditorPane.setEditorKit(kit);
-		
-	    //StyleSheet styleSheet = kit.getStyleSheet();
-		
 		jEditorPane.setVisible(false);
         jEditorPane.addHyperlinkListener(new HyperlinkListener() {
 
@@ -126,6 +122,8 @@ public class PaneIcaolAiport extends JFrame {
                 }
             }
           });
+        
+  	    result = new Result();
 
 		landMeBt = new JButton("Land Me");
 		landMeBt.setEnabled(false);
@@ -141,7 +139,6 @@ public class PaneIcaolAiport extends JFrame {
 		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showAskMeAnswer(result.getCurrentView());
-
 			}
 		});	
 		
@@ -150,6 +147,17 @@ public class PaneIcaolAiport extends JFrame {
 		landItBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("land All");
+/*	?? ->			readData.creatIcaoAirports(Utility.getInstance().getIcaoFromListModel(listIcao),
+						new Distance(
+			    			     (int)distanceSpin.getCitySpinner().getValue(), 
+		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
+		        				 0,
+		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				 distanceSpin.getCheckLinedist().isSelected(),
+		        				 0.0)
+								 ); 
+*/				setResultPanel();
+				manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.flightplanName)));
 			}
 		});		
 		
@@ -292,6 +300,7 @@ public class PaneIcaolAiport extends JFrame {
 	inputIcaoPanel.setBounds(10, 8, 270, 120);
 	resultPanel.setBounds(290, 8, 300, 139);
   	outputPanel.setBounds(290, 145, 300, 149);	
+  	askMePanel.setBounds(290, 145, 300, 149);	
 
 	distanceSpin.getSpinnerPanel().setBounds(10, 130, 280, 190);
     searchButton.setBounds(10, 330, 125, 23);
@@ -306,11 +315,12 @@ public class PaneIcaolAiport extends JFrame {
 	icaoPanel.add(distanceSpin.getSpinnerPanel());
 	icaoPanel.add(outputPanel);
 	icaoPanel.add(resultPanel);
+	icaoPanel.add(askMePanel);
 	icaoPanel.add(searchButton);
 	icaoPanel.add(clearButton);
 	icaoPanel.add(delMeBt);
+	icaoPanel.add(delMeBt);
 	icaoPanel.add(askMeBt);
-	icaoPanel.add(landMeBt);
 	icaoPanel.add(landItBt);
 	icaoPanel.add(googleButton);
 	
