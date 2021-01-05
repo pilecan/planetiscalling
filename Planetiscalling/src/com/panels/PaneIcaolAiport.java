@@ -6,7 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -17,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
@@ -30,12 +34,15 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
+import com.cfg.common.Interaction;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
 import com.cfg.util.Util;
 import com.model.Distance;
 import com.model.Result;
 import com.model.SortedListModel;
+import com.model.Vor;
+import com.util.CreateKML;
 import com.util.ReadData;
 import com.util.Utility;
 
@@ -65,16 +72,14 @@ public class PaneIcaolAiport extends JFrame {
 	private SelectMountain selectMountain;
 	private SelectCity selectCity;
 	private DistanceSpinner distanceSpin; 
-	private JList listIcao;
-	private SortedListModel listIcaoModel;
 	
 	
-	private JButton googleButton;
 	
 	private JPanel askMePanel;
 	private JPanel buttonLeftPanel;
 	private JPanel buttonRightPanel;
 
+	private JButton landAllBt;
 	private JButton buttonBt;
 	private JButton refreshBt;
 	private JButton resetBt;
@@ -83,7 +88,8 @@ public class PaneIcaolAiport extends JFrame {
 	private JButton landItBt;
 	private JButton delMeBt;
 
-	
+	private JButton searchBt;
+
 	private JEditorPane jEditorPane;
 	private HTMLEditorKit kit;
 	private Document doc;
@@ -125,69 +131,6 @@ public class PaneIcaolAiport extends JFrame {
         
   	    result = new Result();
 
-		landMeBt = new JButton("Land Me");
-		landMeBt.setEnabled(false);
-		landMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(result.getCurrentView());
-				System.out.println(result.getCurrentSelection());
-			}
-		});		
-
-		askMeBt = new JButton("Ask Me");
-		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				showAskMeAnswer(result.getCurrentView());
-			}
-		});	
-		
-		landItBt = new JButton("Land It");
-		landItBt.setEnabled(false);
-		landItBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("land All");
-/*	?? ->			readData.creatIcaoAirports(Utility.getInstance().getIcaoFromListModel(listIcao),
-						new Distance(
-			    			     (int)distanceSpin.getCitySpinner().getValue(), 
-		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
-		        				 0,
-		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-		        				 distanceSpin.getCheckLinedist().isSelected(),
-		        				 0.0)
-								 ); 
-*/				setResultPanel();
-				manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.flightplanName)));
-			}
-		});		
-		
-		 delMeBt = new JButton("Del Me");
-		 delMeBt.setEnabled(false);
-		 delMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-
-			{
-				SortedListModel dlm = (SortedListModel) listIcao.getModel();
-
-				if (listIcao.getSelectedIndices().length > 0) {
-					int[] tmp = listIcao.getSelectedIndices();
-					int[] selectedIndices = listIcao.getSelectedIndices();
-
-					for (int i = tmp.length - 1; i >= 0; i--) {
-						selectedIndices = listIcao.getSelectedIndices();
-						dlm.removeElement(selectedIndices[i]);
-					}
-				}
-
-				listIcao.clearSelection();
-
-				//result.setAirports(listIcao.getModel().getSize());
-				setResultPanel();
-
-			}
-		});
-		
-	result.setButtons(delMeBt,landMeBt, askMeBt, landItBt);
 
 	askMePanel = new JPanel(new BorderLayout());
 	askMePanel.setBorder(new TitledBorder(""));
@@ -207,16 +150,14 @@ public class PaneIcaolAiport extends JFrame {
 	resultPanel = new JPanel(new BorderLayout());
 	resultPanel.setBorder(new TitledBorder("Search Result"));
 	
-	googleButton = new JButton("Google Earth");
-	googleButton.setEnabled(false);
-
-
-	googleButton.addActionListener(new ActionListener() {
+	landAllBt = new JButton("Land All to Google Earth");
+	landAllBt.setEnabled(false);
+	landAllBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e)
 
 		{
 			//System.out.println(Utility.getInstance().getIcaoFromListModel(listIcao));
-			readData.creatIcaoAirports(Utility.getInstance().getIcaoFromListModel(listIcao),
+			readData.creatIcaoAirports(Utility.getInstance().getIcaoFromMapAirport(result.getMapAirport()),
 					new Distance(
 		    			     (int)distanceSpin.getCitySpinner().getValue(), 
 	        				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -248,10 +189,34 @@ public class PaneIcaolAiport extends JFrame {
 	inputIcaoPanel.setVisible(true);
 	inputIcaoPanel.setPreferredSize(new Dimension(300,150));
 	
-	
+	resetBt = new JButton("Reset");
+	resetBt.setEnabled(false);
 
-	JButton searchButton = new JButton("Search");
-	searchButton.addActionListener(new ActionListener()
+    resetBt.addActionListener(new ActionListener()
+    {
+      public void actionPerformed(ActionEvent e)
+      {
+			distanceSpin.getCitySpinner().setValue(0);
+			distanceSpin.getVorNdbSpinner().setValue(0);
+			distanceSpin.getMountainSpinner().setValue(0);
+			distanceSpin.getCheckLinedist().setSelected(false);
+
+			readData.resetIcaoResult();
+			resultPanel.removeAll();
+			result.getIcaoPanel().validate();
+			result.getAirportListModel();
+
+			resultPanel.add(result.getIcaoPanel());
+
+			resultPanel.validate();
+			icaoPanel.validate();
+   	  
+
+      }
+    });
+
+    searchBt = new JButton("Search");
+	searchBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
@@ -271,31 +236,113 @@ public class PaneIcaolAiport extends JFrame {
 		  	 //result.getAirportListModel();
 
 	    	 setResultPanel();
-			 googleButton.setEnabled(true);
+			 landAllBt.setEnabled(true);	
+			 resetBt.setEnabled(true);
 			 
 			 icaoPanel.validate();
 
 	      }
 	    });
 
-	JButton clearButton = new JButton("Clear");
-    clearButton.addActionListener(new ActionListener()
-    {
-      public void actionPerformed(ActionEvent e)
-      {
- /*   	  textArea.setText("");
-    	  listIcao.removeAll();
-	   	  outputPanel.removeAll();	
-	   	  outputPanel.setVisible(false);
-	      resultPanel.removeAll();	
-	      resultPanel.setVisible(false);
-	      listIcaoModel.clear();
+	landMeBt = new JButton("Land Me");
+	landMeBt.setEnabled(false);
+	landMeBt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			System.out.println(result.getCurrentView());
+			System.out.println(result.getCurrentSelection());
+			
+			String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
+			String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
+			String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
+			
+			List<Placemark> marks = new ArrayList<>();
 
-*/    	  
+			Distance dist = null;
+			if ("airport".equals(result.getCurrentView())){
+				marks.add(new Placemark(result.getMapAirport().get(keyICAO).getIdent(), result.getMapAirport().get(keyICAO).getDescription(), result.getMapAirport().get(keyICAO).getStyleUrl(), result.getMapAirport().get(keyICAO).getPoint(), result.getMapAirport().get(keyICAO).getCoordinates()));
+				dist = new Distance(0, 0, 1, 0, false, 0);
+				readData.saveKMLFileICAO(manageXMLFile, marks, Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml"),dist);
+			}  else if ("vor".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
+			 } else if ("ndb".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
+			 }else if ("city".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
+			 }else if ("mountain".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+			 }
+			
+			
+	        manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
 
-      }
-    });
+
+		}
+	});		
+
+	askMeBt = new JButton("Ask Me");
+	askMeBt.setEnabled(false);
+	askMeBt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
+		}
+	});	
+		
+	landItBt = new JButton("Land It");
+	landItBt.setEnabled(false);
 	
+	landItBt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			System.out.println("land It");
+			System.out.println(result.getCurrentView());
+			Distance dist = null;
+			if ("airport".equals(result.getCurrentView())){
+				dist = new Distance(0, 0, 1, 0, false, 0);
+			} else if ("vor".equals(result.getCurrentView())){
+				dist = new Distance(0, 0, 0, 1, false, 0);
+			} else if ("ndb".equals(result.getCurrentView())){
+				dist = new Distance(0, 0, 0, 1, false, 0);
+			}else if ("city".equals(result.getCurrentView())){
+				dist = new Distance(1, 0, 0, 0, false, 0);
+			}else if ("mountain".equals(result.getCurrentView())){
+				dist = new Distance(0, 1, 0, 0, false, 0);
+			}
+		   readData.saveKMLFileICAO(manageXMLFile, result.getPlacemarks(), Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
+		   manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.flightplanName)));
+		}
+	});		
+	
+	 delMeBt = new JButton("Del Me");
+	 delMeBt.setEnabled(false);
+	 delMeBt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e)
+
+		{
+			String key;
+			ListModel<?> dlm = (ListModel) result.getCurrentList().getModel();
+
+			if (result.getCurrentList().getSelectedIndices().length > 0) {
+				int[] tmp = result.getCurrentList().getSelectedIndices();
+				int[] selectedIndices = result.getCurrentList().getSelectedIndices();
+
+				for (int i = tmp.length - 1; i >= 0; i--) {
+					selectedIndices = result.getCurrentList().getSelectedIndices();
+				     key = Utility.getInstance().findKeyICAO( (String) result.getCurrentList().getSelectedValue());
+
+					result.getMapAirport().remove(key);
+					((DefaultListModel)result.getCurrentList().getModel()).remove(selectedIndices[i]);
+
+				}
+			}
+			result.getCurrentList().clearSelection();
+
+			//result.setAirports(listIcao.getModel().getSize());
+			setResultPanel();
+
+		}
+	});
+	
+    result.setButtons(delMeBt,landMeBt, askMeBt, landItBt);
+
 
 	inputIcaoPanel.setBounds(10, 8, 270, 120);
 	resultPanel.setBounds(290, 8, 300, 139);
@@ -303,69 +350,30 @@ public class PaneIcaolAiport extends JFrame {
   	askMePanel.setBounds(290, 145, 300, 149);	
 
 	distanceSpin.getSpinnerPanel().setBounds(10, 130, 280, 190);
-    searchButton.setBounds(10, 330, 125, 23);
-	clearButton.setBounds(150, 330, 125, 23);
+    searchBt.setBounds(10, 330, 125, 23);
+	resetBt.setBounds(150, 330, 125, 23);
 	delMeBt.setBounds(290, 290, 70, 23);
 	askMeBt.setBounds(365, 290, 70, 23);
 	landMeBt.setBounds(441, 290, 75, 23);
 	landItBt.setBounds(521, 290, 70, 23);
-	googleButton.setBounds(100, 290, 130, 23);
+	landAllBt.setBounds(100, 360, 160, 23);
 	
 	icaoPanel.add(inputIcaoPanel);
 	icaoPanel.add(distanceSpin.getSpinnerPanel());
 	icaoPanel.add(outputPanel);
 	icaoPanel.add(resultPanel);
 	icaoPanel.add(askMePanel);
-	icaoPanel.add(searchButton);
-	icaoPanel.add(clearButton);
+	icaoPanel.add(searchBt);
+	icaoPanel.add(resetBt);
 	icaoPanel.add(delMeBt);
-	icaoPanel.add(delMeBt);
+	icaoPanel.add(landMeBt);
 	icaoPanel.add(askMeBt);
 	icaoPanel.add(landItBt);
-	icaoPanel.add(googleButton);
+	icaoPanel.add(landAllBt);
 	
 	return icaoPanel;
 	}
 
-	private void showAskMeAnswer(String topic) {
-	    if ("Ask Me".equals(askMeBt.getText())) {
-			outputPanel.setVisible(false);
-			jEditorPane.setVisible(true);
-			askMeBt.setText("Back");
-	        doc = kit.createDefaultDocument();
-	        jEditorPane.setDocument(doc);
-	        if ("waypoint".equals(topic)) {
-	        	topic = result.panelWaypoint(result.getCurrentSelection());
-	        } else if ("waypoint".equals(topic)) {
-	        	topic = result.panelWaypoint(result.getCurrentSelection());
-	        } else if ("airport".equals(topic)) {
-	        	topic = result.panelAirport(result.getCurrentSelection());
-	        }  else if ("vor".equals(topic)) {
-	        	topic = result.panelVor(result.getCurrentSelection());
-	        }   else if ("ndb".equals(topic)) {
-	        	topic = result.panelNdb(result.getCurrentSelection());
-	        }   else if ("city".equals(topic)) {
-	        	topic = result.panelCity(result.getCurrentSelection());
-	        }   else if ("mountain".equals(topic)) {
-	        	topic = result.panelMountain(result.getCurrentSelection());
-	        }  
-	        	
-	        jEditorPane.setText(topic);
-	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	        	   public void run() { 
-	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
-	        	   }
-	        	});
-	    	
-	    } else {
-			outputPanel.setVisible(true);
-			jEditorPane.setVisible(false);
-			askMeBt.setText("Ask Me");
-	    }
-	
-	}
-
-	
 	/**
 	 * 
 	 */

@@ -19,6 +19,7 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.DistanceSpinner;
+import com.cfg.common.Interaction;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.util.Util;
 import com.model.Distance;
@@ -204,7 +205,7 @@ public class PanelFlightplan {
 				distanceSpin.getMountainSpinner().setValue(0);
 				distanceSpin.getCheckTocTod().setSelected(false);
 
-				readData.resetResult();
+				readData.resetFlightPlanResult();
 				panelResult.removeAll();
 				result.getFlightPlanPanel().validate();
 				result.getWaypointListModel();
@@ -244,14 +245,14 @@ public class PanelFlightplan {
 				System.out.println(result.getCurrentView());
 				System.out.println(result.getCurrentSelection());
 			}
-		});		
+		});	
+		
 
 		askMeBt = new JButton("Ask Me");
 		askMeBt.setEnabled(false);
 		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showAskMeAnswer(result.getCurrentView());
-
+				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
 			}
 		});	
 		
@@ -310,49 +311,7 @@ public class PanelFlightplan {
 		return panelFlightplan;					
 	}
 	
-	/**
-	 * 
-	 * 
-	 */
 
-	private void showAskMeAnswer(String topic) {
-	    if ("Ask Me".equals(askMeBt.getText())) {
-			outputPanel.setVisible(false);
-			jEditorPane.setVisible(true);
-			askMeBt.setText("Back");
-	        doc = kit.createDefaultDocument();
-	        jEditorPane.setDocument(doc);
-	        if ("waypoint".equals(topic)) {
-	        	topic = result.panelWaypoint(result.getCurrentSelection());
-	        } else if ("waypoint".equals(topic)) {
-	        	topic = result.panelWaypoint(result.getCurrentSelection());
-	        } else if ("airport".equals(topic)) {
-	        	topic = result.panelAirport(result.getCurrentSelection());
-	        }  else if ("vor".equals(topic)) {
-	        	topic = result.panelVor(result.getCurrentSelection());
-	        }   else if ("ndb".equals(topic)) {
-	        	topic = result.panelNdb(result.getCurrentSelection());
-	        }   else if ("city".equals(topic)) {
-	        	topic = result.panelCity(result.getCurrentSelection());
-	        }   else if ("mountain".equals(topic)) {
-	        	topic = result.panelMountain(result.getCurrentSelection());
-	        }  
-	        	
-	        jEditorPane.setText(topic);
-	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	        	   public void run() { 
-	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
-	        	   }
-	        	});
-	    	
-	    } else {
-			outputPanel.setVisible(true);
-			jEditorPane.setVisible(false);
-			askMeBt.setText("Ask Me");
-	    }
-	
-	}
-	
 		
 	}
 

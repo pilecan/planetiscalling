@@ -331,14 +331,15 @@ public class Utility implements Info{
 
 	}
 	
-	public String getIcaoFromListModel( JList listIcao) {
-		String result = "";
-
-		for (int i = 0; i < listIcao.getModel().getSize(); i++) {
-			result += listIcao.getModel().getElementAt(i).toString().substring(0,5);
-		}
+	public String getIcaoFromMapAirport(Map <String, Airport> mapAirport) {
+		String icaos = "";
 		
-		return result;
+		for (String key : mapAirport.keySet()) {
+			icaos += key+" ";
+		}
+
+		
+		return icaos;
 	}
 	
 	public Map <String, Airport> creatMapAirport(Map<String, Placemark> selectedAirports){
@@ -365,7 +366,7 @@ public class Utility implements Info{
 		return 	builder;
 	}
 
-	public String findFirst(String line) {
+	public String findKeyICAO(String line) {
 		try {
 			line = (String) line.subSequence(0, line.indexOf("\t"));
 			line = line.replace("<html><pre>", "").trim();
@@ -376,7 +377,31 @@ public class Utility implements Info{
 	
 	}
 	 
+	public String findKeyVor(String line) {
+		try {
+			line = (String) line.subSequence(0, line.lastIndexOf("\t"));
+			line = line.replaceAll("\t", "");
+			line = line.replaceAll(" ", "");
+			line = line.replace("<html><pre>", "").trim();
+		} catch (StringIndexOutOfBoundsException e) {
+		}
+		
+		return line.toUpperCase();
+	
+	}
 
+	public String findKeyCity(String line) {
+		try {
+			String[] array = line.split("\t"); 
+			line= array[0]+array[2].replace(" ", "");
+			line = line.replace("<html><pre>", "").trim();
+			line = line.replace("</pre></html>", "").trim();
+		} catch (StringIndexOutOfBoundsException e) {
+		}
+		
+		return line.toUpperCase().replace(" ", "");
+	
+	}
 	
 
 	

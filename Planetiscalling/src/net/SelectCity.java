@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.poi.ss.formula.functions.Replace;
+
 import com.cfg.common.Info;
 import com.cfg.file.ManageXMLFile;
 import com.cfg.model.Placemark;
@@ -51,7 +53,7 @@ public class SelectCity implements Info{
 				while (rs.next()) {
 				    city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital").trim(), rs.getLong("population"));
 				    cities.add(city);
-				    mapCities.put(rs.getString("city"), city);
+				    mapCities.put(rs.getString("city").replace(" ", "").toUpperCase()+rs.getLong("population"), city);
 				}
 				
 				

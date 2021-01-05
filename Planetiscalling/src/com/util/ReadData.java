@@ -176,7 +176,7 @@ public class ReadData implements Info{
 		
 	}
 	
-	public void resetResult() {
+	public void resetFlightPlanResult() {
 		
 		//Flightplan
 	    createKmlFSPlan.setAltitude(Math.round(Double.parseDouble(result.getFlightplan().getCruisingAlt())/3.28084));
@@ -205,6 +205,17 @@ public class ReadData implements Info{
     /**
      * 
      */
+    
+	public void resetIcaoResult() {
+		
+		//Flightplan
+		result.setSelectedCities(new HashMap<String, City>());
+		result.setSelectedMountains(new HashMap<String, Mountain>());
+		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
+		result.setSelectedVors(new HashMap<Integer, Vor>());
+		//setResult();
+	}
+
     public void creatIcaoAirports(String icaos, Distance dist) {
     	
     	this.dist = dist;
@@ -247,8 +258,6 @@ public class ReadData implements Info{
 
 			
 			saveKMLFileICAO(manageXMLFile, placemarks,Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
-		
-			
 	    }
 		
     }
@@ -745,7 +754,7 @@ public class ReadData implements Info{
     }
     
 
-    public  synchronized void saveKMLFileICAO(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative, Distance dist){
+    public  void saveKMLFileICAO(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative, Distance dist){
  		Writer writer = null;
  						
   		try {
@@ -754,13 +763,15 @@ public class ReadData implements Info{
  		    
  		    writer.write(manageXMLFile.createKMLHeader(placemarks.size()));
  		    
-			writer.write("<Folder><name> Airports found ("+placemarks.size()+") </name>");
-
- 		    for(Placemark placemark:placemarks){
- 		    	writer.write(placemark.buildXML("fsx_airport"));
+ 		    if (dist.isAirport()){
+				writer.write("<Folder><name> Airports found ("+placemarks.size()+") </name>");
+	
+	 		    for(Placemark placemark:placemarks){
+	 		    	writer.write(placemark.buildXML("fsx_airport"));
+	 		    }
+				 writer.write("</Folder>"); 
  		    }
-			 writer.write("</Folder>"); 
-		    
+ 		    
  		    if (dist.isCity()){
  			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");
  			    
@@ -854,6 +865,10 @@ public class ReadData implements Info{
 
 	public void setResult(Result result) {
 		this.result = result;
+	}
+
+	public void setSelectedVors(Map<Integer, Vor> selectedVors) {
+		this.selectedVors = selectedVors;
 	}
 
 }

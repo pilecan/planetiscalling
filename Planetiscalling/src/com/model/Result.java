@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -31,6 +32,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
 import com.cfg.model.LegPoint;
@@ -49,6 +52,9 @@ public class Result implements Info {
 	private String departure;
 	private String destination;
 
+	private static Document doc;
+	private static HTMLEditorKit kit;
+	
 	private SelectAirport selectAiport;
 
 	private SpinnerModel altitudeModel;
@@ -76,7 +82,7 @@ public class Result implements Info {
 	private String flightPlanFile;
 	private Flightplan flightplan;
 
-	private JList list;
+	private JList currentList;
 	private ListModel listModel;
 	private JPanel outputPanel;
 	private String currentView;
@@ -92,7 +98,7 @@ public class Result implements Info {
 	private JButton leftBtn;
 	private JButton askMeBt;
 	private JButton landAllBt;
-	private JButton dellMeBt;
+	private JButton delMeBt;
 
 	public Result() {
 		super();
@@ -112,11 +118,11 @@ public class Result implements Info {
 		this.landAllBt = landAllBt;
 	}
 
-	public void setButtons(JButton dellMeBt, JButton landMeBt, JButton askMe, JButton landAllBt) {
+	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe, JButton landAllBt) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
 		this.landAllBt = landAllBt;
-		this.dellMeBt = dellMeBt;
+		this.delMeBt = delMeBt;
 	}
 
 	public JPanel getFlightPlanPanel() {
@@ -417,42 +423,50 @@ public class Result implements Info {
 
 		outputPanel.setVisible(true);
 		outputPanel.removeAll();
-		list = new JList(listModel);
-		list.setFixedCellHeight(18);
+		currentList = new JList(listModel);
+		currentList.setFixedCellHeight(18);
 
 
 		this.landAllBt.setEnabled(true);
 		this.leftBtn.setEnabled(false);
 		this.askMeBt.setEnabled(false);
 
-		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		currentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
 				if (e.getClickCount() == 2) {
-					currentSelection = (String) list.getSelectedValue();
+					currentSelection = (String) currentList.getSelectedValue();
 					askMeBt.doClick();
 
 				}
 			}
 		};
-		list.addMouseListener(mouseListener);
+		currentList.addMouseListener(mouseListener);
 
-		list.addListSelectionListener(new ListSelectionListener() {
+		currentList.addListSelectionListener(new ListSelectionListener() {
 			/**
 			 * {@inheritDoc}
 			 */
 			@Override
 			public void valueChanged(ListSelectionEvent evt) {
-				askMeBt.setEnabled(!list.isSelectionEmpty());
-				currentSelection = (String) list.getSelectedValue();
+				try {
+					delMeBt.setEnabled(!currentList.isSelectionEmpty());
+					if (!"airport".equals(currentView)){
+						delMeBt.setEnabled(false);
+					}
+				} catch (NullPointerException e) {
+				}
+				askMeBt.setEnabled(!currentList.isSelectionEmpty());
 
-				leftBtn.setEnabled(!list.isSelectionEmpty());
+				currentSelection = (String) currentList.getSelectedValue();
+
+				leftBtn.setEnabled(!currentList.isSelectionEmpty());
 			}
 		});
 
-		outputPanel.add(new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		outputPanel.add(new JScrollPane(currentList, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 
 		outputPanel.validate();
@@ -463,7 +477,7 @@ public class Result implements Info {
 		String htmlString = null;
 		for (int i = 0; i < legPoints.size(); i++) {
 			
-			line = Utility.getInstance().findFirst(line);
+			line = Utility.getInstance().findKeyICAO(line);
 
 			if (legPoints.get(i).toString().contains(line)) {
 				htmlString = legPoints.get(i).getHmlString();
@@ -481,7 +495,7 @@ public class Result implements Info {
 
 	public String panelAirport(String line) {
 		String varStr = null;
-		line = Utility.getInstance().findFirst(line);
+		line = Utility.getInstance().findKeyICAO(line);
 		Airport airport = mapAirport.get(line);
 
 		varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
@@ -493,7 +507,7 @@ public class Result implements Info {
 	public String panelVor(String line) {
 		String htmlString = null;
 
-		line = Utility.getInstance().findFirst(line);
+		line = Utility.getInstance().findKeyICAO(line);
 
 		for (Vor vor : selectedVors.values()) {
 			if (vor.getIdent().equals(line)) {
@@ -507,7 +521,7 @@ public class Result implements Info {
 
 	public String panelNdb(String line) {
 		String htmlString = null;
-		line = Utility.getInstance().findFirst(line);
+		line = Utility.getInstance().findKeyICAO(line);
 
 		for (Ndb ndb : selectedNdbs.values()) {
 			if (ndb.getIdent().equals(line)) {
@@ -521,7 +535,7 @@ public class Result implements Info {
 
 	public String panelCity(String line) {
 		String htmlString = null;
-		line = Utility.getInstance().findFirst(line);
+		line = Utility.getInstance().findKeyICAO(line);
 
 		for (City city : selectedCities.values()) {
 			if (city.getCityName().equals(line)) {
@@ -536,7 +550,7 @@ public class Result implements Info {
 
 	public String panelMountain(String line) {
 		String htmlString = null;
-		line = Utility.getInstance().findFirst(line);
+		line = Utility.getInstance().findKeyICAO(line);
 
 		for (Mountain mountain : selectedMountains.values()) {
 			if (mountain.getName().equals(line)) {
@@ -549,6 +563,47 @@ public class Result implements Info {
 
 	}
 
+	public void showAskMeAnswer( JPanel outputPanel, JEditorPane jEditorPane, JButton askMeBt, final JScrollPane askmeScrollPan ) {
+		String content = null;
+	    if ("Ask Me".equals(askMeBt.getText())) {
+			outputPanel.setVisible(false);
+			jEditorPane.setVisible(true);
+			askMeBt.setText("Back");
+			kit = new HTMLEditorKit();
+			doc = kit.createDefaultDocument();
+	        jEditorPane.setDocument(doc);
+	        if ("waypoint".equals(getCurrentView())) {
+	        	content = panelWaypoint(getCurrentSelection());
+	        } else if ("waypoint".equals(getCurrentView())) {
+	        	content = panelWaypoint(getCurrentSelection());
+	        } else if ("airport".equals(getCurrentView())) {
+	        	content = panelAirport(getCurrentSelection());
+	        }  else if ("vor".equals(getCurrentView())) {
+	        	content = panelVor(getCurrentSelection());
+	        }   else if ("ndb".equals(getCurrentView())) {
+	        	content = panelNdb(getCurrentSelection());
+	        }   else if ("city".equals(getCurrentView())) {
+	        	content = panelCity(getCurrentSelection());
+	        }   else if ("mountain".equals(getCurrentView())) {
+	        	content = panelMountain(getCurrentSelection());
+	        }  
+	        	
+	        jEditorPane.setText(content);
+	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	        	   public void run() { 
+	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+	        	   }
+	        	});
+	    	
+	    } else {
+			outputPanel.setVisible(true);
+			jEditorPane.setVisible(false);
+			askMeBt.setText("Ask Me");
+	    }
+	
+	}
+	
+	
 	public long getDistance() {
 		return distance;
 	}
@@ -752,22 +807,7 @@ public class Result implements Info {
 		this.currentSelection = currentSelection;
 	}
 
-	@Override
-	public String toString() {
-		return "Result [distance=" + distance + ", altitude=" + altitude + ", departure=" + departure + ", destination="
-				+ destination + ", selectAiport=" + selectAiport + ", altitudeModel=" + altitudeModel
-				+ ", altitudeSpinner=" + altitudeSpinner + ", panelAltitude=" + panelAltitude + ", resultPanel="
-				+ resultPanel + ", formUtility=" + formUtility + ", panel=" + panel + ", label=" + label
-				+ ", placemarks=" + placemarks + ", listResultModel=" + listResultModel + ", selectedAirports="
-				+ selectedAirports + ", selectedCities=" + selectedCities + ", selectedMountains=" + selectedMountains
-				+ ", addonPlacemarks=" + addonPlacemarks + ", selectedVors=" + selectedVors + ", selectedNdbs="
-				+ selectedNdbs + ", legPoints=" + legPoints + ", flightPlanFile=" + flightPlanFile + ", flightplan="
-				+ flightplan + ", list=" + list + ", listModel=" + listModel + ", outputPanel=" + outputPanel
-				+ ", currentView=" + currentView + ", currentSelection=" + currentSelection + ", waypointBtn="
-				+ waypointBtn + ", airportBtn=" + airportBtn + ", vorBtn=" + vorBtn + ", ndbBtn=" + ndbBtn
-				+ ", cityBtn=" + cityBtn + ", mountainBtn=" + mountainBtn + ", leftBtn=" + leftBtn + ", askMeBt="
-				+ askMeBt + ", landAllBt=" + landAllBt + "]";
-	}
+	
 
 	public Map<String, Airport> getMapAirport() {
 		return mapAirport;
@@ -775,6 +815,14 @@ public class Result implements Info {
 
 	public void setMapAirport(Map<String, Airport> mapAirport) {
 		this.mapAirport = mapAirport;
+	}
+
+	public JList getCurrentList() {
+		return currentList;
+	}
+
+	public void setCurrentList(JList currentList) {
+		this.currentList = currentList;
 	}
 
 }

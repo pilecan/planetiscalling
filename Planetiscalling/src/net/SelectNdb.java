@@ -19,7 +19,7 @@ import com.util.CreateKML;
 
 public class SelectNdb implements Info{
 	
-	private Ndb vor;
+	private Ndb ndb;
 	private  List<Placemark> placemarks;
 	private List <Ndb> ndbs;
 	private Map<String, Ndb> mapNdb;
@@ -30,7 +30,7 @@ public class SelectNdb implements Info{
 		// TODO Auto-generated constructor stub
 	}
 	public void selectAll(String search ) {
-		vor = new Ndb();
+		ndb = new Ndb();
 		ndbs = new ArrayList<>();
 		mapNdb = new TreeMap<>();
 
@@ -62,7 +62,7 @@ public class SelectNdb implements Info{
 			try (ResultSet rs = statement.executeQuery()) {
 
 				while (rs.next()) {
-				    vor = new Ndb(rs.getInt("ndb_id"),      
+				    ndb = new Ndb(rs.getInt("ndb_id"),      
 				    	    rs.getInt("file_id"),      
 				    	    rs.getString("ident"), 
 				    	    rs.getString("name"), 
@@ -76,8 +76,8 @@ public class SelectNdb implements Info{
 				    	    rs.getDouble("lonx"),  
 				    	    rs.getDouble("laty")  );
 
-				    ndbs.add(vor);
-				    mapNdb.put(rs.getString("ident"), vor);
+				    ndbs.add(ndb);
+				    mapNdb.put(rs.getString("ident")+rs.getString("name").replace(" ", ""), ndb);
 				}
 				
 				
@@ -138,8 +138,8 @@ public class SelectNdb implements Info{
 	public Map<String, Ndb> getMapNdb() {
 		return mapNdb;
 	}
-	public void setMapNdb(Map<String, Ndb> mapCities) {
-		this.mapNdb = mapCities;
+	public void setMapNdb(Map<String, Ndb> mapNdb) {
+		this.mapNdb = mapNdb;
 	}
 
 

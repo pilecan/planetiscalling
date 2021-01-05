@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,7 +23,7 @@ public class SelectVor implements Info{
 	private Vor vor;
 	private  List<Placemark> placemarks;
 	private List <Vor> vors;
-	private Map<Integer, Vor> mapVors;
+	private Map<String, Vor> mapVors;
 
 	
 
@@ -79,7 +80,7 @@ public class SelectVor implements Info{
 				    		rs.getDouble("laty"));
 
 				    vors.add(vor);
-				    mapVors.put(rs.getInt("vor_id"), vor);
+				    mapVors.put(rs.getString("ident")+rs.getString("name").replace(" ", ""), vor);
 				}
 				
 				
@@ -137,11 +138,18 @@ public class SelectVor implements Info{
 	public void setVors(List<Vor> vors) {
 		this.vors = vors;
 	}
-	public Map<Integer, Vor> getMapVors() {
+	public Map<String, Vor> getMapVors() {
 		return mapVors;
 	}
-	public void setMapVors(Map<Integer, Vor> mapVors) {
+	public void setMapVors(Map<String, Vor> mapVors) {
 		this.mapVors = mapVors;
+	}
+	
+	public List <Vor> listOfOneVor(Vor vor){
+		List< Vor> listOfOneVor = new ArrayList<Vor>(); 
+		listOfOneVor.add(vor);
+		return listOfOneVor;
+		
 	}
 
 

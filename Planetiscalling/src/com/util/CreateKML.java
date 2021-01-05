@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cfg.common.Info;
 import com.cfg.util.Util;
 import com.model.City;
 import com.model.Mountain;
@@ -24,41 +25,6 @@ public class CreateKML {
 	private static String AIRPORT_ICON ="http://maps.google.com/mapfiles/kml/shapes/airports.png";
 	
 	
-	
-/*	private static final Map<Object, Object> ICON_MAP =
-		    Arrays.stream(new String[][] {
-		        { "Airstrip", "http://maps.google.com/mapfiles/kml/shapes/airports.png" }, 
-		        { "Animal", "http://maps.google.com/mapfiles/kml/shapes/camera.png" }, 
-		        { "Camping", "http://maps.google.com/mapfiles/kml/shapes/campground.png" }, 
-		        { "Canyon", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" }, 
-		        { "Cap", "http://maps.google.com/mapfiles/kml/shapes/trail.png" }, 
-		        { "Chalet", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" }, 
-		        { "Cove", "http://maps.google.com/mapfiles/kml/shapes/marina.png" }, 
-		        { "Historic", "http://maps.google.com/mapfiles/kml/shapes/info_circle.png" }, 
-		        { "Hostel", "http://maps.google.com/mapfiles/kml/shapes/lodging.png" }, 
-		        { "Lake", "http://maps.google.com/mapfiles/kml/shapes/fishing.png" }, 
-		        { "Lighthouse", "http://maps.google.com/mapfiles/kml/shapes/target.png" }, 
-		        { "Pavillon", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" }, 
-		        { "Plane", "http://maps.google.com/mapfiles/kml/shapes/flag.png" }, 
-		        { "Port", "http://maps.google.com/mapfiles/kml/shapes/ferry.png" }, 
-		        { "Pourvoirie", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" }, 
-		        { "Reserve", "http://maps.google.com/mapfiles/kml/shapes/parks.png" }, 
-		        { "Waterfall", "http://maps.google.com/mapfiles/kml/shapes/water.png" }, 
-		        { "Wreck", "http://maps.google.com/mapfiles/kml/shapes/poi.png" }, 
-		        { "River", "http://maps.google.com/mapfiles/kml/shapes/water.png" }, 
-		        { "Castle", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" }, 
-		        { "Village", "http://maps.google.com/mapfiles/kml/shapes/square.png" }, 
-		        { "Church", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" }, 
-		        { "Abbey", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" }, 
-		        { "", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" }, 
-		        { null, "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" }, 
-		        { "minor", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" }, 
-		        { "admin", "http://maps.google.com/mapfiles/kml/paddle/pink-stars.png" }, 
-		        { "primary", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" }, 
-		        { "volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" }, 
-		        { "mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" }, 
-		    }).collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
-*/	
     private static final Map<String, String> ICON_MAP;
     static {
         Map<String, String> aMap = new HashMap<>();
@@ -133,7 +99,43 @@ public class CreateKML {
 		
 	}
 	
-	private String createKMLHeader(int total, String title) {
+	public static void makeOn(Object object, String title) {
+		Writer writer = null;
+     	try {
+			//writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("g:\\addons\\work\\castel_czech.kml"), "utf-8"));
+			
+			writer = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(Utility.getInstance().getFlightPlanName(title+".kml")), "utf-8"));
+			
+			writer.write(createKMLHeader(1,title));
+			
+			if (object instanceof Vor) {
+				writer.write(buildVorPlaceMark((Vor)object));
+
+			} else if (object instanceof City) {
+				writer.write(buildCityPlaceMark((City)object));
+
+			} else if (object instanceof Ndb) {
+				writer.write(buildNdbPlaceMark((Ndb)object));
+
+			} else if (object instanceof Mountain) {
+				writer.write(buildMountainPlaceMark((Mountain)object));
+			}
+
+			writer.write("</Folder></Document></kml>");
+
+		} catch (IOException ex) {
+			System.err.println(ex.getMessage());
+		} finally {
+			try {
+				writer.close();
+			} catch (Exception ex) {
+			}
+		}
+	
+	}
+	
+	private static String createKMLHeader(int total, String title) {
 		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 				+ "<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">"
 				+ "<Document>"
@@ -141,7 +143,7 @@ public class CreateKML {
 				+ "<name>"+title+"</name>"
 				+ "<description><div>"+total+" "+title+"</div>"
 				//+ "<div>"+fligthSimPage+"</div>"
-				+ "<div>KML file create by pierre.legault@gmail.com</div>"
+				+ "<div>KML file create by PlanetIsCalling</div>"
 				+ " </description>";
 	}	
 

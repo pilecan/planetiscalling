@@ -61,7 +61,7 @@ public class SelectMountain implements Info{
 				    		rs.getString("author"), rs.getString("country"), rs.getDouble("lonx"), rs.getDouble("laty"),
 				    		rs.getString("location"),rs.getString("type"), rs.getInt("last_activite"));
 				    mountains.add(mountain);
-				    mapMountains.put(rs.getString("name"), mountain);
+				    mapMountains.put(rs.getString("name").replace(" ", "").toUpperCase()+rs.getInt("elevation"), mountain);
 
 				}
 				
