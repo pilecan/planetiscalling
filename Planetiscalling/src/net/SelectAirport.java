@@ -12,10 +12,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.cfg.common.Info;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
 import com.model.Airport;
 import com.model.Runway;
+import com.util.Utility;
 
 /**
  *
@@ -26,10 +25,8 @@ public class SelectAirport implements Info{
 	private Airport airport;
 	private Runway runway;
 	private  List<Runway> listRunways;
-	private List<Placemark> placemarks; 
-	private Map<String, Placemark> mapPlacemark;
 	private Map<String, Airport> mapAirport;
-	
+	private List<Airport> airports;
 
 	/**
 	 * Connect to the test.db database
@@ -55,12 +52,10 @@ public class SelectAirport implements Info{
 	public void selectAll(String search) {
 		//this.placemarks = placemarks;
 		
-    	placemarks = new ArrayList<>();
 
 
 		listRunways = new ArrayList<>();
 		airport = new Airport();
-		mapPlacemark = new TreeMap<String, Placemark>();
 		
 		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
 				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name, hour_zone, time_zone  "
@@ -82,8 +77,6 @@ public class SelectAirport implements Info{
 					if (!lastAirport.equals(rs.getString("ident"))) {
 						airport.setRunways(listRunways);
 						if (!"".equals(lastAirport)) {
-							placemarks.add(new Placemark(airport.getIdent(), airport.getDescription(), airport.getStyleUrl(), airport.getPoint(), airport.getCoordinates()));
-							mapPlacemark.put(airport.getIdent(), new Placemark(airport.getIdent(), airport.getDescription(), airport.getStyleUrl(), airport.getPoint(), airport.getCoordinates()));
 							
 						}
 						airport = new Airport();
@@ -140,9 +133,6 @@ public class SelectAirport implements Info{
 
 				airport.setRunways(listRunways);
 				if (airport.getIdent() != null) {
-					placemarks.add(new Placemark(airport.getIdent(), airport.getDescription(), airport.getStyleUrl(), airport.getPoint(), airport.getCoordinates()));
-					mapPlacemark.put(airport.getIdent(), new Placemark(airport.getIdent(), airport.getDescription(), airport.getStyleUrl(), airport.getPoint(), airport.getCoordinates()));
-
 				}
 
 			}
@@ -157,6 +147,7 @@ public class SelectAirport implements Info{
 	}
 	public void select(String search) {
 		listRunways = new ArrayList<>();
+		airports = new ArrayList<>();
 		airport = new Airport();
 		mapAirport = new TreeMap<String, Airport>();
 		
@@ -181,6 +172,7 @@ public class SelectAirport implements Info{
 						airport.setRunways(listRunways);
 						if (!"".equals(lastAirport)) {
 							mapAirport.put(airport.getIdent(), airport);
+							airports.add(airport);
 						}
 						airport = new Airport();
 						listRunways = new ArrayList<>();
@@ -237,6 +229,7 @@ public class SelectAirport implements Info{
 				airport.setRunways(listRunways);
 				if (airport.getIdent() != null) {
 					mapAirport.put(airport.getIdent(), airport);
+					airports.add(airport);
 				}
 
 			}
@@ -254,9 +247,7 @@ public class SelectAirport implements Info{
 	 * @param args the command line arguments
 	 */
 	public static void main(String[] args) {
-		List<Placemark> placemarks = new ArrayList<>();
-		ManageXMLFile manageXMLFile = new ManageXMLFile();
-     	String search = "CYVR CYPN".toUpperCase();		
+   	String search = "CYVR CYPN".toUpperCase();		
 		
     	String kmlRelative = "data\\airport.kml";
 
@@ -265,29 +256,11 @@ public class SelectAirport implements Info{
 
 		 
 		selectAiport.selectAll(search);
-		placemarks = selectAiport.getPlacemarks();
-		
-		 manageXMLFile.saveKMLFile(placemarks,kmlRelative);
-		 manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+		 Utility.getInstance().launchGoogleEarth(new File(kmlRelative));
 	}
 
 
-	public List<Placemark> getPlacemarks() {
-		return placemarks;
-	}
-
-	public void setPlacemarks(List<Placemark> placemarks) {
-		this.placemarks = placemarks;
-	}
-
-	public Map<String, Placemark> getMapPlacemark() {
-		return mapPlacemark;
-	}
-
-	public void setMapPlacemark(Map<String, Placemark> mapPlacemark) {
-		this.mapPlacemark = mapPlacemark;
-	}
-
+	
 	public Airport getAirport() {
 		return airport;
 	}
@@ -302,6 +275,14 @@ public class SelectAirport implements Info{
 
 	public void setMapAirport(Map<String, Airport> mapAirport) {
 		this.mapAirport = mapAirport;
+	}
+
+	public List<Airport> getAirports() {
+		return airports;
+	}
+
+	public void setAirports(List<Airport> airports) {
+		this.airports = airports;
 	}
 
 	

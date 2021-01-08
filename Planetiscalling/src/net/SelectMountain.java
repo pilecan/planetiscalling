@@ -6,15 +6,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import com.cfg.common.Info;
-//import com.WriteMountainKML;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
 import com.model.Mountain;
 
 public class SelectMountain implements Info{
@@ -91,8 +87,6 @@ public class SelectMountain implements Info{
 	
 	
 	public static void main(String[] args) {
-		List<Placemark> placemarks = new ArrayList<>();
-		ManageXMLFile manageXMLFile = new ManageXMLFile();
      	String search = "usa";	
      	
      	//search = "";
@@ -107,7 +101,7 @@ public class SelectMountain implements Info{
 		// new CreateKML().write(selectCity.getCities(), search, kmlRelative);
 
 		 
-		// manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+		// Utility.getInstance().launchGoogleEarth(new File(kmlRelative));
 		
 	}
 	public List<Mountain> getMountains() {

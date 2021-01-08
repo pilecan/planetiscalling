@@ -6,46 +6,33 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
-import com.cfg.common.Interaction;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
-import com.cfg.util.Util;
 import com.model.Distance;
 import com.model.Result;
-import com.model.SortedListModel;
-import com.model.Vor;
 import com.util.CreateKML;
 import com.util.ReadData;
+import com.util.Util;
 import com.util.Utility;
 
+import net.SelectAirport;
 import net.SelectCity;
 import net.SelectMountain;
 import net.SelectNdb;
@@ -59,13 +46,11 @@ public class PaneIcaolAiport extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	private Result result;
-	private ManageXMLFile manageXMLFile;
 	private JPanel outputPanel;
 	private JPanel icaoPanel;
 	private JPanel resultPanel;
 	private ReadData readData;
 
-	private List<Placemark> airports ;
 	private JScrollPane jScrollPane1;
 	private SelectVor selectVor;
 	private SelectNdb selectNdb;
@@ -79,7 +64,7 @@ public class PaneIcaolAiport extends JFrame {
 	private JPanel buttonLeftPanel;
 	private JPanel buttonRightPanel;
 
-	private JButton landAllBt;
+	private JButton googleBt;
 	private JButton buttonBt;
 	private JButton refreshBt;
 	private JButton resetBt;
@@ -94,17 +79,18 @@ public class PaneIcaolAiport extends JFrame {
 	private HTMLEditorKit kit;
 	private Document doc;
 	
-	JScrollPane askmeScrollPan;
+	private JScrollPane askmeScrollPan;
 
+	private SelectAirport selectAirport;
 	
 	
-	
-	public JPanel getPanel(final ManageXMLFile manageXMLFile,  final SelectVor selectVor,  final SelectNdb selectNdb,final SelectMountain selectMountain, final SelectCity selectCity) {
-		this.setManageXMLFile(manageXMLFile);
+	public JPanel getPanel(final SelectVor selectVor,  final SelectNdb selectNdb,final SelectMountain selectMountain, final SelectCity selectCity) {
 		this.selectVor = selectVor;
 		this.selectNdb = selectNdb;
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
+		this.selectAirport = new SelectAirport();
+
 		
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("icao");
@@ -150,9 +136,9 @@ public class PaneIcaolAiport extends JFrame {
 	resultPanel = new JPanel(new BorderLayout());
 	resultPanel.setBorder(new TitledBorder("Search Result"));
 	
-	landAllBt = new JButton("Land All to Google Earth");
-	landAllBt.setEnabled(false);
-	landAllBt.addActionListener(new ActionListener() {
+	googleBt = new JButton("Land All to Google Earth");
+	googleBt.setEnabled(false);
+	googleBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e)
 
 		{
@@ -167,7 +153,7 @@ public class PaneIcaolAiport extends JFrame {
 	        				 0.0)
 							 ); 
 			setResultPanel();
-			manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.flightplanName)));
+			Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName)));
 		}
 	});
 
@@ -207,6 +193,12 @@ public class PaneIcaolAiport extends JFrame {
 			result.getAirportListModel();
 
 			resultPanel.add(result.getIcaoPanel());
+			textArea.setText("");
+			
+			landItBt.setEnabled(false);
+			googleBt.setEnabled(false);
+			resetBt.setEnabled(false);
+
 
 			resultPanel.validate();
 			icaoPanel.validate();
@@ -220,7 +212,7 @@ public class PaneIcaolAiport extends JFrame {
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	  readData = new ReadData(textArea.getText(),result, manageXMLFile, selectVor,selectNdb, selectMountain, selectCity,
+	    	  readData = new ReadData(textArea.getText(),result, selectVor,selectNdb, selectMountain, selectCity,
 	    			  new Distance(
 	    			     (int)distanceSpin.getCitySpinner().getValue(), 
         				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -236,7 +228,7 @@ public class PaneIcaolAiport extends JFrame {
 		  	 //result.getAirportListModel();
 
 	    	 setResultPanel();
-			 landAllBt.setEnabled(true);	
+			 googleBt.setEnabled(true);	
 			 resetBt.setEnabled(true);
 			 
 			 icaoPanel.validate();
@@ -255,13 +247,10 @@ public class PaneIcaolAiport extends JFrame {
 			String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
 			String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
 			
-			List<Placemark> marks = new ArrayList<>();
-
 			Distance dist = null;
 			if ("airport".equals(result.getCurrentView())){
-				marks.add(new Placemark(result.getMapAirport().get(keyICAO).getIdent(), result.getMapAirport().get(keyICAO).getDescription(), result.getMapAirport().get(keyICAO).getStyleUrl(), result.getMapAirport().get(keyICAO).getPoint(), result.getMapAirport().get(keyICAO).getCoordinates()));
-				dist = new Distance(0, 0, 1, 0, false, 0);
-				readData.saveKMLFileICAO(manageXMLFile, marks, Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml"),dist);
+				selectAirport.select("where ident = '"+keyICAO+"'");
+				CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
 			}  else if ("vor".equals(result.getCurrentView())){
 					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
 			 } else if ("ndb".equals(result.getCurrentView())){
@@ -273,7 +262,7 @@ public class PaneIcaolAiport extends JFrame {
 			 }
 			
 			
-	        manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+	        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
 
 
 		}
@@ -306,8 +295,8 @@ public class PaneIcaolAiport extends JFrame {
 			}else if ("mountain".equals(result.getCurrentView())){
 				dist = new Distance(0, 1, 0, 0, false, 0);
 			}
-		   readData.saveKMLFileICAO(manageXMLFile, result.getPlacemarks(), Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
-		   manageXMLFile.launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.flightplanName)));
+		   readData.saveKMLFileICAO( result.getMapAirport(), Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName),dist);
+		   Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName)));
 		}
 	});		
 	
@@ -356,7 +345,7 @@ public class PaneIcaolAiport extends JFrame {
 	askMeBt.setBounds(365, 290, 70, 23);
 	landMeBt.setBounds(441, 290, 75, 23);
 	landItBt.setBounds(521, 290, 70, 23);
-	landAllBt.setBounds(100, 360, 160, 23);
+	googleBt.setBounds(100, 360, 160, 23);
 	
 	icaoPanel.add(inputIcaoPanel);
 	icaoPanel.add(distanceSpin.getSpinnerPanel());
@@ -369,7 +358,7 @@ public class PaneIcaolAiport extends JFrame {
 	icaoPanel.add(landMeBt);
 	icaoPanel.add(askMeBt);
 	icaoPanel.add(landItBt);
-	icaoPanel.add(landAllBt);
+	icaoPanel.add(googleBt);
 	
 	return icaoPanel;
 	}
@@ -387,16 +376,4 @@ public class PaneIcaolAiport extends JFrame {
 	}
 
 	
-	public ManageXMLFile getManageXMLFile() {
-		return manageXMLFile;
-	}
-
-
-	public void setManageXMLFile(ManageXMLFile manageXMLFile) {
-		this.manageXMLFile = manageXMLFile;
-	}
- 
-	 
-	
-
 }

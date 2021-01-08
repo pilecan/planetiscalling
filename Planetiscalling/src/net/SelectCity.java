@@ -11,18 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.poi.ss.formula.functions.Replace;
-
 import com.cfg.common.Info;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
 import com.model.City;
 import com.util.CreateKML;
+import com.util.Utility;
 
 public class SelectCity implements Info{
 	
 	private City city;
-	private  List<Placemark> placemarks;
 	private List <City> cities;
 	private Map<String, City> mapCities;
 
@@ -82,8 +78,6 @@ public class SelectCity implements Info{
 	
 	
 	public static void main(String[] args) {
-		List<Placemark> placemarks = new ArrayList<>();
-		ManageXMLFile manageXMLFile = new ManageXMLFile();
      	String search = "LF LI LE".toUpperCase();	
      	
      	//search = "";
@@ -96,14 +90,8 @@ public class SelectCity implements Info{
 		 
 		 new CreateKML().write(selectCity.getCities(), search, kmlRelative);
 		 
-		 manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+		 Utility.getInstance().launchGoogleEarth(new File(kmlRelative));
 		
-	}
-	public List<Placemark> getPlacemarks() {
-		return placemarks;
-	}
-	public void setPlacemarks(List<Placemark> placemarks) {
-		this.placemarks = placemarks;
 	}
 	public List<City> getCities() {
 		return cities;

@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cfg.common.Info;
-import com.cfg.util.Util;
+import com.model.Airport;
 import com.model.City;
 import com.model.Mountain;
 import com.model.Ndb;
@@ -56,14 +55,11 @@ public class CreateKML {
         aMap.put("volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" ); 
         aMap.put("vor", "http://maps.google.com/mapfiles/kml/shapes/polygon.png" ); 
         aMap.put("ndb", "http://maps.google.com/mapfiles/kml/shapes/triangle.png" ); 
-        
+        aMap.put("airport", "http://maps.google.com/mapfiles/kml/shapes/airports.png" ); 
         aMap.put("mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
         ICON_MAP = Collections.unmodifiableMap(aMap);
     }
 
-	
-
-	
 	public CreateKML() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -109,7 +105,10 @@ public class CreateKML {
 			
 			writer.write(createKMLHeader(1,title));
 			
-			if (object instanceof Vor) {
+			if (object instanceof Airport) {
+				writer.write(buildAirportPlaceMark((Airport)object));
+
+			} else if (object instanceof Vor) {
 				writer.write(buildVorPlaceMark((Vor)object));
 
 			} else if (object instanceof City) {
@@ -145,6 +144,14 @@ public class CreateKML {
 				//+ "<div>"+fligthSimPage+"</div>"
 				+ "<div>KML file create by PlanetIsCalling</div>"
 				+ " </description>";
+	}	
+	
+	public static String createHeader(int total) {
+		return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<kml xmlns=\"http://earth.google.com/kml/2.2\">"
+				+ "<Document><Style id=\"fsx_airport\"><IconStyle><Icon><href>http://maps.google.com/mapfiles/kml/pal2/icon48.png</href></Icon></IconStyle></Style><Folder>"
+				+ "<name>KML file create by PlanetIsCalling</name>"
+				+ "<description>"+total+" placemarks found!</description>";
 	}	
 
 	static public String buildCityPlaceMark(City city){
@@ -320,7 +327,49 @@ public class CreateKML {
 
 		
 		return description;
+		
+		
+		
 	}
+	
+	static public String buildAirportPlaceMark(Airport airport){
+		String airportName = "";
+		String country= "";
+		String description = "";
+		
+		String[] descs = airport.getDescription().split("\\|");
+		for(String desc:descs){
+			if ("".equals(desc)){
+				description += "<div style='padding: 5px;'></div>";
+			} else {
+
+				if (desc.contains("Country:") && !desc.contains(airport.getName())){
+					country = desc.substring(desc.indexOf(":")+1);
+				}
+				if (desc.contains("Airport Name:") && !desc.contains(airport.getName())){
+					airportName = desc.substring(desc.indexOf(":")+1);
+					desc +=  Util.aviationWeather.replace("xxxx", airport.getName());
+					desc = desc.replace(airportName, Util.createHref(airportName,airport.getName()+" "+airportName+" wikipedia", 0));
+				} else if (desc.contains("BGL file:")) {
+					desc += "<br><br>Other Searches: "+Util.createHref("(freewarescenery.com)",country.trim().toLowerCase(), 7);
+				}
+				
+				description += "<div style=\"width: 300px; font-size: 12px;\">"+desc+"</div>";
+			}
+		}
+		
+		String icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get("airport")+"</href></Icon></IconStyle></Style>";
+
+
+		return "<Placemark><name>"+airport.getName()+airportName+"</name>\n"
+				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ icone
+				+ "<Point><coordinates>"+airport.getCoordinates()+"</coordinates></Point>\n"
+				+ "</Placemark>\n";
+	}
+	
+	
+
 
   public static void main(String argv[]) {
 	 // new WriteKML().read("g:\\addons\\work\\FR-Dordogne-Chateaux.kml","","");

@@ -23,10 +23,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.cfg.model.LegPoint;
-import com.cfg.util.Util;
+import com.util.Util;
 import com.geo.util.Geoinfo;
 import com.model.Flightplan;
+import com.model.LegPoint;
 
 public class ReadFsxPlan extends DefaultHandler{
 
@@ -40,9 +40,9 @@ public class ReadFsxPlan extends DefaultHandler{
 	
 	private Flightplan flightplan;
 
-	private LinkedList<LegPoint> legPoints;
+	private LinkedList<com.model.LegPoint> legPoints;
 	
-	private LegPoint legPoint;
+	private com.model.LegPoint legPoint;
 	
 	
 	private Stack currentElement = new Stack();

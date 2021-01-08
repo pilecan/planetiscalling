@@ -2,9 +2,6 @@ package com.model;
 
 import java.util.Map;
 
-import com.cfg.model.LegPoint;
-import com.cfg.model.Placemark;
-
 public class Flightplan {
     private String title;
     private String fpType;
@@ -28,29 +25,29 @@ public class Flightplan {
 	}
 
 	
-	public void validIcao(Map<String, Placemark> hashPlacemak, LegPoint legPoint,boolean isDeparture, Distance dist) {
-		Placemark placemark = hashPlacemak.get(legPoint.getId());
+	public void validIcao(Map<String, Airport> hashAirport, LegPoint legPoint,boolean isDeparture, Distance dist) {
+		Airport airport = hashAirport.get(legPoint.getId());
 		String field = null;
 		
-		if (placemark == null) {
+		if (airport == null) {
 			try {
-				placemark = hashPlacemak.get(legPoint.getIcaoIdent());
+				airport = hashAirport.get(legPoint.getIcaoIdent());
 			} catch (NullPointerException e) {
 			}
-			if (placemark == null) {
+			if (airport == null) {
 				if (isDeparture) {
 					field = departureID;
 				} else {
 					field = destinationID;
 				}
-				placemark = hashPlacemak.get(field);
+				airport = hashAirport.get(field);
 			}
 				
 		}
 
-		if (placemark != null) {
-			legPoint.setIcaoIdent(placemark.getName());
-			legPoint.setPosition(placemark.getCoordinates());
+		if (airport != null) {
+			legPoint.setIcaoIdent(airport.getIdent());
+			legPoint.setPosition(airport.getCoordinates());
 			legPoint.correctAltitude();
 		} else {
 			dist.setLine(false);

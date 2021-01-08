@@ -2,7 +2,7 @@ package com.model;
 
 import java.util.List;
 
-import com.cfg.util.Util;
+import com.util.Util;
 
 public class Airport {
 	private Integer airportId;
@@ -38,6 +38,35 @@ public class Airport {
 public Airport() {
 	super();
 	// TODO Auto-generated constructor stub
+}
+
+
+
+public Airport(Airport airport) {
+	super();
+	this.airportId = airport.getAirportId();
+	this.ident = airport.getIdent();
+	this.name = airport.getName();
+	this.iata = airport.getIata();
+	this.state = airport.getState();
+	this.city = airport.getCity();
+	this.country = airport.getCountry();
+	this.region = airport.getRegion();
+	this.atisFrequency = airport.getAtisFrequency();
+	this.towerFrequency = airport.getTowerFrequency();
+	this.dst = airport.getDst();
+	this.altitude = airport.getAltitude();
+	this.magVar = airport.getMagVar();
+	this.hourZone = airport.getHourZone();
+	this.timeZone = airport.getTimeZone();
+	this.lonx = airport.getLonx();
+	this.laty = airport.getLaty();
+	PlaceMarkName = airport.getPlaceMarkName();
+	this.description = airport.getDescription();
+	this.styleUrl = airport.getStyleUrl();
+	this.point = airport.getPoint();
+	this.coordinates = airport.getCoordinates();
+	this.runways = airport.getRunways();
 }
 
 
@@ -201,9 +230,9 @@ public String getDescription() {
 	String result = "";
 	try {
 		result = (iata!=null?"|IATA: "+iata:"")
-				+ "|Airport Name: "+name.replace("&","&amp;")
-				//+ "|Airport Name: "+Util.createHref(name ,name+"airport wiki", 0)+" ("+Util.createHref("Weather",name+" "+country+" weather", 0)+ ")"
-				+ "|City: "+Util.createHref(city ,city+" City", 0)+" ("+Util.createHref("Weather",city+" "+(country!=null?"|Country: "+country:"")+" weather", 0)+ ")"
+				//+ "|Airport Name: "+name.replace("&","&amp;")
+				+ "|Airport Name: "+Util.createHref(name ,name+" airport wiki", 0)+" ("+Util.createHref("Weather",name+" "+country+" airport weather", 0)+ ")"
+				+ "|City: "+Util.createHref(city ,city+" City "+(state!=null?state:"")+" "+(country!=null?country:""), 0)+" ("+Util.createHref("Weather",city+" "+(state!=null?state:"")+" "+(country!=null?country:"")+" weather", 0)+ ")"
 				+ (state!=null?"|State: "+state:"")
 				+ (country!=null?"|Country: "+country:"")
 				+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
@@ -223,32 +252,7 @@ public String getDescription() {
 	
 	return result;
 }
-public String getDescriptionAskme() {
-	
-	String result = "";
-	try {
-		result = (iata!=null?"|IATA: "+iata:"")
-				+ "|Airport Name: "+Util.createHref(name ,name+" airport wiki", 0)+" ("+Util.createHref("Weather",name+" "+country+" weather", 0)+ ")"
-				+ "|City: "+Util.createHref(city ,city+" City "+country, 0)+" ("+Util.createHref("Weather",city+" "+(country!=null?country:"")+" weather", 0)+ ")"
-				+ (state!=null?"|State: "+state:"")
-				+ (country!=null?"|Country: "+country:"")
-				+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
-				+ "|"
-				+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
-				+ "|Magnetic Variation: "+Util.formatMagvar(magVar)
-				+ "|"
-				+ (atisFrequency!=null && atisFrequency > 0?"|ATIS: "+Util.formatFrequency(atisFrequency):"")
-				+ (towerFrequency!=null && towerFrequency > 0?"|Tower: "+Util.formatFrequency(towerFrequency):"")
-				+ "|"
-				+ makeRunways()
-				+ "|";
-	} catch (Exception e) {
-		// TODO Auto-generated catch block
-		//e.printStackTrace();
-	} 
-	
-	return result;
-}
+
 
 
 

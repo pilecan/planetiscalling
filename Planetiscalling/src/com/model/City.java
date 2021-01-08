@@ -204,25 +204,6 @@ public class City {
 		this.population = population;
 	}
 
-	public String getDescription() {
-		
-		return " |Name: "+cityName
-				+ (!cityName.equals(cityAscii)?"|International Name: "+cityAscii:"")
-				+ (adminName!=null?"|State: "+adminName:"")
-				+ "|Country: "+country
-				+ "|Abreviation short: "+iso2
-				+ "|Abreviation long: "+iso3
-				+ "|Population : "+population
-				+ "|";
-	}
-	
-	public String buildKML() {
-		return "<Placemark><name>"+cityName+"</name>\n"
-				+ "<description><![CDATA["+getDescription()+"]]></description>\n"
-				+ "<styleUrl>"+getStyleUrl()+"</styleUrl>\n"
-				+ "<Point><coordinates>"+getCoordinates()+"</coordinates></Point>\n"
-				+ "</Placemark>\n";		
-	}
 
 	public String getStyleUrl() {
 		return "|#fsx_airport";

@@ -10,24 +10,18 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.cfg.common.Dataline;
-import com.cfg.file.ManageConfigFile;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.LegPoint;
-import com.cfg.model.Placemark;
-import com.cfg.plan.ReadFs9Plan;
-import com.cfg.plan.ReadPlanGPlan;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
 import com.model.Distance;
 import com.model.Flightplan;
+import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Vor;
@@ -35,24 +29,21 @@ import com.util.CreateKML;
 import com.util.ReadFsxPlan;
 import com.util.Utility;
 
+
 public class CreateKmlFSPlan{
 	
 	
 	private String flightPlanFile;// = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
 
-	private Map<String, Placemark> selectedAirports ;
+	private Map<String, Airport> selectedAirports ;
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
-	private Map<String, Placemark> addonPlacemarks ;
 	private Map<Integer, Vor> selectedVors;
 	private Map<Integer, Ndb> selectedNdbs;
 	private List <String> addonList;
 	
 	private String kmlFlightPlanFile = "/data/last_flightplan.kml";
 
-	private ManageXMLFile manageXMLFile;
-
-	private ManageConfigFile configFile;
 	
 	private LinkedList<LegPoint> legPoints;
 	
@@ -63,11 +54,7 @@ public class CreateKmlFSPlan{
 	
 	private Distance dist;
 	
-	private ReadFs9Plan fs9Plan;
-	
 	private ReadFsxPlan fsxPlan;
-	
-	private ReadPlanGPlan planGPlan;
 	
 
 	private boolean isDone;
@@ -79,6 +66,8 @@ public class CreateKmlFSPlan{
 	
 	private Dataline dataline;
 
+	
+	private SelectAirport selectAirport;
 	private CreateKML createKML;
 	
 	private int current;
@@ -93,20 +82,17 @@ public class CreateKmlFSPlan{
 	
 	
 	public CreateKmlFSPlan(String flightPlanFile,  Distance dist, 
-			ManageXMLFile xmlfile,
 			List<City> cities, 
 			List<Mountain> mountains,
 			List<Vor> vors,
 			List<Ndb> ndbs) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
 		this.flightPlanFile = flightPlanFile;
 		this.dist = dist;
-		this.manageXMLFile = xmlfile;
 		this.selectedAirports = new HashMap<>();
 		this.selectedCities = new HashMap<>();
 		this.selectedMountains = new HashMap<>();
 		this.selectedNdbs = new HashMap<>();
 		this.selectedVors = new HashMap<>();
-		this.addonPlacemarks = new HashMap<>();
 		this.isDone = false;
 		this.cities = cities;
 		this.mountains = mountains;
@@ -151,15 +137,12 @@ public class CreateKmlFSPlan{
 			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
 		} 
 		
-		List <Placemark> airports = new ArrayList<>();
 
-		SelectAirport selectAiport = new SelectAirport(); 
-		selectAiport.selectAll("");
-		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
-		manageXMLFile.setHashPlacemark(selectAiport.getMapPlacemark());
+		selectAirport = new SelectAirport(); 
+		selectAirport.select("");
 		
-		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(0), true, dist);
-		flightplan.validIcao(selectAiport.getMapPlacemark(), legPoints.get(legPoints.size()-1), false, dist);
+		flightplan.validIcao(selectAirport.getMapAirport(), legPoints.get(0), true, dist);
+		flightplan.validIcao(selectAirport.getMapAirport(), legPoints.get(legPoints.size()-1), false, dist);
 		
 		int cptNew = 0;
 		
@@ -211,8 +194,8 @@ public class CreateKmlFSPlan{
 		}
 		
 		
-		// search airports
-		searchNeighbor();
+		// search Neighbor
+		searchFlightPlanNeighbor(selectAirport);
 		
 		if (distanceBetween < 1000) {
 			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
@@ -222,7 +205,7 @@ public class CreateKmlFSPlan{
 		if (dist.isLine()) {
 			int indexToc = Geoinfo.createTOC(flightplan, legPoints);
 			int indexTod = Geoinfo.createTOD(flightplan, legPoints);
-			if ( indexToc >= indexTod) //Altitude too high
+			if ( indexToc >= indexTod) //Altitude too high and tod is before toc
 			{
 				legPoints.remove(indexTod);
 				legPoints.remove(indexToc);
@@ -244,18 +227,18 @@ public class CreateKmlFSPlan{
 	
 
 	
-	private void searchNeighbor() {
+	private void searchFlightPlanNeighbor(SelectAirport selectAirport) {
 		
 		
 		if (dist.isAirport()) {
-			for(Placemark placemark : manageXMLFile.getPlacemarks()){
-				Double[] dd1 = Geoinfo.convertDoubleLongLat(placemark.getCoordinates());
+			for(Airport	 airport : selectAirport.getMapAirport().values()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 				current++;
 				for(LegPoint point : legPoints){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()){
-						selectedAirports.put(placemark.getName(),new Placemark(placemark));
+						selectedAirports.put(airport.getIdent(),new Airport(airport));
 						if (dist.isLine()) {
 							//dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
@@ -264,8 +247,8 @@ public class CreateKmlFSPlan{
 			}
 		} else if (!dist.isAirport()) { //Load the last and first for the flightplan
 			try {
-				selectedAirports.put(legPoints.get(0).getIcaoIdent(),manageXMLFile.getHashPlacemark().get(legPoints.get(0).getIcaoIdent()));
-				selectedAirports.put(legPoints.get(legPoints.size()-1).getIcaoIdent(),manageXMLFile.getHashPlacemark().get(legPoints.get(legPoints.size()-1).getIcaoIdent()));
+				selectedAirports.put(legPoints.get(0).getIcaoIdent(),selectAirport.getMapAirport().get(legPoints.get(0).getIcaoIdent()));
+				selectedAirports.put(legPoints.get(legPoints.size()-1).getIcaoIdent(),selectAirport.getMapAirport().get(legPoints.get(legPoints.size()-1).getIcaoIdent()));
 				dist.setAirportDist(selectedAirports.size());
 			} catch (NullPointerException e) {
 				// TODO Auto-generated catch block
@@ -382,6 +365,8 @@ public class CreateKmlFSPlan{
 		    for (LegPoint legPoint : legPoints){
 
 				if ("1".equals(legPoint.getVisible()) || distanceBetween > 1000) {
+				//	System.out.println(selectedAirports.get(legPoint.getIcaoIdent()));
+					
 			    	writer.write(legPoint.buildPoint());
 				}
 		    	
@@ -405,9 +390,9 @@ public class CreateKmlFSPlan{
 		    if (dist.isAirport()){
 			    writer.write("<Folder><name> FS2020 Airports found ("+selectedAirports.size()+") </name>");
 			    
-			    for(Placemark placemark:selectedAirports.values()){
+			    for(Airport airport:selectedAirports.values()){
 			    	try {
-						writer.write(placemark.buildXML("fsx_airport"));
+						writer.write(CreateKML.buildAirportPlaceMark(airport));
 					} catch (NullPointerException e) {
 						// TODO Auto-generated catch block
 						//e.printStackTrace();
@@ -520,13 +505,9 @@ public class CreateKmlFSPlan{
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) throws FileNotFoundException, NullPointerException, NoPoints, IOException {
-		ManageXMLFile manageXMLFile = new ManageXMLFile("");
-		List<Placemark> placemarks = new ArrayList<>();
 
 		SelectAirport selectAiport = new SelectAirport();
 		selectAiport.selectAll("");
-		
-		manageXMLFile.setPlacemarks(selectAiport.getPlacemarks());
 		
 		SelectCity selectCity = new SelectCity();
 		selectCity.selectAll("");
@@ -553,16 +534,7 @@ public class CreateKmlFSPlan{
 	}
 
 
-	public Map<String, Placemark> getAddonPlacemarks() {
-		return addonPlacemarks;
-	}
-
-
-	public void setAddonPlacemarks(Map<String, Placemark> addonPlacemarks) {
-		this.addonPlacemarks = addonPlacemarks;
-	}
-	
-	public class NoPoints extends Exception {
+		public class NoPoints extends Exception {
 	    public NoPoints(String message) {
 	        super(message);
 	    }
@@ -659,12 +631,12 @@ public class CreateKmlFSPlan{
 	}
 
 
-	public Map<String, Placemark> getSelectedAirports() {
+	public Map<String, Airport> getSelectedAirports() {
 		return selectedAirports;
 	}
 
 
-	public void setSelectedAirports(Map<String, Placemark> selectedAirports) {
+	public void setSelectedAirports(Map<String, Airport> selectedAirports) {
 		this.selectedAirports = selectedAirports;
 	}
 

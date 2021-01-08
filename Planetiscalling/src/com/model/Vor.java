@@ -1,6 +1,6 @@
 package com.model;
 
-import com.cfg.util.Util;
+import com.util.Util;
 
 public class Vor {
     Integer vorId;

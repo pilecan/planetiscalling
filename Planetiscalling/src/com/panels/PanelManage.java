@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,10 +20,9 @@ import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Info;
-import com.cfg.util.Util;
-import com.model.Distance;
 import com.model.Preference;
 import com.util.SwingUtils;
+import com.util.Util;
 import com.util.Utility;
 
 public class PanelManage implements Info {

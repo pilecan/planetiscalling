@@ -4,19 +4,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import com.cfg.util.FormUtility;
+import com.util.FormUtility;
 
 public class DistanceSpinner implements Info {
 	private SpinnerModel distanceCity;
@@ -91,16 +87,19 @@ public class DistanceSpinner implements Info {
         	checkTocTod = makeCheckbox("Top of Climb and Top of Descent to the Flightplan", "Top of Climb and Descent", checkTocTod, true, panel, formUtility);
 
          } else if ("airport".equals(topic)) {
+         	vorNdbSpinner =  makeSpinner("Vor/NDB distances in Nautical Miles", "Vor/NDB (nm)", vorNdbSpinner, distanceVorNdb, panel, formUtility);
          	citySpinner = makeSpinner("City distances in Nautical Miles", "City (nm)", citySpinner, distanceCity, panel, formUtility);
         	mountainSpinner = makeSpinner("Moutain distances in Nautical Miles", "Mountain (nm)", mountainSpinner, distanceMountain, panel, formUtility);
       	    checkLinedist = makeCheckbox("Check it to see lines between placemarks", "Line Between", checkLinedist, false, panel, formUtility);
          } else if ("city".equals(topic)) {
          	airportSpinner = makeSpinner("Airport distances in Nautical Miles", "Airport (nm)", airportSpinner, distanceAirport, panel, formUtility);
+        	vorNdbSpinner =  makeSpinner("Vor/NDB distances in Nautical Miles", "Vor/NDB (nm)", vorNdbSpinner, distanceVorNdb, panel, formUtility);
         	mountainSpinner = makeSpinner("Moutain distances in Nautical Miles", "Mountain (nm)", mountainSpinner, distanceMountain, panel, formUtility);
       	    checkLinedist = makeCheckbox("Check it to see lines between placemarks", "Line Between", checkLinedist, false, panel, formUtility);
        
          } else  if ("mountain".equals(topic)) {
          	airportSpinner = makeSpinner("Airport distances in Nautical Miles", "Airport (nm)", airportSpinner, distanceAirport, panel, formUtility);
+        	vorNdbSpinner =  makeSpinner("Vor/NDB distances in Nautical Miles", "Vor/NDB (nm)", vorNdbSpinner, distanceVorNdb, panel, formUtility);
          	citySpinner = makeSpinner("City distances in Nautical Miles", "City (nm)", citySpinner, distanceCity, panel, formUtility);
       	    checkLinedist = makeCheckbox("Check it to see lines between placemarks", "Line Between", checkLinedist, false, panel, formUtility);
 

@@ -1,6 +1,5 @@
 package net;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,15 +11,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.cfg.common.Info;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
 import com.model.Ndb;
-import com.util.CreateKML;
 
 public class SelectNdb implements Info{
 	
 	private Ndb ndb;
-	private  List<Placemark> placemarks;
 	private List <Ndb> ndbs;
 	private Map<String, Ndb> mapNdb;
 
@@ -120,14 +115,8 @@ public class SelectNdb implements Info{
 		 
 //	 new CreateKML().write(selectVor.getVors(), search, kmlRelative);
 		 
-	//	 manageXMLFile.launchGoogleEarth(new File(kmlRelative));
+	//	 Utility.getInstance().launchGoogleEarth(new File(kmlRelative));
 		
-	}
-	public List<Placemark> getPlacemarks() {
-		return placemarks;
-	}
-	public void setPlacemarks(List<Placemark> placemarks) {
-		this.placemarks = placemarks;
 	}
 	public List<Ndb> getNdbs() {
 		return ndbs;

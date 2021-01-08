@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,12 +26,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
-import javax.swing.JList;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
-import com.cfg.model.Placemark;
-import com.cfg.util.Util;
 import com.main.PlanetIsCalling;
 import com.model.Airport;
 
@@ -46,6 +48,8 @@ public class Utility implements Info{
 	private SelectAirport selectAiport;
 	
 	private StringBuilder builder;
+
+	private String googleEarthExec = "C:/Program Files/Google/Google Earth Pro/client/googleearth.exe";
 
 	public static Utility getInstance(){
 		return instance;
@@ -307,6 +311,7 @@ public class Utility implements Info{
     	icaos = icaos.replaceAll("'", "");
     	icaos = icaos.replaceAll("=", " ");
     	icaos = icaos.replaceAll(",", " ");
+    	icaos = icaos.replaceAll("\\*", " ");
     	icaos = icaos.replaceAll(":", " ");
     	icaos = icaos.replaceAll(";", " ");
     	icaos = icaos.replaceAll("\\.", " ");
@@ -342,7 +347,7 @@ public class Utility implements Info{
 		return icaos;
 	}
 	
-	public Map <String, Airport> creatMapAirport(Map<String, Placemark> selectedAirports){
+	public Map <String, Airport> creatMapAirport(Map<String, Airport> selectedAirports){
 		String icaos = "(";
 		selectAiport = new SelectAirport();
 		
@@ -403,7 +408,44 @@ public class Utility implements Info{
 	
 	}
 	
+	public JEditorPane initjEditorPane() {
+		
+		JEditorPane jEditorPane = new JEditorPane();
+		jEditorPane.setEditable(false);
+		HTMLEditorKit kit = new HTMLEditorKit();
+		jEditorPane.setEditorKit(kit);
+		jEditorPane.setVisible(false);
+	       jEditorPane.addHyperlinkListener(new HyperlinkListener() {
 
+	            @Override
+	            public void hyperlinkUpdate(HyperlinkEvent e) {
+	                HyperlinkEvent.EventType type = e.getEventType();
+	                final URL url = e.getURL();
+	                if (type == HyperlinkEvent.EventType.ENTERED) {
+	                    // do desired highlighting
+	                } else if (type == HyperlinkEvent.EventType.ACTIVATED) {
+	                	Util.openURL(url.toString());
+	                }
+	            }
+	          });
+	       
+	       return jEditorPane;
+		
+	}
+	
+
+	public void launchGoogleEarth(File file){
+		try {
+			Runtime.getRuntime().exec(new String[] {
+					googleEarthExec ,
+					file.getAbsolutePath()
+			});
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		
+	}
 	
 
 

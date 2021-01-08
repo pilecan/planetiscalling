@@ -9,7 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
@@ -36,12 +35,10 @@ import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
-import com.cfg.model.LegPoint;
-import com.cfg.model.Placemark;
-import com.cfg.util.FormUtility;
-import com.cfg.util.Util;
 import com.geo.util.Geoinfo;
 import com.util.CreateKML;
+import com.util.FormUtility;
+import com.util.Util;
 import com.util.Utility;
 
 import net.SelectAirport;
@@ -64,14 +61,13 @@ public class Result implements Info {
 	private FormUtility formUtility;
 	private JPanel panel;
 	private JLabel label;
-	private List<Placemark> placemarks;
 
 	private SortedListModel listResultModel;
 
-	private Map<String, Placemark> selectedAirports;
+	private Map<String, Airport> selectedMapAirports;
+
 	private Map<String, City> selectedCities;
 	private Map<String, Mountain> selectedMountains;
-	private Map<String, Placemark> addonPlacemarks;
 	private Map<Integer, Vor> selectedVors;
 	private Map<Integer, Ndb> selectedNdbs;
 	private LinkedList<LegPoint> legPoints;
@@ -112,6 +108,11 @@ public class Result implements Info {
 
 	}
 
+	public void setButtons(JButton landMeBt, JButton askMe) {
+		this.leftBtn = landMeBt;
+		this.askMeBt = askMe;
+	}
+	
 	public void setButtons(JButton landMeBt, JButton askMe, JButton landAllBt) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
@@ -281,28 +282,81 @@ public class Result implements Info {
 		return resultPanel;
 
 	}
+	public JPanel getAiportPanel() {
+		resultPanel = new JPanel();
+		resultPanel.setLayout(new GridBagLayout());
 
-	public SortedListModel getListIcaoModel() {
-		listResultModel = new SortedListModel();
-		String info = "";
-		for (int i = 0; i < placemarks.size(); i++) {
-			try {
-				//System.out.println(placemarks.get(i).getDescription());
+		formUtility = new FormUtility();
 
-				info = placemarks.get(i).getDescription().substring(
-						placemarks.get(i).getDescription().indexOf("?q=") + 3,
-						placemarks.get(i).getDescription().indexOf("+wikipedia"));
-				listResultModel.add(info.replace("+", " "));
-			} catch (StringIndexOutOfBoundsException e) {
-				// TODO Auto-generated catch block
-				// e.printStackTrace();
-			}
-		}
+		ButtonGroup bgroup = new ButtonGroup();
 
-		currentView = "icao";
+		airportBtn = new JRadioButton("", true);
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+		cityBtn = new JRadioButton("");
+		mountainBtn = new JRadioButton("");
 
-		return listResultModel;
+		bgroup.add(airportBtn);
+		bgroup.add(vorBtn);
+		bgroup.add(ndbBtn);
+		bgroup.add(cityBtn);
+		bgroup.add(mountainBtn);
+
+		RadioListener myListener = new RadioListener();
+		airportBtn.addActionListener(myListener);
+		vorBtn.addActionListener(myListener);
+		ndbBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
+
+		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+
+		resultPanel.validate();
+		return resultPanel;
+
 	}
+	public JPanel getCityPanel() {
+		resultPanel = new JPanel();
+		resultPanel.setLayout(new GridBagLayout());
+
+		formUtility = new FormUtility();
+
+		ButtonGroup bgroup = new ButtonGroup();
+
+		cityBtn = new JRadioButton("", true);
+		airportBtn = new JRadioButton("");
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+		mountainBtn = new JRadioButton("");
+
+		bgroup.add(airportBtn);
+		bgroup.add(vorBtn);
+		bgroup.add(ndbBtn);
+		bgroup.add(mountainBtn);
+		bgroup.add(cityBtn);
+
+		RadioListener myListener = new RadioListener();
+		vorBtn.addActionListener(myListener);
+		ndbBtn.addActionListener(myListener);
+		airportBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
+
+		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+	    setformLine(resultPanel, "Airports:", this.selectedMapAirports.size(), airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+
+		resultPanel.validate();
+		return resultPanel;
+
+	}
+
 
 
 	public void getAirportListModel() {
@@ -426,8 +480,10 @@ public class Result implements Info {
 		currentList = new JList(listModel);
 		currentList.setFixedCellHeight(18);
 
-
-		this.landAllBt.setEnabled(true);
+		if (landAllBt != null) {
+			this.landAllBt.setEnabled(true);
+		}
+			
 		this.leftBtn.setEnabled(false);
 		this.askMeBt.setEnabled(false);
 
@@ -499,7 +555,7 @@ public class Result implements Info {
 		Airport airport = mapAirport.get(line);
 
 		varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
-		varStr += airport.getDescriptionAskme().replaceAll("\\|", "<br>");
+		varStr += airport.getDescription().replaceAll("\\|", "<br>");
 		return varStr;
 
 	}
@@ -668,19 +724,7 @@ public class Result implements Info {
 		this.destination = destination;
 	}
 
-	public void setListAirport(List<Placemark> placemarks) {
-
-		this.placemarks = placemarks;
-
-	}
-
-	public Map<String, Placemark> getSelectedAirports() {
-		return selectedAirports;
-	}
-
-	public void setSelectedAirports(Map<String, Placemark> selectedAirports) {
-		this.selectedAirports = selectedAirports;
-	}
+	
 
 	public Map<String, City> getSelectedCities() {
 		return selectedCities;
@@ -714,13 +758,6 @@ public class Result implements Info {
 		this.selectedNdbs = selectedNdbs;
 	}
 
-	public Map<String, Placemark> getAddonPlacemarks() {
-		return addonPlacemarks;
-	}
-
-	public void setAddonPlacemarks(Map<String, Placemark> addonPlacemarks) {
-		this.addonPlacemarks = addonPlacemarks;
-	}
 
 	public LinkedList<LegPoint> getLegPoints() {
 		return legPoints;
@@ -763,13 +800,6 @@ public class Result implements Info {
 		this.label = label;
 	}
 
-	public List<Placemark> getPlacemarks() {
-		return placemarks;
-	}
-
-	public void setPlacemarks(List<Placemark> placemarks) {
-		this.placemarks = placemarks;
-	}
 
 	public SortedListModel getListResultModel() {
 		return listResultModel;
@@ -823,6 +853,14 @@ public class Result implements Info {
 
 	public void setCurrentList(JList currentList) {
 		this.currentList = currentList;
+	}
+
+	public Map<String, Airport> getSelectedMapAirports() {
+		return selectedMapAirports;
+	}
+
+	public void setSelectedMapAirports(Map<String, Airport> selectedMapAirports) {
+		this.selectedMapAirports = selectedMapAirports;
 	}
 
 }

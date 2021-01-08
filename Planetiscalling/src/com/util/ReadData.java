@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -22,13 +21,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Dataline;
 import com.cfg.common.Info;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.LegPoint;
-import com.cfg.model.Placemark;
 import com.geo.util.Geoinfo;
+import com.model.Airport;
 import com.model.City;
 import com.model.Distance;
-import com.model.Flightplan;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Result;
@@ -43,7 +39,6 @@ import net.SelectNdb;
 import net.SelectVor;
 
 public class ReadData implements Info{
-	private ManageXMLFile manageXMLFile;
 	private SelectAirport selectAiport;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
@@ -52,7 +47,9 @@ public class ReadData implements Info{
 	private String kmlFlightPlanFile;
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
-	private Map<String, Placemark> selectedAirports ;
+	private Map<String, Airport> selectedAirports ;
+	private Map<String, Airport> selectedMapAirports;
+
 	private Map<Integer, Vor> selectedVors;
 	private Map<Integer, Ndb> selectedNdbs;
 	private CreateKmlFSPlan createKmlFSPlan;
@@ -73,8 +70,7 @@ public class ReadData implements Info{
 	private boolean isMountain = true;
 	private boolean isDistance = true;
 	
-	public ReadData(Result result, ManageXMLFile manageXMLFile, SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
-		this.manageXMLFile = manageXMLFile;
+	public ReadData(Result result,  SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor =selectVor;
@@ -86,8 +82,7 @@ public class ReadData implements Info{
 		
 	}
 	
-	public ReadData(String icaos, Result result, ManageXMLFile manageXMLFile, SelectVor selectVor, SelectNdb selectNdb, SelectMountain selectMountain, SelectCity selectCity, Distance dist){
-		this.manageXMLFile = manageXMLFile;
+	public ReadData(String icaos, Result result, SelectVor selectVor, SelectNdb selectNdb, SelectMountain selectMountain, SelectCity selectCity, Distance dist){
 		this.selectVor =selectVor;
 		this.selectNdb	= selectNdb;
 		this.selectCity = selectCity;
@@ -128,18 +123,32 @@ public class ReadData implements Info{
 				flightplanName = chooser.getSelectedFile().toString();
 				createFlightplan(dist);
 		    } else {
+		    	flightplanName = "";
 		    	kmlFlightPlanFile = "";
 		    }
 			
 		
 	}
-	
+	  private JFileChooser selectDirectoryProgram(String title,String directory){
+			JFileChooser chooser = new JFileChooser();
+			chooser.setCurrentDirectory(new java.io.File(directory));
+			chooser.setDialogTitle(title);
+			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setAcceptAllFileFilterUsed(false);
+			String[] EXTENSION=new String[]{"pln"};
+			 FileNameExtensionFilter filter=new FileNameExtensionFilter("FS2020/FSX (.pln)",EXTENSION);
+			 chooser.setFileFilter(filter);
+			 chooser.setMultiSelectionEnabled(false);
+		
+			return chooser;
+	    	
+	    }
+
 	public void createFlightplan( Distance dist) {
 		
 		try {
 
 			this.createKmlFSPlan =  new CreateKmlFSPlan(flightplanName, dist, 
-					manageXMLFile,
 					selectCity.getCities(), 
 					selectMountain.getMountains(),
 					selectVor.getVors(),
@@ -167,7 +176,6 @@ public class ReadData implements Info{
 		
 		
 		result.setFlightplan(createKmlFSPlan.getFlightplan());
-		result.setSelectedAirports(createKmlFSPlan.getSelectedAirports());
 		result.setMapAirport(Utility.getInstance().creatMapAirport(createKmlFSPlan.getSelectedAirports()));
 		result.setSelectedCities(createKmlFSPlan.getSelectedCities());
 		result.setSelectedMountains(createKmlFSPlan.getSelectedMountains());
@@ -180,7 +188,7 @@ public class ReadData implements Info{
 		
 		//Flightplan
 	    createKmlFSPlan.setAltitude(Math.round(Double.parseDouble(result.getFlightplan().getCruisingAlt())/3.28084));
-		createKmlFSPlan.setSelectedAirports(new HashMap<String, Placemark>() );
+		createKmlFSPlan.setSelectedAirports(new HashMap<String, Airport>() );
 		createKmlFSPlan.setSelectedCities(new HashMap<String, City>());
 		createKmlFSPlan.setSelectedMountains(new HashMap<String, Mountain>());
 		createKmlFSPlan.setSelectedNdbs(new HashMap<Integer, Ndb>());
@@ -188,27 +196,13 @@ public class ReadData implements Info{
 		setResult();
 	}
 	
-    private JFileChooser selectDirectoryProgram(String title,String directory){
-		JFileChooser chooser = new JFileChooser();
-		chooser.setCurrentDirectory(new java.io.File(directory));
-		chooser.setDialogTitle(title);
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setAcceptAllFileFilterUsed(false);
-		String[] EXTENSION=new String[]{"pln"};
-		 FileNameExtensionFilter filter=new FileNameExtensionFilter("FS2020/FSX (.pln)",EXTENSION);
-		 chooser.setFileFilter(filter);
-		 chooser.setMultiSelectionEnabled(false);
-	
-		return chooser;
-    	
-    }
-    /**
+      /**
      * 
      */
     
 	public void resetIcaoResult() {
 		
-		//Flightplan
+		result.setMapAirport(new HashMap<String, Airport>());
 		result.setSelectedCities(new HashMap<String, City>());
 		result.setSelectedMountains(new HashMap<String, Mountain>());
 		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
@@ -216,11 +210,28 @@ public class ReadData implements Info{
 		//setResult();
 	}
 
+	public void resetAirportResult() {
+		
+	//	result.setMapAirport(new HashMap<String, Airport>());
+		result.setSelectedCities(new HashMap<String, City>());
+		result.setSelectedMountains(new HashMap<String, Mountain>());
+		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
+		result.setSelectedVors(new HashMap<Integer, Vor>());
+		//setResult();
+	}
+	public void resetCityResult(Result result) {
+		
+	    result.setMapAirport(new HashMap<String, Airport>());
+		//result.setSelectedCities(new HashMap<String, City>());
+		result.setSelectedMountains(new HashMap<String, Mountain>());
+		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
+		result.setSelectedVors(new HashMap<Integer, Vor>());
+		//setResult();
+	}
+	
     public void creatIcaoAirports(String icaos, Distance dist) {
     	
     	this.dist = dist;
-    	List<Placemark> placemarks = new ArrayList<>();
-		manageXMLFile = new ManageXMLFile("");
 		createKML = new CreateKML();
 		selectedMountains = new HashMap<>();
 		selectedCities = new HashMap<>();
@@ -237,19 +248,15 @@ public class ReadData implements Info{
 
 	    	SelectAirport selectAirport = new SelectAirport();	
 	 	
-			selectAirport.selectAll(sql);
-			placemarks = selectAirport.getPlacemarks();
-			
+				
 			selectAirport.select(sql);
 
+
+			searchAiportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
+			searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor, selectNdb);
+				
 			result.setMapAirport(selectAirport.getMapAirport());
 			
-			result.setListAirport(placemarks);
-
-			searchAiportNeighbor(placemarks,selectCity,selectMountain);
-			searchIcaoVorNdb(placemarks, selectVor, selectNdb);
-				
-			result.setSelectedAirports(selectAirport.getMapPlacemark());
 			result.setMapAirport(selectAirport.getMapAirport());
 			result.setSelectedCities(selectedCities);
 			result.setSelectedMountains(selectedMountains);
@@ -257,22 +264,25 @@ public class ReadData implements Info{
 			result.setSelectedVors(selectedVors);
 
 			
-			saveKMLFileICAO(manageXMLFile, placemarks,Utility.getInstance().getFlightPlanName(Info.flightplanName),dist);
+			saveKMLFileICAO(selectAirport.getMapAirport(),Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName),dist);
 	    }
 		
     }
     /**
      * 
-     * @param placemarks
+     * @param airports
      * @param selectVor
      * @param selectNdb
      */
-    private void searchIcaoVorNdb(List<Placemark> placemarks,SelectVor selectVor,SelectNdb selectNdb) {
+    private void searchIcaoVorNdb(List<Airport> airports,SelectVor selectVor,SelectNdb selectNdb) {
+    	
+		selectedVors = new HashMap<>();
+
 		if (dist.isVorNdb()) {
-			for(Vor vor : selectVor.getVors()){
+    		for(Vor vor : selectVor.getVors()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
 				
- 				for(Placemark airport : placemarks){
+ 				for(Airport airport : airports){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
@@ -287,11 +297,12 @@ public class ReadData implements Info{
 		}
 		
 		//Search NDB
+		selectedNdbs = new HashMap<>();
 		if (dist.isVorNdb()) {
-			for(Ndb ndb : selectNdb.getNdbs()){
+		    for(Ndb ndb : selectNdb.getNdbs()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
 				
- 				for(Placemark airport : placemarks){
+ 				for(Airport airport : airports){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 					
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
@@ -308,19 +319,64 @@ public class ReadData implements Info{
    	
     }
 
+    private void searchCityVorNdb(SelectVor selectVor,SelectNdb selectNdb) {
+    	
+		selectedVors = new HashMap<>();
+
+		if (dist.isVorNdb()) {
+    		for(Vor vor : selectVor.getVors()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
+				
+ 				for(City city : selectCity.getCities()){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedVors.put(vor.getVorId(),new Vor(vor));
+						if (dist.isLine()) {
+							dataline.setData("vor",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+		//Search NDB
+		selectedNdbs = new HashMap<>();
+		if (dist.isVorNdb()) {
+		    for(Ndb ndb : selectNdb.getNdbs()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
+				
+ 				for(City city : selectCity.getCities()){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getVorNdbDist()){
+						selectedNdbs.put(ndb.getNdbId(),new Ndb(ndb));
+						if (dist.isLine()) {
+							dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+		
+   	
+    }
     /**
      * 
      * @param airports
      * @param selectCity
      * @param selectMoutain
      */
-    private void searchAiportNeighbor(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
+    private void searchAiportNeighbor(List<Airport> airports,SelectCity selectCity,SelectMountain selectMoutain) {
+		
+    	selectedCities = new HashMap<String, City>();
  		if (dist.isCity()) {
- 			selectedCities = new HashMap<String, City>();
  			for(City city : selectCity.getCities()){
  				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
  				
- 				for(Placemark airport : airports){
+ 				for(Airport airport : airports){
  					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
  					
  					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
@@ -332,12 +388,12 @@ public class ReadData implements Info{
  				}
  			}
  		}
+		selectedMountains = new HashMap<>();
 		if (dist.isMountain()) {
-			selectedMountains = new HashMap<>();
 			for(Mountain mountain : selectMoutain.getMountains()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
 
- 				for(Placemark airport : airports){
+ 				for(Airport airport : airports){
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()) {
@@ -355,21 +411,22 @@ public class ReadData implements Info{
 
     /**
      * 
-     * @param airports
+     * @param placemarks
      * @param selectCity
      * @param selectMoutain
      */
-	private void searchCityNeighbor(List<Placemark> airports, SelectCity selectCity, SelectMountain selectMoutain) {
+	private void searchCityNeighbor(List<Airport> airports, SelectCity selectCity, SelectMountain selectMoutain) {
+		selectedAirports = new HashMap<String, Airport>();
+		selectedMapAirports  = new HashMap<>();
 		if (dist.isAirport()) {
-			selectedAirports = new HashMap<String, Placemark>();
-			for (Placemark airport : airports) {
+			for (Airport airport : airports) {
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 
 				for (City city : selectCity.getCities()) {
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
-						selectedAirports.put(airport.getName(), new Placemark(airport));
+						selectedAirports.put(airport.getName(), new Airport(airport));
 						if (dist.isLine()) {
 							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
@@ -377,6 +434,7 @@ public class ReadData implements Info{
 				}
 			}
 		}
+		selectedMountains = new HashMap<>();
 		if (dist.isMountain()) {
 			selectedMountains = new HashMap<>();
 			for(Mountain mountain : selectMoutain.getMountains()){
@@ -402,18 +460,18 @@ public class ReadData implements Info{
 	 * @param selectCity
 	 * @param selectMoutain
 	 */
-	private void searchMountainNeighbor(List<Placemark> airports, SelectCity selectCity, SelectMountain selectMoutain) {
-		
+	private void searchMountainNeighbor(List<Airport> airports, SelectCity selectCity, SelectMountain selectMoutain) {
+		selectedAirports = new HashMap<String, Airport>();
+	
 		if (dist.isAirport()) {
-			selectedAirports = new HashMap<String, Placemark>();
-			for (Placemark airport : airports) {
+			for (Airport airport : airports) {
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 
 				for (Mountain mountain : selectMoutain.getMountains()) {
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
-						selectedAirports.put(airport.getName(), new Placemark(airport));
+						selectedAirports.put(airport.getName(), new Airport(airport));
 						if (dist.isLine()) {
 							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
@@ -422,8 +480,8 @@ public class ReadData implements Info{
 			}
 
 		}
-		if (dist.isCity()) {
-			selectedCities = new HashMap<>();
+		selectedCities = new HashMap<>();
+    	if (dist.isCity()) {
 			for(City city: selectCity.getCities()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
 
@@ -443,12 +501,12 @@ public class ReadData implements Info{
 
 	}
 	
-	/**
+/*	*//**
 	 * 
 	 * @param airports
 	 * @param selectCity
 	 * @param selectMoutain
-	 */
+	 *//*
     private void searchAiport(List<Placemark> airports,SelectCity selectCity,SelectMountain selectMoutain) {
 				if (isCity) {
 					selectedCities = new HashMap<String, City>();
@@ -486,7 +544,7 @@ public class ReadData implements Info{
 		
     	
     }
-    
+*/    
     /**
      * 
      * @param manageXMLFile
@@ -495,7 +553,7 @@ public class ReadData implements Info{
      * @param comboMountain
      * @param dist
      */
-	public void createKMLMountain(ManageXMLFile manageXMLFile,Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboMountain,Distance dist) {
+	public void createKMLMountain(Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboMountain,Distance dist) {
 		String sql = "";	
     	SelectCity selectCity = new SelectCity();
     	SelectMountain selectMountain = new SelectMountain();
@@ -528,21 +586,18 @@ public class ReadData implements Info{
 		selectMountain.selectAll(sql);
 		
 
-    	List<Placemark> airports = new ArrayList<>();
-    	SelectAirport selectAiport = new SelectAirport();
-		selectAiport.selectAll(sqlCountry);
-		airports = selectAiport.getPlacemarks();
+    	SelectAirport selectAirport = new SelectAirport();
 		
     	selectCity.selectAll(sqlCountry);
 		
-    	searchMountainNeighbor(airports,selectCity,selectMountain);
+    	searchMountainNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 		
 		selectedMountains = selectMountain.getMapMountains();
 		
     	KmlFlightplanName = Utility.getInstance().getFlightPlanName("mountain_city_airport.kml");
 
-		saveKMLFile(manageXMLFile,airports,KmlFlightplanName);
-		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
+		saveKMLFile(new ArrayList<Airport>(selectAirport.getMapAirport().values()),KmlFlightplanName, dist);
+		Utility.getInstance().launchGoogleEarth(new File(KmlFlightplanName));
 		
 		//System.out.println(airports.size());
 
@@ -557,13 +612,14 @@ public class ReadData implements Info{
      * @param comboState
      * @param comboCity
      */
-	public void createKMLCity(ManageXMLFile manageXMLFile,Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity, Distance dist) {
+	public void createKMLCity(Result result, Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity, 
+			SelectMountain selectMountain,SelectVor selectVor, SelectNdb selectNdb, Distance dist) {
 		this.dataline = new Dataline();
 		this.dist = dist;
+		this.result = result;
 
 		String sql = "";	
 		String strQuote = "";
-    	SelectCity selectCity = new SelectCity();
 
 		strQuote = ((String) comboCity.getSelectedItem()).replace("'", "''");
 		
@@ -590,30 +646,39 @@ public class ReadData implements Info{
 			System.out.println("Oups sais pas quoi faire....");
 		}
 		
-		
+		this.selectCity = new SelectCity();
 		selectCity.selectAll(sql);
-		
 
-		SelectMountain selectMoutain = new SelectMountain();
-		selectMoutain.selectAll("");
-
-    	List<Placemark> airports = new ArrayList<>();
-    	SelectAirport selectAiport = new SelectAirport();
-    	sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
-		selectAiport.selectAll(sql);
-		airports = selectAiport.getPlacemarks();
+    	SelectAirport selectAirport = new SelectAirport();
+    	
+    	sql = sql.replace("admin_name", "state");
+    	
+	    selectAirport.select(sql);
 		
-		searchCityNeighbor(airports,selectCity,selectMoutain);
+		if (selectAirport.getMapAirport().size() == 0) {
+			sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
+		    selectAirport.select(sql);
+		}
+
+	     // List<Airport> airports = new ArrayList<Airport>(selectAirport.getMapAirport().values());
+
+		searchCityNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
+		searchCityVorNdb(selectVor,selectNdb);
 		
 		selectedCities = selectCity.getMapCities();
 		
-    	KmlFlightplanName = Utility.getInstance().getFlightPlanName("city_airport_mountain.kml");
-    	
-		saveKMLFile(manageXMLFile,airports,KmlFlightplanName);
+		if (selectedAirports.size() == 0) {
+			selectAirport.setMapAirport(new HashMap<String, Airport>());
+		} 
 		
-		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
+		result.setSelectedMapAirports(selectedMapAirports);
+	    result.setMapAirport(selectAirport.getMapAirport());
+		result.setSelectedCities(selectedCities);
+		result.setSelectedMountains(selectedMountains);
+		result.setSelectedNdbs(selectedNdbs);
+		result.setSelectedVors(selectedVors);
 		
-		//System.out.println(airports.size());
+		saveKMLFile(new ArrayList<Airport>(selectAirport.getMapAirport().values()),Utility.getInstance().getFlightPlanName(Info.kmlCityAirportMountainName),dist);
 
 	}
 	
@@ -625,11 +690,12 @@ public class ReadData implements Info{
 	 * @param comboState
 	 * @param comboCity
 	 */
-	public void createKMLAirport(ManageXMLFile manageXMLFile,Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity, Distance dist) {
+	public void createKMLAirport(Result result, Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity,
+			SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist) {
 		this.dataline = new Dataline();
 		String sql = "";	
 		String strQuote = "";
-		SelectCity selectCity = new SelectCity();
+		this.result = result;
 	
 		this.dist = dist;
 
@@ -658,52 +724,53 @@ public class ReadData implements Info{
 			System.out.println("Oups sais pas quoi faire....");
 		}
 		
-		
+		SelectCity selectCity = new SelectCity();
 		selectCity.selectAll(sql.replace("state", "admin_name"));
-   	
-    	SelectMountain selectMoutain = new SelectMountain();
-		selectMoutain.selectAll("");
-		
-		//selectedMountains = selectMoutain.getMapMountains();
 
-    	SelectAirport selectAiport = new SelectAirport();
+    	SelectAirport selectAirport = new SelectAirport();
 		
-    	List<Placemark> placemarks = new ArrayList<>();
-		selectAiport.selectAll(sql);
-		placemarks = selectAiport.getPlacemarks();
-		selectedAirports = selectAiport.getMapPlacemark();
-	
-		searchAiportNeighbor(placemarks,selectCity,selectMoutain);
-	
-    	KmlFlightplanName = Utility.getInstance().getFlightPlanName("airport_city_mountain.kml");
+		selectAirport.select(sql);
+		selectedAirports = selectAirport.getMapAirport();
 		
-		saveKMLFile(manageXMLFile,placemarks,KmlFlightplanName);
+		searchAiportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
+		searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor,selectNdb);
 		
-		manageXMLFile.launchGoogleEarth(new File(KmlFlightplanName));
+		result.setMapAirport(selectAirport.getMapAirport());
+		result.setSelectedCities(selectedCities);
+		result.setSelectedMountains(selectedMountains);
+		result.setSelectedNdbs(selectedNdbs);
+		result.setSelectedVors(selectedVors);
+		
+		saveKMLFile(new ArrayList<Airport>(selectAirport.getMapAirport().values()),Utility.getInstance().getFlightPlanName(Info.kmlAirportCityName),dist);
+		
+		//Utility.getInstance().launchGoogleEarth(new File(KmlFlightplanName));
 		
 		//System.out.println("airports found = "+ placemarks.size());
 
 	}
 
     
-    public  synchronized void saveKMLFile(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative){
+    public  synchronized void saveKMLFile(List<Airport> airports, String kmlRelative, Distance dist){
 		Writer writer = null;
 						
  		try {
- 			
-			
-		    writer = new BufferedWriter(new OutputStreamWriter(
+ 		    writer = new BufferedWriter(new OutputStreamWriter(
 		          new FileOutputStream(kmlRelative), "utf-8"));
 		    
-		    writer.write(manageXMLFile.createKMLHeader(
+		    writer.write(CreateKML.createHeader(
 		    		(selectedAirports != null ?selectedAirports.size():0)+
 		    		(selectedCities != null?selectedCities.size():0)+
-		    		(selectedMountains != null?selectedMountains.size():0)));
+		    		(selectedMountains != null?selectedMountains.size():0)+
+		    		(selectedVors != null?selectedVors.size():0)+
+		    		(selectedNdbs != null?selectedNdbs.size():0)
+		    		));
 		    
 		    
 		    writer.write("<Folder><name> Airports found ("+selectedAirports.size()+") </name>");
-		    for(Placemark placemark:selectedAirports.values()){
-		    	writer.write(placemark.buildXML("fsx_airport"));
+		    for(Airport airport:selectedAirports.values()){
+		    	//writer.write(placemark.buildXML("fsx_airport"));
+				writer.write(createKML.buildAirportPlaceMark(airport));
+
 		    }   
 	        writer.write("</Folder>");
 
@@ -719,6 +786,22 @@ public class ReadData implements Info{
 		    }
 		    writer.write("</Folder>"); 
 	    
+		    writer.write("<Folder><name> VOR found ("+selectedVors.size()+") </name>");
+		    
+		    
+		    for(Vor vor: selectedVors.values()){
+		    	writer.write(createKML.buildVorPlaceMark(vor));
+		    }
+	    	
+		    writer.write("</Folder>"); 
+		    writer.write("<Folder><name> NDB found ("+selectedNdbs.size()+") </name>");
+		    
+		    
+		    for(Ndb ndb: selectedNdbs.values()){
+		    	writer.write(createKML.buildNdbPlaceMark(ndb));
+		    }
+	    	
+		    writer.write("</Folder>"); 
 
 		    if (dist.isLine()){
 		    	for (String key: dataline.getMapData().keySet()) {
@@ -754,20 +837,22 @@ public class ReadData implements Info{
     }
     
 
-    public  void saveKMLFileICAO(ManageXMLFile manageXMLFile,List<Placemark> placemarks, String kmlRelative, Distance dist){
+    public  void saveKMLFileICAO(Map<String, Airport> mapAirports, String kmlRelative, Distance dist){
  		Writer writer = null;
  						
   		try {
  		    writer = new BufferedWriter(new OutputStreamWriter(
  		          new FileOutputStream(kmlRelative), "utf-8"));
  		    
- 		    writer.write(manageXMLFile.createKMLHeader(placemarks.size()));
+ 		    writer.write(CreateKML.createHeader((mapAirports!= null?mapAirports.size():1)));
  		    
  		    if (dist.isAirport()){
-				writer.write("<Folder><name> Airports found ("+placemarks.size()+") </name>");
+				writer.write("<Folder><name> Airports found ("+mapAirports.size()+") </name>");
 	
-	 		    for(Placemark placemark:placemarks){
-	 		    	writer.write(placemark.buildXML("fsx_airport"));
+	 		    for(Airport airport:mapAirports.values()){
+	 		    	//writer.write(placemark.buildXML("fsx_airport"));
+ 			    	writer.write(createKML.buildAirportPlaceMark(airport));
+
 	 		    }
 				 writer.write("</Folder>"); 
  		    }
@@ -850,7 +935,7 @@ public class ReadData implements Info{
     public ActionListener launchGoogleEarth() {
     	
     	if (kmlFlightPlanFile != null) {
-        	manageXMLFile.launchGoogleEarth(new File(kmlFlightPlanFile));
+        	Utility.getInstance().launchGoogleEarth(new File(kmlFlightPlanFile));
     	}
 		return null;
     }

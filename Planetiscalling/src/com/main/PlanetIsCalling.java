@@ -17,15 +17,13 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import com.cfg.common.Info;
-import com.cfg.file.ManageXMLFile;
-import com.cfg.model.Placemark;
+import com.model.Airport;
 import com.panels.PaneIcaolAiport;
+import com.panels.PanelFlightplan;
 import com.panels.PanelLandmarks;
 import com.panels.PanelManage;
-import com.panels.PanelFlightplan;
 import com.util.Utility;
 
-import net.SelectAirport;
 import net.SelectCity;
 import net.SelectMountain;
 import net.SelectNdb;
@@ -38,14 +36,13 @@ public class PlanetIsCalling extends JFrame implements Info {
 	
 	private	JPanel	panel6;
 
-	private ManageXMLFile manageXMLFile;
 	private SelectCity selectCity;
 	private SelectMountain selectMountain;
 	private SelectVor selectVor;
 	private SelectNdb selectNdb;
 
 	
-	private List<Placemark> airports ;
+	private List<Airport> airports ;
 	
 	/**
 	 * Launch the application.
@@ -63,7 +60,6 @@ public class PlanetIsCalling extends JFrame implements Info {
 	 * Create the frame.
 	 */
 	public PlanetIsCalling() {
-		manageXMLFile = new ManageXMLFile("");
 		selectCity = new SelectCity();
 		selectMountain = new SelectMountain();
 		selectVor = new SelectVor();
@@ -117,11 +113,11 @@ public class PlanetIsCalling extends JFrame implements Info {
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(manageXMLFile,selectCity,selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(manageXMLFile,selectVor, selectNdb, selectMountain, selectCity));
-		tabPane.addTab( "Airport", new PanelLandmarks().getAirportPanel(manageXMLFile,selectCity,selectMountain));
-		tabPane.addTab( "City", new PanelLandmarks().getCityPanel(manageXMLFile));
-		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainPanel(manageXMLFile));
+		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(selectCity,selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(selectVor, selectNdb, selectMountain, selectCity));
+		tabPane.addTab( "Airport", new PanelLandmarks().getAirportPanel(selectCity,selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "City", new PanelLandmarks().getCityPanel(selectCity, selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainPanel());
 		tabPane.addTab( "Setting", new PanelManage().getSettingPanel());
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);
