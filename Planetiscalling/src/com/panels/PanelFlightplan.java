@@ -1,6 +1,7 @@
 package com.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -111,7 +112,8 @@ public class PanelFlightplan {
 
 		result.setOutputPanel(outputPanel);
 		
-		buttonBt = new JButton("Select Flightplan");
+		buttonBt = Utility.getInstance().setButton("Select Flightplan");
+		
 		buttonBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -131,7 +133,7 @@ public class PanelFlightplan {
 		 		 panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
 
 		  		 panelResult.removeAll();	
-				 panelResult.add(result.getFlightPlanPanel());
+				 panelResult.add(result.getFlightPlanFormPanel());
 				 panelResult.validate();
 				 
 			  	 result.getWaypointListModel();
@@ -169,7 +171,7 @@ public class PanelFlightplan {
 				  
 				 resetBt.setEnabled(true);
 
-		    	 panelResult.add(result.getFlightPlanPanel());
+		    	 panelResult.add(result.getFlightPlanFormPanel());
 				 panelResult.validate();
 				 panelFlightplan.validate();
 	      }
@@ -190,10 +192,10 @@ public class PanelFlightplan {
 
 				readData.resetFlightPlanResult();
 				panelResult.removeAll();
-				result.getFlightPlanPanel().validate();
+				result.getFlightPlanFormPanel().validate();
 				result.getWaypointListModel();
 
-				panelResult.add(result.getFlightPlanPanel());
+				panelResult.add(result.getFlightPlanFormPanel());
 
 				resetBt.setEnabled(false);
 
@@ -214,7 +216,7 @@ public class PanelFlightplan {
 						(double) result.getAltitudeModel().getValue()));
 				panelResult.removeAll();
 
-				panelResult.add(result.getFlightPlanPanel());
+				panelResult.add(result.getFlightPlanFormPanel());
 				panelResult.validate();
 				panelFlightplan.add(panelResult);
 				panelFlightplan.validate();

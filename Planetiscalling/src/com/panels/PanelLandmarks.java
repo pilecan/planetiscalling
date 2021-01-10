@@ -204,7 +204,7 @@ public class PanelLandmarks implements Info {
 		         
 		         searchBt.setText("Update");
 		         panelResult.removeAll();	
-				 panelResult.add(result.getAiportPanel());
+				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
 				 
 				 googleBt.setEnabled(true);
@@ -232,11 +232,11 @@ public class PanelLandmarks implements Info {
 
 				readData.resetAirportResult();
 				panelResult.removeAll();
-				result.getAiportPanel();
+				result.getAiportFormPanel();
 				result.getAirportListModel();
 				
 				googleBt.setEnabled(false);
-				panelResult.add(result.getAiportPanel());
+				panelResult.add(result.getAiportFormPanel());
 
 				panelResult.validate();
 				panelLandMark.validate();
@@ -256,7 +256,7 @@ public class PanelLandmarks implements Info {
 		        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
 		         panelResult.removeAll();	
-				 panelResult.add(result.getAiportPanel());
+				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
 				 
 			  	result.getAirportListModel();
@@ -316,20 +316,22 @@ public class PanelLandmarks implements Info {
 	
 	private JPanel setLandmarkPanel(DistanceSpinner distanceSpin) {
 		
-		distanceSpin.getSpinnerPanel().setBounds(10, 10, 300, 190);
+		distanceSpin.getSpinnerPanel().setBounds(10, 10, 290, 190);
 		panelCombo.setBounds(10, 200, 240, 90);
 		
-	  	panelResult.setBounds(330, 10, 300, 190);	
-	  	outputPanel.setBounds(290, 250, 380, 140);	
+		int x = 330;
+		
+	  	panelResult.setBounds(x, 10, 300, 190);	
+	  	outputPanel.setBounds(x, 210, 300, 150);	
+	  	askMePanel.setBounds(x, 210, 300, 150);	
+
+	  	x += 40;
+		landMeBt.setBounds(x, 365, 94, 23);
+		askMeBt.setBounds(x+120, 365, 94, 23);
 
 		resetBt.setBounds(120, 300, 90, 23);
   	    searchBt.setBounds(10, 300, 90, 23);
 		googleBt.setBounds(10, 330, 200, 23);
-
-		landMeBt.setBounds(295, 395, 94, 23);
-		askMeBt.setBounds(395, 395, 94, 23);
-	  	askMePanel.setBounds(290, 250, 380, 140);	
-
 
 		
 		panelLandMark.add(panelCombo);
@@ -472,7 +474,7 @@ public class PanelLandmarks implements Info {
 		        		  );
 		             searchBt.setText("Update");
 			         panelResult.removeAll();	
-					 panelResult.add(result.getCityPanel());
+					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
 					 
 					 googleBt.setEnabled(true);
@@ -497,13 +499,13 @@ public class PanelLandmarks implements Info {
 
 				readData.resetCityResult(result);
 				panelResult.removeAll();
-				result.getCityPanel();
+				result.getCityFormPanel();
 				result.getCityListModel();
 				
 				googleBt.setEnabled(false);
 				resetBt.setEnabled(false);
 
-				panelResult.add(result.getCityPanel());
+				panelResult.add(result.getCityFormPanel());
 
 				panelResult.validate();
 				panelLandMark.validate();
@@ -527,7 +529,7 @@ public class PanelLandmarks implements Info {
 		        		  );
 		             searchBt.setText("Update");
 			         panelResult.removeAll();	
-					 panelResult.add(result.getCityPanel());
+					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
 					 
 					 googleBt.setEnabled(true);
@@ -596,15 +598,37 @@ public class PanelLandmarks implements Info {
 	  * @param manageXMLFile
 	  * @return
 	  */
-	public JPanel getMountainPanel() {
+	public JPanel getMountainPanel(final SelectCity selectCity ,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");
 		
+		selectAirport = new SelectAirport();
+		readData = new ReadData();
+
+		jEditorPane = Utility.getInstance().initjEditorPane();
+		
 		panelResult = new JPanel(new BorderLayout());
 		panelResult.setBorder(new TitledBorder("Searh Result"));
+
+
+    	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
-		labelHeader = new JLabel("Mountain to find their surrounding Airports and Cities:");
+ 		result = new Result();
+ 		
+		
+		outputPanel = new JPanel(new BorderLayout());
+		outputPanel.setBorder(new TitledBorder(""));
+		
+		askMePanel = new JPanel(new BorderLayout());
+		askMePanel.setBorder(new TitledBorder(""));
+		askMePanel.add(askmeScrollPan);
+		
+		result.setOutputPanel(outputPanel);
+	
+	
+		
 		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
 		panelLandMark.setLayout(null);
@@ -644,43 +668,137 @@ public class PanelLandmarks implements Info {
    	    panelCombo.add(comboCountry);
 		panelCombo.add(comboMountain);
 
-		JButton searchButton = new JButton("Create");
-		JButton clearButton = new JButton("Reset");
-			
-		labelHeader.setBounds(10, 5, 330, 23);
-		panelCombo.setBounds(10, 30, 240, 60);
-		
-		distanceSpin.getSpinnerPanel().setBounds(10, 95, 320, 100);
-		
-		clearButton.setBounds(120, 200, 90, 23);
-  	    searchButton.setBounds(10, 200, 90, 23);
-
-		searchButton.addActionListener(new ActionListener()
+		searchBt = new JButton("Search");
+		searchBt.addActionListener(new ActionListener()
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
-		          new ReadData().createKMLMountain(selectDB.getMapCities(), comboCountry,comboMountain,
-			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 0, (int)distanceSpin.getAirportSpinner().getValue(), distanceSpin.getCheckLinedist().isSelected()));
+		          new ReadData().createKMLMountain(result, selectDB.getMapCities(), comboCountry,comboMountain, selectVor,selectNdb,
+			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+			        				 0, 
+			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
+			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 distanceSpin.getCheckLinedist().isSelected(),
+			        				 0.0)
+			        		 
+		        		  
+		        		  );
+		             searchBt.setText("Update");
+			         panelResult.removeAll();	
+					 panelResult.add(result.getMountainFormPanel());
+					 panelResult.validate();
+					 
+					 googleBt.setEnabled(true);
+					 resetBt.setEnabled(true);
+					 
+				  	result.getMountainListModel();
+				  	panelLandMark.validate();
 		      }
 		    });
 
-		clearButton.addActionListener(new ActionListener()
+		resetBt = new JButton("Reset");
+		resetBt.setEnabled(false);
+		
+		resetBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	 // labelResult.setText("");
+				distanceSpin.getAirportSpinner().setValue(0);
+				distanceSpin.getVorNdbSpinner().setValue(0);
+				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getCheckLinedist().setSelected(false);
+
+				readData.resetCityResult(result);
+				panelResult.removeAll();
+				result.getCityFormPanel();
+				result.getCityListModel();
+				
+				googleBt.setEnabled(false);
+				resetBt.setEnabled(false);
+
+				panelResult.add(result.getCityFormPanel());
+
+				panelResult.validate();
+				panelLandMark.validate();
 	      }
 	    });
 		
-		panelLandMark.add(labelHeader);
-		panelLandMark.add(panelCombo);
- 		panelLandMark.add(distanceSpin.getSpinnerPanel());
-		panelLandMark.add(searchButton);
-		panelLandMark.add(clearButton);
-		panelLandMark.add(panelResult);
+		googleBt = new JButton("Land All on Google Earth");
+		googleBt.setEnabled(false);
+		googleBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+		          new ReadData().createKMLMountain(result, selectDB.getMapCities(), comboCountry,comboMountain, selectVor,selectNdb,
+			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+			        				 0, 
+			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
+			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 distanceSpin.getCheckLinedist().isSelected(),
+			        				 0.0)
+			        		 
+		        		  
+		        		  );
+		             searchBt.setText("Update");
+			         panelResult.removeAll();	
+					 panelResult.add(result.getMountainFormPanel());
+					 panelResult.validate();
+					 
+					 googleBt.setEnabled(true);
+					 resetBt.setEnabled(true);
+					 
+				  	result.getMountainListModel();
+				  	panelLandMark.validate();
+
+				Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlMountainCityAirportName)));
+
+			}
+		});
 		
-		return panelLandMark;
-	
+		
+		
+		landMeBt = new JButton("Land Me");
+		landMeBt.setEnabled(false);
+		landMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(result.getCurrentView());
+				System.out.println(result.getCurrentSelection());
+				
+				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
+				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
+				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
+				
+				if ("airport".equals(result.getCurrentView())){
+					selectAirport.select("where ident = '"+keyICAO+"'");
+					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
+				}  else if ("vor".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
+				 } else if ("ndb".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
+				 }else if ("city".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
+				 }else if ("mountain".equals(result.getCurrentView())){
+					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+				 }
+				
+				
+		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+
+
+			}
+		});		
+
+		askMeBt = new JButton("Ask Me");
+		askMeBt.setEnabled(false);
+		askMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
+			}
+		});	
+			
+		
+		result.setButtons(landMeBt, askMeBt);
+	    
+		
+		return setLandmarkPanel(distanceSpin);
 	}
 	
 

@@ -189,10 +189,10 @@ public class PaneIcaolAiport extends JFrame {
 
 			readData.resetIcaoResult();
 			resultPanel.removeAll();
-			result.getIcaoPanel().validate();
+			result.getIcaoFormPanel().validate();
 			result.getAirportListModel();
 
-			resultPanel.add(result.getIcaoPanel());
+			resultPanel.add(result.getIcaoFormPanel());
 			textArea.setText("");
 			
 			landItBt.setEnabled(false);
@@ -368,7 +368,7 @@ public class PaneIcaolAiport extends JFrame {
 	 */
 	private void setResultPanel() {
 		resultPanel.removeAll();
-		resultPanel.add(result.getIcaoPanel());
+		resultPanel.add(result.getIcaoFormPanel());
 		resultPanel.setVisible(true);
 		resultPanel.validate();
 

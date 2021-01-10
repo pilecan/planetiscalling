@@ -111,10 +111,12 @@ public class DistanceSpinner implements Info {
 	
     private JSpinner makeSpinner(String text1, String text2, JSpinner spin, SpinnerModel model, JPanel panel, FormUtility formUtility) {
         spin=new JSpinner(model);
-        spin.setPreferredSize( new Dimension (80,25) );
+        spin.setPreferredSize( new Dimension (60,25) );
         spin.setToolTipText(text1);
-        formUtility.addLabel(text2,spinnerPanel, Color.BLACK,fontText);
+        formUtility.addLabel(text2+"                                       ",spinnerPanel);
         panel = new JPanel();
+        panel.setPreferredSize( new Dimension (300,30) );
+
         panel.add(spin, BorderLayout.WEST);
         formUtility.addLastField(panel, spinnerPanel);
    	
@@ -127,7 +129,7 @@ public class DistanceSpinner implements Info {
     	check.setSelected(isChecked);
     	check.setToolTipText(text1);
 
-        formUtility.addLabel(text2,spinnerPanel, Color.BLACK,fontText);
+        formUtility.addLabel(text2,spinnerPanel);
         panel = new JPanel();
         panel.add(check, BorderLayout.WEST);
         formUtility.addLastField(panel, spinnerPanel);

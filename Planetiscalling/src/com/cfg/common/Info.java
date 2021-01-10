@@ -6,10 +6,12 @@ import java.awt.Font;
 import javax.swing.plaf.ColorUIResource;
 
 public interface Info {
-	Color[] colorBackground = {new ColorUIResource(183,132,85),new ColorUIResource(222,231,239),new ColorUIResource(38,30,18),new ColorUIResource(229,228,200),new ColorUIResource(22,105,23)};
-	Color[] colorForground = {new ColorUIResource(255,253,195),new Color(11,40,117),Color.lightGray,new ColorUIResource(22,105,23),new ColorUIResource(229,228,200)};
+	Color[] colorBackground = {new ColorUIResource(183,132,85),new ColorUIResource(12,133,222),new ColorUIResource(38,30,18),new ColorUIResource(229,228,200),new ColorUIResource(26,108,26)};
+	Color[] colorForground = {new ColorUIResource(255,253,195),new ColorUIResource(222,231,239),Color.lightGray,new ColorUIResource(22,105,23),new Color(255,196,52)};
+	Color[] colorForgroundBtn = {Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY};
 	Color[] colorBack = {new Color(165,181,214),new Color(165,181,214),new Color(165,181,214)};
-	Color[] colorBackList = {new Color(222,231,239),new Color(222,231,239),new Color(222,231,239)};
+	Color[] colorBackList = {new Color(222,231,239),new Color(222,231,239),new Color(218,218,218),new Color(146,63,22),new Color(253,248,138)};
+	Color[] colorFrontList = {new ColorUIResource(255,253,195),new ColorUIResource(222,231,239),Color.lightGray,new ColorUIResource(22,105,23),new Color(255,196,52)};
 	Color[] colorBackMenu = {new Color(222,231,239),new Color(222,231,239),new Color(222,231,239)};
 	Color[] colorBackArea = {new Color(247,247,255),new Color(247,247,255),new Color(247,247,255)};
 	Color[] colorBlueText = {new Color(11,40,117),new Color(11,40,117),new Color(11,40,117)};
@@ -32,6 +34,7 @@ public interface Info {
 	String kmlAirportCityMountainName = "airport_city_mountain.kml";
 	String kmlAirportCityName = "airport_city.kml";
 	String kmlCityAirportMountainName = "city_airport_mountain.kml";
+	String kmlMountainCityAirportName = "mountain_city_airport.kml";
 
     String imageLogo = "/images/hello_here.jpg";
     String datadir  = "/data/";

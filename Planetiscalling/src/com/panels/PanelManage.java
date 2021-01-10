@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -32,9 +35,11 @@ public class PanelManage implements Info {
 	
 	private JComboBox<String> comboFPDir;
 	private JComboBox<String> comboKMLDir;
+	private JComboBox<String> comboColor;
 	
 	private JLabel labelDefaultFP;
 	private JLabel labelDefaultKML;
+	private JLabel labelDefaultColor;
 	private JLabel labelGoogle;
 
 	private boolean isFromAdd = false;
@@ -59,9 +64,11 @@ public class PanelManage implements Info {
 		labelGoogle  = new JLabel();
 		labelDefaultFP  = new JLabel();
 		labelDefaultKML = new JLabel();
+		labelDefaultColor = new JLabel();
 		
 		comboFPDir = new JComboBox<>();
 		comboKMLDir = new JComboBox<>();
+		comboColor = new JComboBox<>();
 	
 		readPrefs() ;
 
@@ -71,7 +78,7 @@ public class PanelManage implements Info {
   	    saveButton.setBounds(10, 245, 90, 23);
 
 		
-	    JButton buttonFPPerfs = new JButton("Add Flightplan");
+	    JButton buttonFPPerfs = new JButton("Add Flightplan Dir");
 		buttonFPPerfs.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -146,7 +153,33 @@ public class PanelManage implements Info {
 	      }
 	    });
 
-		
+		comboColor.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				try {
+					labelDefaultColor.setText("GUI Colors");
+					labelDefaultColor.setToolTipText(e.getItem().toString());
+					Utility.getInstance().getPrefs().put("numcolor", e.getItem());
+					//Util.pause(3000);
+
+			    	Utility.getInstance().savePrefProperties();
+			    	
+			    	
+			    	
+/*			    	JOptionPane.showMessageDialog(null, "You must restart the application to set the new color.", 
+							"PlanetIsCalling",
+							JOptionPane.INFORMATION_MESSAGE);
+*/				 //   LaunchPIC();
+			  		//System.exit(0);
+				} catch (Exception e1) {
+				//	System.err.println(e1);
+					// TODO Auto-generated catch block
+				}
+
+			}
+
+		});
+	
 		saveButton.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -168,6 +201,10 @@ public class PanelManage implements Info {
 		labelGoogle.setBounds(10, 130, 300, 23);
 		buttonGoogle.setBounds(10, 150, 120, 23);
 
+		labelDefaultColor.setBounds(10, 180, 300, 23);
+		comboColor.setBounds(10, 200, 120, 23);
+
+
 		panelResult.add(labelHeader);
 		panelResult.add(labelDefaultFP);
 		panelResult.add(labelDefaultKML);
@@ -179,6 +216,8 @@ public class PanelManage implements Info {
 		//panelResult.add(saveButton);
 		//panelResult.add(resetButton);
 		panelResult.add(buttonGoogle);
+		panelResult.add(labelDefaultColor);
+		panelResult.add(comboColor);
 		
 		return panelResult;
 	}
@@ -280,6 +319,7 @@ public class PanelManage implements Info {
 		labelDefaultKML.setToolTipText(Utility.getInstance().getPrefs().getProperty("kmlflightplandir"));
 		labelGoogle.setToolTipText(Utility.getInstance().getPrefs().getProperty("googleearth"));
 		labelGoogle.setText(Utility.getInstance().getPrefs().getProperty("googleearth"));
+		labelDefaultColor.setText(Utility.getInstance().getPrefs().getProperty("numcolor"));
 
 		Enumeration<?> e = Utility.getInstance().getPrefs().propertyNames();
 
@@ -294,13 +334,32 @@ public class PanelManage implements Info {
 	    	  hashFP.put(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty(key)), 
 	    			  new Preference(key,Utility.getInstance().getPrefs().getProperty(key)));
 	      }	
-	   }
+	   
 	      comboFPDir = new JComboBox<>(hashFP.keySet().toArray(new String[hashFP.size()]));
 	      comboFPDir.setSelectedItem(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty("flightplandir")));
 	      comboKMLDir = new JComboBox<>(hashKML.keySet().toArray(new String[hashKML.size()]));
 	      comboKMLDir.setSelectedItem(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty("kmlflightplandir")));
+	 }
+      String[] colors = {"0","1","2","3","4"};
+      comboColor = new JComboBox<String>(colors);
+      
+      comboColor.setSelectedItem(Utility.getInstance().getPrefs().getProperty("numcolor"));
+      
 
 	
+	}
+	
+	
+	private synchronized void LaunchPIC() {
+		Util.pause(3000);
+		Runtime rt = Runtime.getRuntime();
+		try {
+		  	Process ps = rt.exec("PlanetIsCalling.exe");
+		  
+		} catch (IOException e) {
+			System.err.println(e);
+		}
+		
 	}
 
 }

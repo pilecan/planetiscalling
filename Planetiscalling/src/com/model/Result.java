@@ -126,7 +126,7 @@ public class Result implements Info {
 		this.delMeBt = delMeBt;
 	}
 
-	public JPanel getFlightPlanPanel() {
+	public JPanel getFlightPlanFormPanel() {
 		panelAltitude = new JPanel();
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
@@ -135,7 +135,7 @@ public class Result implements Info {
 
 		formUtility = new FormUtility();
 
-		formUtility.addLabel("Title:", resultPanel, colorForground[0], fontText);
+		formUtility.addLabel("Title:", resultPanel);
 		label = new JLabel(this.flightplan.getTitle());
 		label.setToolTipText(this.flightplan.getDepartureName() + "/" + this.flightplan.getDestinationName());
 		panel = new JPanel();
@@ -143,7 +143,7 @@ public class Result implements Info {
 		panel.add(label, BorderLayout.WEST);
 		formUtility.addLastField(panel, resultPanel);
 
-		formUtility.addLabel("Distance:", resultPanel, colorForground[0], fontText);
+		formUtility.addLabel("Distance:", resultPanel);
 		label = new JLabel(this.distance + " nm");
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -157,7 +157,7 @@ public class Result implements Info {
 		altitudeSpinner = new JSpinner(altitudeModel);
 		altitudeSpinner.setPreferredSize(new Dimension(80, 25));
 		altitudeSpinner.setToolTipText("Change altitude of flightplan");
-		formUtility.addLabel("Altitude:", resultPanel, colorForground[0], fontText);
+		formUtility.addLabel("Altitude:", resultPanel);
 		JPanel panelSpin = new JPanel();
 		panelSpin.setLayout(new BorderLayout());
 		panelSpin.add(altitudeSpinner, BorderLayout.WEST);
@@ -234,7 +234,7 @@ public class Result implements Info {
 
 	private void setformLine(JPanel resultPanel, String strLabel, int number, JRadioButton radioBtn) {
 
-		formUtility.addLabel(strLabel + "                         ", resultPanel, colorForground[0], fontText);
+		formUtility.addLabel(strLabel + "                         ", resultPanel);
 		label = new JLabel(String.format("%03d", number) + "                 ");
 
 		panel = new JPanel();
@@ -245,7 +245,7 @@ public class Result implements Info {
 
 	}
 
-	public JPanel getIcaoPanel() {
+	public JPanel getIcaoFormPanel() {
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
 
@@ -282,7 +282,7 @@ public class Result implements Info {
 		return resultPanel;
 
 	}
-	public JPanel getAiportPanel() {
+	public JPanel getAiportFormPanel() {
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
 
@@ -319,7 +319,7 @@ public class Result implements Info {
 		return resultPanel;
 
 	}
-	public JPanel getCityPanel() {
+	public JPanel getCityFormPanel() {
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
 
@@ -351,6 +351,44 @@ public class Result implements Info {
 		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+
+		resultPanel.validate();
+		return resultPanel;
+
+	}
+
+	public JPanel getMountainFormPanel() {
+		resultPanel = new JPanel();
+		resultPanel.setLayout(new GridBagLayout());
+
+		formUtility = new FormUtility();
+
+		ButtonGroup bgroup = new ButtonGroup();
+
+		mountainBtn = new JRadioButton("", true);
+		cityBtn = new JRadioButton("");
+		airportBtn = new JRadioButton("");
+		vorBtn = new JRadioButton();
+		ndbBtn = new JRadioButton("");
+
+		bgroup.add(airportBtn);
+		bgroup.add(vorBtn);
+		bgroup.add(ndbBtn);
+		bgroup.add(mountainBtn);
+		bgroup.add(cityBtn);
+
+		RadioListener myListener = new RadioListener();
+		vorBtn.addActionListener(myListener);
+		ndbBtn.addActionListener(myListener);
+		airportBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
+
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+      	setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+	    setformLine(resultPanel, "Airports:", this.selectedMapAirports.size(), airportBtn);
+		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
+		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 
 		resultPanel.validate();
 		return resultPanel;

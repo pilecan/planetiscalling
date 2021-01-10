@@ -1,5 +1,6 @@
 package com.util;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.event.HyperlinkEvent;
@@ -46,12 +48,15 @@ public class Utility implements Info{
     private List <String>listDirectories = null;
     
 	private SelectAirport selectAiport;
+
+
 	
 	private StringBuilder builder;
 
 	private String googleEarthExec = "C:/Program Files/Google/Google Earth Pro/client/googleearth.exe";
 
 	public static Utility getInstance(){
+
 		return instance;
 	}
 	
@@ -82,7 +87,7 @@ public class Utility implements Info{
 	   public void savePrefProperties(){
 		   Writer out = null;
 	   		Path currentRelativePath = Paths.get("");
-	   		String file = currentRelativePath.toAbsolutePath().toString()+"\\data\\preferences.properties";
+	   		String file = currentRelativePath.toAbsolutePath().toString()+"/data/preferences.properties";
 		    File f = new File(file);
 	   		
 	 		try {
@@ -214,8 +219,8 @@ public class Utility implements Info{
 		}
 		return keys;
 	}
+	public String getFlightPlanName(String flightplanName) {
 	
-    public String getFlightPlanName(String flightplanName) {
     	if (getPrefs() == null) {
         	readPrefProperties();
     	}
@@ -447,6 +452,23 @@ public class Utility implements Info{
 		
 	}
 	
+   public JButton setButton(String text) {
+	   if (getPrefs().getProperty("numcolor") == null) {
+		   readPrefProperties();
+	   }
+	   
+		int numColor = Integer.parseInt(getPrefs().getProperty("numcolor"));
 
+	   
+		JButton buttonBt = new JButton(text);
+		
+		//buttonBt.setBackground(colorBackground[numColor]);
+		//buttonBt.setForeground(colorForground[numColor]);	    
+//
+	//	buttonBt.setBackground(Color.BLACK);
+	///	buttonBt.setForeground(Color.WHITE);	    
+
+		return buttonBt;
+   }
 
 }
