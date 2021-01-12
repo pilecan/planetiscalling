@@ -1,21 +1,25 @@
 package com.panels;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.cfg.common.DistanceSpinner;
 import com.model.Distance;
 import com.model.Result;
+import com.model.TimeZones;
 import com.util.CreateKML;
 import com.util.ReadData;
 import com.util.Utility;
@@ -49,13 +53,14 @@ public class PanelFlightplan {
 	
 	
 	private String flightPlanFile;
-	private JButton buttonBt;
+	private JButton flightPlanBt;
 	private JButton refreshBt;
 	private JButton resetBt;
 	private JButton landMeBt;
 	private JButton askMeBt;
 	
 	private SelectAirport selectAirport;
+	private TimeZones timeZones;
 
 	
 	private JEditorPane jEditorPane;
@@ -66,12 +71,13 @@ public class PanelFlightplan {
 		super();
 	}
 
-	public JPanel getPanel(SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
+	public JPanel getPanel(TimeZones timeZones, SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor = selectVor;
 		this.selectNdb = selectNdb;
 		this.flightPlanFile = "";
+		this.timeZones = timeZones;
 		this.selectAirport = new SelectAirport();
 
 		return createPanel();
@@ -82,13 +88,14 @@ public class PanelFlightplan {
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
 		
-		
 		jEditorPane = Utility.getInstance().initjEditorPane();
+
+		
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
-		result = new Result();
+        result = new Result();
 		
 		
 		panelFlightplan = new JPanel();
@@ -102,19 +109,23 @@ public class PanelFlightplan {
 		
 		outputPanel = new JPanel(new BorderLayout());
 		outputPanel.setBorder(new TitledBorder(""));
+	     Border border = outputPanel.getBorder();
+		 Border margin = new EmptyBorder(5,5,5,5);
+		 outputPanel.setBorder(new CompoundBorder(border, margin));
+
+		
+//		outputPanel = Utility.getInstance().setBorderPanel(outputPanel);
 		
 		askMePanel = new JPanel(new BorderLayout());
 		askMePanel.setBorder(new TitledBorder(""));
-		
 			
 		askMePanel.add(askmeScrollPan);
 
-
 		result.setOutputPanel(outputPanel);
 		
-		buttonBt = Utility.getInstance().setButton("Select Flightplan");
+		flightPlanBt = Utility.getInstance().setButton("Select Flightplan");
 		
-		buttonBt.addActionListener(new ActionListener()
+		flightPlanBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
@@ -272,8 +283,6 @@ public class PanelFlightplan {
 		
 		result.setButtons(landMeBt, askMeBt);
 
-		
-
 		buttonLeftPanel.add(refreshBt);
 		buttonLeftPanel.add(resetBt);
 		buttonLeftPanel.add(googleBt);
@@ -281,24 +290,30 @@ public class PanelFlightplan {
 		buttonRightPanel.add(askMeBt);
 		buttonRightPanel.add(landMeBt);
 		
-		buttonBt.setBounds(10, 20, 200, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 50, 260, 220);
 
-		buttonLeftPanel.setBounds(40, 280, 200, 100);
-		refreshBt.setBounds(10, 270, 200, 23);
+		flightPlanBt.setBounds(50, 20, 200, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 60,  310, 190);
+
+		buttonLeftPanel.setBounds(50, 260, 200, 100);
+		
+/*		refreshBt.setBounds(10, 270, 200, 23);
 		resetBt.setBounds(10, 300, 200, 23);
 		googleBt.setBounds(10, 330, 200, 23);
-
-		landMeBt.setBounds(295, 395, 94, 23);
-		askMeBt.setBounds(395, 395, 94, 23);
+*/		
 		buttonRightPanel.setBounds(290, 380, 300, 23);
 
-	  	panelResult.setBounds(290, 10, 380, 240);	
-	  	outputPanel.setBounds(290, 250, 380, 140);	
-	  	askMePanel.setBounds(290, 250, 380, 140);	
+		int x = 330;
+		
+	  	panelResult.setBounds(x, 10, 340, 240);	
+	  	outputPanel.setBounds(x, 260, 340, 130);	
+	  	askMePanel.setBounds(x, 260, 340, 130);	
+
+	  	x += 40;
+		landMeBt.setBounds(x, 400, 94, 23);
+		askMeBt.setBounds(x+120, 400, 94, 23);
 	  	
 
-     	panelFlightplan.add(buttonBt);
+     	panelFlightplan.add(flightPlanBt);
 		panelFlightplan.add(panelResult);
 		panelFlightplan.add(outputPanel);
 		panelFlightplan.add(askMePanel);

@@ -1,6 +1,8 @@
 package com.util;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,8 +32,19 @@ import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.plaf.metal.DefaultMetalTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
@@ -152,9 +165,6 @@ public class Utility implements Info{
 
    }
 	public void setIcon(JFrame frame, String image) {
-		// jframe.setIconImage(new
-		// ImageIcon("C:/projects/fsx/ReadCfgFile/job/FSLauncpad/src/images/bnc-logo.png").getImage()
-		// );
 		try {
 			java.net.URL u = PlanetIsCalling.class.getResource(image);
 			// System.out.println(u);
@@ -416,6 +426,10 @@ public class Utility implements Info{
 	public JEditorPane initjEditorPane() {
 		
 		JEditorPane jEditorPane = new JEditorPane();
+	     Border border = jEditorPane.getBorder();
+		 Border margin = new EmptyBorder(5,5,5,5);
+		 jEditorPane.setBorder(new CompoundBorder(border, margin));
+		 
 		jEditorPane.setEditable(false);
 		HTMLEditorKit kit = new HTMLEditorKit();
 		jEditorPane.setEditorKit(kit);
@@ -471,4 +485,137 @@ public class Utility implements Info{
 		return buttonBt;
    }
 
+   
+	  public void initLookAndFeel(PlanetIsCalling jFrame) {
+	      String lookAndFeel = "";
+	      String LOOKANDFEEL = "Metal";
+	      String THEME = "Ocean";
+	      
+	      if (LOOKANDFEEL != null) {
+	          if (LOOKANDFEEL.equals("Metal")) {
+	        	  
+	              lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+	            //  an alternative way to set the Metal L&F is to replace the 
+	            // previous line with:
+	            lookAndFeel = "javax.swing.plaf.metal.MetalLookAndFeel";
+	               
+	          }
+	           
+	          else if (LOOKANDFEEL.equals("System")) {
+	              lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+	          } 
+	           
+	          else if (LOOKANDFEEL.equals("Motif")) {
+	              lookAndFeel = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+	          } 
+	           
+	          else if (LOOKANDFEEL.equals("GTK")) { 
+	              lookAndFeel = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+	          } 
+	           
+	          else {
+	              System.err.println("Unexpected value of LOOKANDFEEL specified: "
+	                                 + LOOKANDFEEL);
+	              lookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+	          }
+
+	          try {
+	              UIManager.setLookAndFeel(lookAndFeel);
+	               
+	              // If L&F = "Metal", set the theme
+	               
+	              if (LOOKANDFEEL.equals("Metal")) {
+	                if (THEME.equals("DefaultMetal"))
+	                   MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+	                else if (THEME.equals(""))
+	                   MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+	               
+	                    
+	                UIManager.setLookAndFeel(new MetalLookAndFeel()); 
+	              }   
+	                   
+	          } 
+	          catch (ClassNotFoundException e) {
+	              System.err.println("Couldn't find class for specified look and feel:"
+	                                 + lookAndFeel);
+	              System.err.println("Did you include the L&F library in the class path?");
+	              System.err.println("Using the default look and feel.");
+	          } 
+	           
+	          catch (UnsupportedLookAndFeelException e) {
+	              System.err.println("Can't use the specified look and feel ("
+	                                 + lookAndFeel
+	                                 + ") on this platform.");
+	              System.err.println("Using the default look and feel.");
+	          } 
+	           
+	          catch (Exception e) {
+	              System.err.println("Couldn't get specified look and feel ("
+	                                 + lookAndFeel
+	                                 + "), for some reason.");
+	              System.err.println("Using the default look and feel.");
+	              e.printStackTrace();
+	          }          
+	      }
+			Utility.getInstance().readPrefProperties();
+			int numColor = Integer.parseInt(Utility.getInstance().getPrefs().getProperty("numcolor"));
+
+			
+			UIManager.put("OptionPane.background", colorBackground[numColor]);
+			UIManager.put("OptionPane.foreground", colorForground[numColor]);
+			
+			UIManager.put("TextArea.font", new Font("Serif",Font.BOLD,16));
+
+			UIManager.put("Panel.background", colorBackground[numColor]);
+		    UIManager.put("Panel.foreground", colorForground[numColor]);
+		    UIManager.put("Panel.border", colorBackList[numColor]);
+		    
+			UIManager.put("ComboBox.background", colorBackground[numColor]);
+		    UIManager.put("ComboBox.foreground", colorForground[numColor]);
+	
+		    UIManager.put("RadioButton.background", colorBackground[numColor]);
+
+			UIManager.put("CheckBox.border", colorBackground[numColor]);
+			UIManager.put("CheckBox.border", colorBackground[numColor]);
+			UIManager.put("CheckBox.foreground", colorBackground[numColor]);
+
+			
+		    UIManager.put("TitledBorder.titleColor", colorForground[numColor]);
+		    
+		    UIManager.put("TabbedPane.background", colorForground[numColor]);
+		    UIManager.put("TabbedPane.foreground", colorBackground[numColor]);
+		  
+		    UIManager.put("EditorPane.background", colorBackList[numColor]);
+		    UIManager.put("EditorPane.foreground", colorBackList[numColor]);
+		    UIManager.put("EditorPane. margin", colorBackList[numColor]);
+		    UIManager.put("EditorPane.border", colorBackList[numColor]);
+
+		    UIManager.put("Button.foreground", colorForgroundBtn[numColor]);
+		    UIManager.put("Button.background", colorBackground[numColor]);
+
+			UIManager.put("List.background", colorBackList[numColor]);
+		    UIManager.put("List.foreground", colorBlueText[0]);
+
+			UIManager.put("Label.background", colorBackground[numColor]);
+		    UIManager.put("Label.foreground", colorForground[numColor]);
+		    UIManager.put("CheckBox.select", Color.red);
+		    
+		    SwingUtilities.updateComponentTreeUI(jFrame);
+
+	
+	  }      
+	  
+	  public JPanel setBorderPanel(JPanel panel) {
+			panel = new JPanel(new GridBagLayout());
+			panel.setBorder(new TitledBorder(""));
+
+		     Border border = panel.getBorder();
+			 Border margin = new EmptyBorder(1,1,1,1);
+			 panel.setBorder(new CompoundBorder(border, margin));
+			 
+			 return panel;
+			
+		}
+
+   
 }

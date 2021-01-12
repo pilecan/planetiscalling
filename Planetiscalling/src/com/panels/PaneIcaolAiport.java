@@ -17,7 +17,12 @@ import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
@@ -48,7 +53,7 @@ public class PaneIcaolAiport extends JFrame {
 	private Result result;
 	private JPanel outputPanel;
 	private JPanel icaoPanel;
-	private JPanel resultPanel;
+	private JPanel panelResult;
 	private ReadData readData;
 
 	private JScrollPane jScrollPane1;
@@ -133,8 +138,8 @@ public class PaneIcaolAiport extends JFrame {
 	outputPanel.setBorder(new TitledBorder(""));
 	result.setOutputPanel(outputPanel);
 
-	resultPanel = new JPanel(new BorderLayout());
-	resultPanel.setBorder(new TitledBorder("Search Result"));
+	panelResult = new JPanel(new BorderLayout());
+	panelResult.setBorder(new TitledBorder("Search Result"));
 	
 	googleBt = new JButton("Land All to Google Earth");
 	googleBt.setEnabled(false);
@@ -160,20 +165,48 @@ public class PaneIcaolAiport extends JFrame {
 	
 
 	final JTextArea textArea = new JTextArea();
-	textArea.setText("[oc-australia-airport-ybdg-Bendigo Airport, oc-australia-airport-ydpo-devponport, oc-australia-airport-ykbn-kooralbyn, oc-australia-airport-ymhb-hobart, oc-australia-airport-ysbk-tollrescue, oc-australia-bridge-anzac, oc-australia-city-hammerheadh-melcbdone, oc-australia-city-hammerheadh-melcbdthree, oc-australia-city-hammerheadh-melcbdtwo, oc-australia-city-NZA-Discord_Brisbane-CBD, oc-australia-city-NZA-Discord_Brisbane-Gabba, oc-australia-city-NZA-Discord_Brisbane-Gateway, oc-australia-city-NZA-Discord_Brisbane-StoreyBridge, oc-australia-city-NZA-Discord_Brisbane-Suncorp, oc-australia-city-perth, oc-australia-city-port-melbourne, oc-australia-city-sydney, oc-australia-city-sydneyharbour, oc-french-polynisia-aerial-ntam-rimatara, oc-french-polynisia-aerial-ntav-raivavae, oc-french-polynisia-aerial-ntte-tetiaroa, oc-french-polynisia-aerial-nttp-maupiti, oc-french-polynisia-airport-ntaa-papeete, oc-french-polynisia-airport-ntav-raivavae, oc-french-polynisia-airport-nttb-borabora, oc-french-polynisia-airport-ntte-tetiaroa, oc-french-polynisia-airport-nttp-maupiti, oc-new-zealand-aiprort-ARNZ-NZAA-Auckland, oc-new-zealand-aiprort-nzou-NZA-Discord_NZOU_Oamaru-Scenery-Pack-1.0, oc-new-zealand-aiprort-nzwn-ARNZ-Wellington, oc-new-zealand-airport-nzmf-milford, oc-new-zealand-airport-nznd-ARNZ-NZDN-Dunedin, oc-new-zealand-airport-nznr-napier-NZ_AUS_MFS2020_Discord, oc-new-zealand-airport-nztl-lake-tekapo, oc-new-zealand-airport-nzws-Westport-Scenery-Pack-1.0, oc-new-zealand-calvinpg-nzsupremecourt, oc-new-zealand-calvinpg-vicuni-cbd, oc-new-zealand-calvinpg-vicuni-lawschool, oc-new-zealand-calvinpg-wellingtonrailwaystation, oc-new-zealand-calvinpg-wellingtonstadium, oc-new-zealand-landmark-wellingtonparliament, oc-new-zealand-mountain-mtcook, oc-new-zealand-NZA-Discord_Auckland-AucklandHarbourBridge, oc-new-zealand-NZA-Discord_Auckland-AucklandMuseum, oc-new-zealand-NZA-Discord_Auckland-CBD01, oc-new-zealand-NZA-Discord_Auckland-CBD02, oc-new-zealand-NZA-Discord_Auckland-CBD03, oc-new-zealand-NZA-Discord_Auckland-CBD04, oc-new-zealand-NZA-Discord_Auckland-CBD05, oc-new-zealand-NZA-Discord_Auckland-CBD06, oc-new-zealand-NZA-Discord_Auckland-CBD07, oc-new-zealand-NZA-Discord_Auckland-CBD08, oc-new-zealand-NZA-Discord_Auckland-CBD09, oc-new-zealand-NZA-Discord_Auckland-CBD10, oc-new-zealand-NZA-Discord_Auckland-CBD11, oc-new-zealand-NZA-Discord_Auckland-CBD12, oc-new-zealand-NZA-Discord_Auckland-CBD13, oc-new-zealand-NZA-Discord_Auckland-CBD14, oc-new-zealand-NZA-Discord_Auckland-CBD15, oc-new-zealand-NZA-Discord_Auckland-CBD16, oc-new-zealand-NZA-Discord_Auckland-CBD17, oc-new-zealand-NZA-Discord_Auckland-CBD18, oc-new-zealand-NZA-Discord_Auckland-CBD19, oc-new-zealand-NZA-Discord_Auckland-CBD20, oc-new-zealand-NZA-Discord_Auckland-CBD21, oc-new-zealand-NZA-Discord_Auckland-CBD22, oc-new-zealand-NZA-Discord_Auckland-CBD23, oc-new-zealand-NZA-Discord_Auckland-CBD24, oc-new-zealand-NZA-Discord_Auckland-CBD25, oc-new-zealand-NZA-Discord_Auckland-CBD26, oc-new-zealand-NZA-Discord_Auckland-CBD27, oc-new-zealand-NZA-Discord_Auckland-CBD28, oc-new-zealand-NZA-Discord_Auckland-CBD29, oc-new-zealand-NZA-Discord_Auckland-CBDSkyTower, oc-new-zealand-NZA-Discord_Auckland-EdenPark, oc-new-zealand-NZA-Discord_Auckland-Port01, oc-new-zealand-NZA-Discord_Auckland-Port02, oc-new-zealand-NZA-Discord_Auckland-SparkArena, oc-papua-landmarks-bush-trip]");
+	//textArea.setFont(textArea.getFont().deriveFont(14f));
+	textArea.setText("");
 	setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	textArea.setColumns(100);
 	textArea.setLineWrap(true);
 	textArea.setRows(1000);
 	textArea.setWrapStyleWord(true);
 	textArea.setPreferredSize(new Dimension(300,500));
+	
+	textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+        	System.out.println("removeUpdate");
+        	resetBt.setEnabled(!"".equals(textArea.getText()));
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+        	System.out.println("insertUpdate");
+        	resetBt.setEnabled(!"".equals(textArea.getText()));
+
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent arg0) {
+        	System.out.println("changedUpdate");
+        	resetBt.setEnabled(!"".equals(textArea.getText()));
+
+        }
+    });
 
 	JPanel inputIcaoPanel = new JPanel(new BorderLayout());
-	inputIcaoPanel.setBorder(new TitledBorder("Type or Paste you ICAO Codes here"));
+	inputIcaoPanel.setBorder(new TitledBorder("Type or Paste you ICAO Code(s) here"));
 	inputIcaoPanel.add(new JScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
 			ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 	inputIcaoPanel.setVisible(true);
 	inputIcaoPanel.setPreferredSize(new Dimension(300,150));
+    Border border = inputIcaoPanel.getBorder();
+	Border margin = new EmptyBorder(3,3,3,3);
+	inputIcaoPanel.setBorder(new CompoundBorder(border, margin));
+
 	
 	resetBt = new JButton("Reset");
 	resetBt.setEnabled(false);
@@ -187,12 +220,15 @@ public class PaneIcaolAiport extends JFrame {
 			distanceSpin.getMountainSpinner().setValue(0);
 			distanceSpin.getCheckLinedist().setSelected(false);
 
-			readData.resetIcaoResult();
-			resultPanel.removeAll();
-			result.getIcaoFormPanel().validate();
-			result.getAirportListModel();
+			if (readData != null) {
+				readData.resetIcaoResult();
+				panelResult.removeAll();
+				result.getIcaoFormPanel().validate();
+				result.getAirportListModel();
 
-			resultPanel.add(result.getIcaoFormPanel());
+				panelResult.add(result.getIcaoFormPanel());
+				
+			}
 			textArea.setText("");
 			
 			landItBt.setEnabled(false);
@@ -200,7 +236,7 @@ public class PaneIcaolAiport extends JFrame {
 			resetBt.setEnabled(false);
 
 
-			resultPanel.validate();
+			panelResult.validate();
 			icaoPanel.validate();
    	  
 
@@ -333,24 +369,29 @@ public class PaneIcaolAiport extends JFrame {
     result.setButtons(delMeBt,landMeBt, askMeBt, landItBt);
 
 
-	inputIcaoPanel.setBounds(10, 8, 270, 120);
-	resultPanel.setBounds(290, 8, 300, 139);
-  	outputPanel.setBounds(290, 145, 300, 149);	
-  	askMePanel.setBounds(290, 145, 300, 149);	
+	inputIcaoPanel.setBounds(10, 10, 310, 120);
+	
+	int x = 330;
+	int y = 370;
+	
+	panelResult.setBounds(x, 10, 340, 190);	
+  	outputPanel.setBounds(x, 210, 340, 150);	
+  	askMePanel.setBounds(x, 210, 340, 150);	
 
-	distanceSpin.getSpinnerPanel().setBounds(10, 130, 280, 190);
+	delMeBt.setBounds(x, y, 78, 23);
+	askMeBt.setBounds(x+86, y, 78, 23);
+	landMeBt.setBounds(x+170, y, 82, 23);
+	landItBt.setBounds(x+260, y, 80, 23);
+  	
+	distanceSpin.getSpinnerPanel().setBounds(10, 130, 310, 190);
     searchBt.setBounds(10, 330, 125, 23);
 	resetBt.setBounds(150, 330, 125, 23);
-	delMeBt.setBounds(290, 290, 70, 23);
-	askMeBt.setBounds(365, 290, 70, 23);
-	landMeBt.setBounds(441, 290, 75, 23);
-	landItBt.setBounds(521, 290, 70, 23);
 	googleBt.setBounds(100, 360, 160, 23);
 	
 	icaoPanel.add(inputIcaoPanel);
 	icaoPanel.add(distanceSpin.getSpinnerPanel());
 	icaoPanel.add(outputPanel);
-	icaoPanel.add(resultPanel);
+	icaoPanel.add(panelResult);
 	icaoPanel.add(askMePanel);
 	icaoPanel.add(searchBt);
 	icaoPanel.add(resetBt);
@@ -367,12 +408,12 @@ public class PaneIcaolAiport extends JFrame {
 	 * 
 	 */
 	private void setResultPanel() {
-		resultPanel.removeAll();
-		resultPanel.add(result.getIcaoFormPanel());
-		resultPanel.setVisible(true);
-		resultPanel.validate();
+		panelResult.removeAll();
+		panelResult.add(result.getIcaoFormPanel());
+		panelResult.setVisible(true);
+		panelResult.validate();
 
-		icaoPanel.add(resultPanel);
+		icaoPanel.add(panelResult);
 	}
 
 	

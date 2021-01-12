@@ -11,11 +11,14 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.swing.JLabel;
@@ -469,6 +472,42 @@ public class Util implements Info {
 	}
 	
 
+	private static String makeAbbreviation(String text) {
+		
+		String[] line = text.split(" ");
+		System.out.println(text);
+		try {
+			text = line[0].substring(0,1)+line[1].substring(0,1)+line[2].substring(0,1);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
+		return text;
+		
+	}
+	
+	
+	public static String getTime(String where ) {
+		String zone = "";
+		TimeZone timeZone = null ;
+		if ("local".equals(where)){
+	    	timeZone = TimeZone.getDefault();
+	    	 zone = makeAbbreviation(timeZone.getDisplayName());
+		} else if ("UTC".equals(where)){
+			timeZone = TimeZone.getTimeZone("UTC");
+			zone = "UTC";
+		}
+
+		
+		Calendar calUTC = new GregorianCalendar(timeZone);
+        int hour = calUTC.get(Calendar.HOUR_OF_DAY);
+        int min = calUTC.get(Calendar.MINUTE);
+        int sec = calUTC.get(Calendar.SECOND);
+	
+        return String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec);
+
+		
+	}
 	
 	public static String formatMessageError(String message) {
 		if (message.length() > 40) {

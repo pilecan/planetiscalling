@@ -1,7 +1,6 @@
 package com.cfg.common;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
@@ -10,6 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.util.FormUtility;
@@ -64,10 +66,14 @@ public class DistanceSpinner implements Info {
 	      	      10);               
 
          //spinnerPanel = new JPanel();
+		
          
          spinnerPanel = new JPanel(new BorderLayout());
          spinnerPanel.setBorder(new TitledBorder("Search Criteria"));
-       //  spinnerPanel.setBorder(new EmptyBorder(1,1, 1, 1));
+ 	     Border border = spinnerPanel.getBorder();
+ 		 Border margin = new EmptyBorder(10,10,10,10);
+         spinnerPanel.setBorder(new CompoundBorder(border, margin));
+
 
          
         spinnerPanel.setLayout(new GridBagLayout());
@@ -111,7 +117,7 @@ public class DistanceSpinner implements Info {
 	
     private JSpinner makeSpinner(String text1, String text2, JSpinner spin, SpinnerModel model, JPanel panel, FormUtility formUtility) {
         spin=new JSpinner(model);
-        spin.setPreferredSize( new Dimension (60,25) );
+        spin.setPreferredSize( new Dimension (45,20) );
         spin.setToolTipText(text1);
         formUtility.addLabel(text2+"                                       ",spinnerPanel);
         panel = new JPanel();

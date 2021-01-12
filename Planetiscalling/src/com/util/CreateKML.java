@@ -333,37 +333,9 @@ public class CreateKML {
 	}
 	
 	static public String buildAirportPlaceMark(Airport airport){
-		String airportName = "";
-		String country= "";
-		String description = "";
-		
-		String[] descs = airport.getDescription().split("\\|");
-		for(String desc:descs){
-			if ("".equals(desc)){
-				description += "<div style='padding: 5px;'></div>";
-			} else {
-
-				if (desc.contains("Country:") && !desc.contains(airport.getName())){
-					country = desc.substring(desc.indexOf(":")+1);
-				}
-				if (desc.contains("Airport Name:") && !desc.contains(airport.getName())){
-					airportName = desc.substring(desc.indexOf(":")+1);
-					desc +=  Util.aviationWeather.replace("xxxx", airport.getName());
-					desc = desc.replace(airportName, Util.createHref(airportName,airport.getName()+" "+airportName+" wikipedia", 0));
-				} else if (desc.contains("BGL file:")) {
-					desc += "<br><br>Other Searches: "+Util.createHref("(freewarescenery.com)",country.trim().toLowerCase(), 7);
-				}
-				
-				description += "<div style=\"width: 300px; font-size: 12px;\">"+desc+"</div>";
-			}
-		}
-		
-		String icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get("airport")+"</href></Icon></IconStyle></Style>";
-
-
-		return "<Placemark><name>"+airport.getName()+airportName+"</name>\n"
-				+ "<description><![CDATA["+description+"]]></description>\n"
-				+ icone
+		return "<Placemark><name>"+airport.getIdent()+" "+airport.getName()+"</name>\n"
+				+ "<description><![CDATA["+airport.getDescription().replaceAll("\\|", "<br>")+"]]></description>\n"
+				+ "<Style id=\"airport\"><IconStyle><Icon><href>"+ICON_MAP.get("airport")+"</href></Icon></IconStyle></Style>"
 				+ "<Point><coordinates>"+airport.getCoordinates()+"</coordinates></Point>\n"
 				+ "</Placemark>\n";
 	}

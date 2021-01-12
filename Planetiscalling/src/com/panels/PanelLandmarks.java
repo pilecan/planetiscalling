@@ -316,14 +316,14 @@ public class PanelLandmarks implements Info {
 	
 	private JPanel setLandmarkPanel(DistanceSpinner distanceSpin) {
 		
-		distanceSpin.getSpinnerPanel().setBounds(10, 10, 290, 190);
+		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
 		panelCombo.setBounds(10, 200, 240, 90);
 		
 		int x = 330;
 		
-	  	panelResult.setBounds(x, 10, 300, 190);	
-	  	outputPanel.setBounds(x, 210, 300, 150);	
-	  	askMePanel.setBounds(x, 210, 300, 150);	
+	  	panelResult.setBounds(x, 10, 340, 190);	
+	  	outputPanel.setBounds(x, 210, 340, 150);	
+	  	askMePanel.setBounds(x, 210, 340, 150);	
 
 	  	x += 40;
 		landMeBt.setBounds(x, 365, 94, 23);

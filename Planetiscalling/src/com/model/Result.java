@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -27,6 +28,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -61,6 +65,7 @@ public class Result implements Info {
 	private FormUtility formUtility;
 	private JPanel panel;
 	private JLabel label;
+	private JCheckBox checkAltitude;
 
 	private SortedListModel listResultModel;
 
@@ -126,12 +131,25 @@ public class Result implements Info {
 		this.delMeBt = delMeBt;
 	}
 
-	public JPanel getFlightPlanFormPanel() {
-		panelAltitude = new JPanel();
+	private JPanel setBorderPanel(JPanel resultPanel) {
 		resultPanel = new JPanel();
 		resultPanel.setLayout(new GridBagLayout());
+		
+	     Border border = resultPanel.getBorder();
+		 Border margin = new EmptyBorder(10,10,10,10);
+		 resultPanel.setBorder(new CompoundBorder(border, margin));
+		 
+		 return resultPanel;
+		
+	}
+	
+	public JPanel getFlightPlanFormPanel() {
+		panelAltitude = new JPanel();
+		
+		resultPanel = setBorderPanel(resultPanel);
 
-		JTextField textField = new JTextField();
+		checkAltitude = new JCheckBox();
+		checkAltitude.setToolTipText("Change altitude of Flight Plan file");
 
 		formUtility = new FormUtility();
 
@@ -150,18 +168,21 @@ public class Result implements Info {
 		panel.add(label, BorderLayout.WEST);
 		formUtility.addLastField(panel, resultPanel);
 
+		
 		altitudeModel = new SpinnerNumberModel(altitude, 500, // min
 				100000, // max
 				500);
 
 		altitudeSpinner = new JSpinner(altitudeModel);
-		altitudeSpinner.setPreferredSize(new Dimension(80, 25));
-		altitudeSpinner.setToolTipText("Change altitude of flightplan");
+		altitudeSpinner.setPreferredSize(new Dimension(65, 25));
+		altitudeSpinner.setToolTipText("Change altitude of KML");
 		formUtility.addLabel("Altitude:", resultPanel);
-		JPanel panelSpin = new JPanel();
-		panelSpin.setLayout(new BorderLayout());
-		panelSpin.add(altitudeSpinner, BorderLayout.WEST);
-		formUtility.addLastField(panelSpin, resultPanel);
+		JPanel panelAltitude = new JPanel();
+		panelAltitude.setLayout(new BorderLayout());
+		panelAltitude.add(checkAltitude, BorderLayout.EAST);
+		panelAltitude.add(altitudeSpinner, BorderLayout.WEST);
+
+		formUtility.addLastField(panelAltitude, resultPanel);
 
 		altitudeSpinner.addChangeListener(new ChangeListener() {
 
@@ -234,8 +255,8 @@ public class Result implements Info {
 
 	private void setformLine(JPanel resultPanel, String strLabel, int number, JRadioButton radioBtn) {
 
-		formUtility.addLabel(strLabel + "                         ", resultPanel);
-		label = new JLabel(String.format("%03d", number) + "                 ");
+		formUtility.addLabel(strLabel + "                            ", resultPanel);
+		label = new JLabel(String.format("%03d", number) + "                                    ");
 
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -246,8 +267,7 @@ public class Result implements Info {
 	}
 
 	public JPanel getIcaoFormPanel() {
-		resultPanel = new JPanel();
-		resultPanel.setLayout(new GridBagLayout());
+		resultPanel = setBorderPanel(resultPanel);
 
 		formUtility = new FormUtility();
 
@@ -283,8 +303,7 @@ public class Result implements Info {
 
 	}
 	public JPanel getAiportFormPanel() {
-		resultPanel = new JPanel();
-		resultPanel.setLayout(new GridBagLayout());
+		resultPanel = setBorderPanel(resultPanel);
 
 		formUtility = new FormUtility();
 
@@ -320,8 +339,7 @@ public class Result implements Info {
 
 	}
 	public JPanel getCityFormPanel() {
-		resultPanel = new JPanel();
-		resultPanel.setLayout(new GridBagLayout());
+		resultPanel = setBorderPanel(resultPanel);
 
 		formUtility = new FormUtility();
 
@@ -358,8 +376,7 @@ public class Result implements Info {
 	}
 
 	public JPanel getMountainFormPanel() {
-		resultPanel = new JPanel();
-		resultPanel.setLayout(new GridBagLayout());
+		resultPanel = setBorderPanel(resultPanel);
 
 		formUtility = new FormUtility();
 
@@ -856,6 +873,10 @@ public class Result implements Info {
 	}
 
 	public void setOutputPanel(JPanel outputPanel) {
+	     Border border = outputPanel.getBorder();
+		 Border margin = new EmptyBorder(5,5,5,5);
+		 outputPanel.setBorder(new CompoundBorder(border, margin));
+
 		this.outputPanel = outputPanel;
 	}
 

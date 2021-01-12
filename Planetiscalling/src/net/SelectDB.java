@@ -17,7 +17,7 @@ import javax.swing.JComboBox;
 
 import com.cfg.common.Info;
 import com.model.City;
-import com.util.CreateKML;
+import com.model.TimeZones;
 
 /**
  *
@@ -40,9 +40,8 @@ public class SelectDB implements Info{
 	private Map<String, Set<String>> mapCountryMountain = new TreeMap<>();
 	private List<String> listState = new ArrayList<>();
 	private List<String> listMountain = new ArrayList<>();
-
-
-
+	
+	private TimeZones timeZones;
 
 
 	/**
@@ -60,6 +59,34 @@ public class SelectDB implements Info{
 			System.out.println(e.getMessage());
 		}
 		return conn;
+	}
+	public void selectTimeZone(String where) {
+		timeZones = null;
+		String sql = "SELECT abbr, name, hour from time_zone where name = ' "+where+"'";
+				
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				int cpt = 0;
+				String lastCountry = "";
+					while (rs.next()) {
+						timeZones = new TimeZones(rs.getString("abbr"), rs.getString("name"),rs.getString("hour"));
+					
+				}
+				
+				mapCountryMountain.put(lastCountry, countryMountain);
+
+				
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 	}
 
 	public void selectMountainTable() {
@@ -463,6 +490,12 @@ public class SelectDB implements Info{
 
 	public void setMapCountryMountain(Map<String, Set<String>> mapCountryMountain) {
 		this.mapCountryMountain = mapCountryMountain;
+	}
+	public TimeZones getTimeZones() {
+		return timeZones;
+	}
+	public void setTimeZones(TimeZones timeZones) {
+		this.timeZones = timeZones;
 	}
 
 	

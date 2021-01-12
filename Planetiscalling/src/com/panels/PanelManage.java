@@ -5,7 +5,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
@@ -16,13 +15,14 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Info;
+import com.main.PlanetIsCalling;
 import com.model.Preference;
 import com.util.SwingUtils;
 import com.util.Util;
@@ -51,7 +51,7 @@ public class PanelManage implements Info {
 
 	private JPanel panelResult;
 	
-	public JPanel getSettingPanel() {
+	public JPanel getSettingPanel(final PlanetIsCalling frame) {
 		hashFP = new TreeMap<>();
 		hashKML = new TreeMap<>();
 		
@@ -164,8 +164,10 @@ public class PanelManage implements Info {
 
 			    	Utility.getInstance().savePrefProperties();
 			    	
-			    	
-			    	
+				    Utility.getInstance().initLookAndFeel(frame);
+				    
+
+				    frame.validate();
 /*			    	JOptionPane.showMessageDialog(null, "You must restart the application to set the new color.", 
 							"PlanetIsCalling",
 							JOptionPane.INFORMATION_MESSAGE);
