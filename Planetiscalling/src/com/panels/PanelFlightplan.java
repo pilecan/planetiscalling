@@ -16,19 +16,18 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import com.back.CreateKML;
+import com.back.ReadData;
 import com.cfg.common.DistanceSpinner;
+import com.db.SelectAirport;
+import com.db.SelectCity;
+import com.db.SelectMountain;
+import com.db.SelectNdb;
+import com.db.SelectVor;
 import com.model.Distance;
 import com.model.Result;
 import com.model.TimeZones;
-import com.util.CreateKML;
-import com.util.ReadData;
 import com.util.Utility;
-
-import net.SelectAirport;
-import net.SelectCity;
-import net.SelectMountain;
-import net.SelectNdb;
-import net.SelectVor;
 
 public class PanelFlightplan {
 

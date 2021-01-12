@@ -1,4 +1,4 @@
-package net;
+package com.db;
 
 import java.io.File;
 import java.sql.Connection;

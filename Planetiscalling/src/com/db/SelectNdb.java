@@ -1,4 +1,4 @@
-package net;
+package com.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -11,27 +11,27 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.cfg.common.Info;
-import com.model.Vor;
+import com.model.Ndb;
 
-public class SelectVor implements Info{
+public class SelectNdb implements Info{
 	
-	private Vor vor;
-	private List <Vor> vors;
-	private Map<String, Vor> mapVors;
+	private Ndb ndb;
+	private List <Ndb> ndbs;
+	private Map<String, Ndb> mapNdb;
 
 	
 
-	public SelectVor() {
+	public SelectNdb() {
 		// TODO Auto-generated constructor stub
 	}
 	public void selectAll(String search ) {
-		vor = new Vor();
-		vors = new ArrayList<>();
-		mapVors = new TreeMap<>();
+		ndb = new Ndb();
+		ndbs = new ArrayList<>();
+		mapNdb = new TreeMap<>();
 
 		
 
-		String sql = "SELECT vor_id," + 
+		String sql = "SELECT ndb_id," + 
 				"       file_id," + 
 				"       ident," + 
 				"       name," + 
@@ -39,17 +39,13 @@ public class SelectVor implements Info{
 				"       airport_id," + 
 				"       type," + 
 				"       frequency," + 
-				"       channel," + 
 				"       range," + 
 				"       mag_var," + 
-				"       dme_only," + 
-				"       dme_altitude," + 
-				"       dme_lonx," + 
-				"       dme_laty," + 
 				"       altitude," + 
 				"       lonx," + 
 				"       laty" + 
-				"  FROM vor ";
+				"  FROM ndb " + 
+				" ";
 		
 		if (!"".equals(search)) {
 			 sql += search;
@@ -59,29 +55,31 @@ public class SelectVor implements Info{
 			final PreparedStatement statement = this.connect().prepareStatement(sql);
 
 			try (ResultSet rs = statement.executeQuery()) {
-				String lastAirport = "";
 
 				while (rs.next()) {
-				    vor = new Vor(rs.getInt("vor_id"), rs.getInt("file_id"), 
-				    		rs.getString("ident"), rs.getString("name"),
-				    		rs.getString("region"), 
-				    		rs.getInt("airport_id"), rs.getString("type"), 
-				    		rs.getInt("frequency"), rs.getString("channel"), 
-				    		rs.getInt("range"), rs.getDouble("mag_var"), 
-				    		rs.getInt("dme_only"), rs.getInt("dme_altitude"), 
-				    		rs.getDouble("dme_lonx"), rs.getDouble("dme_laty"), 
-				    		rs.getInt("altitude"), rs.getDouble("lonx"), 
-				    		rs.getDouble("laty"));
+				    ndb = new Ndb(rs.getInt("ndb_id"),      
+				    	    rs.getInt("file_id"),      
+				    	    rs.getString("ident"), 
+				    	    rs.getString("name"), 
+				    	    rs.getString("region"), 
+				    	    rs.getInt("airport_id"),
+				    	    rs.getString("type"), 
+				    	    rs.getInt("frequency"),
+				    	    rs.getInt("range"),
+				    	    rs.getDouble("mag_var"),  
+				    	    rs.getInt("altitude"),
+				    	    rs.getDouble("lonx"),  
+				    	    rs.getDouble("laty")  );
 
-				    vors.add(vor);
-				    mapVors.put(rs.getString("ident")+rs.getString("name").replace(" ", ""), vor);
+				    ndbs.add(ndb);
+				    mapNdb.put(rs.getString("ident")+rs.getString("name").replace(" ", ""), ndb);
 				}
 				
 				
 
 		}
-			System.out.println(vors.size());
-			System.out.println(mapVors.size());
+			System.out.println(ndbs.size());
+			System.out.println(mapNdb.size());
 			} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -106,9 +104,9 @@ public class SelectVor implements Info{
 	public static void main(String[] args) {
      	String search = "LF LI LE".toUpperCase();	
      	
-     	search = "where ident = 'TOL'";
+     	search = "";
 
-		SelectVor selectVor = new SelectVor();
+		SelectNdb selectVor = new SelectNdb();
 		selectVor.selectAll(search );
 		
 	    	String kmlRelative = "data\\vor"+search+".kml";
@@ -120,24 +118,17 @@ public class SelectVor implements Info{
 	//	 Utility.getInstance().launchGoogleEarth(new File(kmlRelative));
 		
 	}
-	public List<Vor> getVors() {
-		return vors;
+	public List<Ndb> getNdbs() {
+		return ndbs;
 	}
-	public void setVors(List<Vor> vors) {
-		this.vors = vors;
+	public void setNdbs(List<Ndb> cities) {
+		this.ndbs = cities;
 	}
-	public Map<String, Vor> getMapVors() {
-		return mapVors;
+	public Map<String, Ndb> getMapNdb() {
+		return mapNdb;
 	}
-	public void setMapVors(Map<String, Vor> mapVors) {
-		this.mapVors = mapVors;
-	}
-	
-	public List <Vor> listOfOneVor(Vor vor){
-		List< Vor> listOfOneVor = new ArrayList<Vor>(); 
-		listOfOneVor.add(vor);
-		return listOfOneVor;
-		
+	public void setMapNdb(Map<String, Ndb> mapNdb) {
+		this.mapNdb = mapNdb;
 	}
 
 

@@ -18,6 +18,11 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import com.cfg.common.Info;
+import com.db.SelectCity;
+import com.db.SelectDB;
+import com.db.SelectMountain;
+import com.db.SelectNdb;
+import com.db.SelectVor;
 import com.model.Airport;
 import com.panels.PaneIcaolAiport;
 import com.panels.PanelFlightplan;
@@ -25,12 +30,6 @@ import com.panels.PanelLandmarks;
 import com.panels.PanelManage;
 import com.util.Util;
 import com.util.Utility;
-
-import net.SelectCity;
-import net.SelectDB;
-import net.SelectMountain;
-import net.SelectNdb;
-import net.SelectVor;
 
 
 public class PlanetIsCalling extends JFrame implements Info, Runnable {

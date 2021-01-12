@@ -48,10 +48,9 @@ import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
+import com.db.SelectAirport;
 import com.main.PlanetIsCalling;
 import com.model.Airport;
-
-import net.SelectAirport;
 
 
 public class Utility implements Info{

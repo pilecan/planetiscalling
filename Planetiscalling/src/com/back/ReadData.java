@@ -1,4 +1,4 @@
-package com.util;
+package com.back;
 
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
@@ -21,6 +21,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Dataline;
 import com.cfg.common.Info;
+import com.db.CreateKmlFSPlan;
+import com.db.SelectAirport;
+import com.db.SelectCity;
+import com.db.SelectMountain;
+import com.db.SelectNdb;
+import com.db.SelectVor;
+import com.db.CreateKmlFSPlan.NoPoints;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
@@ -29,14 +36,8 @@ import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Result;
 import com.model.Vor;
-
-import net.CreateKmlFSPlan;
-import net.CreateKmlFSPlan.NoPoints;
-import net.SelectAirport;
-import net.SelectCity;
-import net.SelectMountain;
-import net.SelectNdb;
-import net.SelectVor;
+import com.util.SwingUtils;
+import com.util.Utility;
 
 public class ReadData implements Info{
 	private SelectAirport selectAiport;

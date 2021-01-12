@@ -38,14 +38,13 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
+import com.back.CreateKML;
 import com.cfg.common.Info;
+import com.db.SelectAirport;
 import com.geo.util.Geoinfo;
-import com.util.CreateKML;
 import com.util.FormUtility;
 import com.util.Util;
 import com.util.Utility;
-
-import net.SelectAirport;
 
 public class Result implements Info {
 	private long distance;

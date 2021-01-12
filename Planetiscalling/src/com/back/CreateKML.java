@@ -1,4 +1,4 @@
-package com.util;
+package com.back;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -15,6 +15,8 @@ import com.model.City;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Vor;
+import com.util.Util;
+import com.util.Utility;
 
 public class CreateKML {
 	private static String CASTEL_ICON ="http://maps.google.com/mapfiles/kml/shapes/ranger_station.png";

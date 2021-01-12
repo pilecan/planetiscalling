@@ -28,20 +28,19 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
+import com.back.CreateKML;
+import com.back.ReadData;
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
+import com.db.SelectAirport;
+import com.db.SelectCity;
+import com.db.SelectMountain;
+import com.db.SelectNdb;
+import com.db.SelectVor;
 import com.model.Distance;
 import com.model.Result;
-import com.util.CreateKML;
-import com.util.ReadData;
 import com.util.Util;
 import com.util.Utility;
-
-import net.SelectAirport;
-import net.SelectCity;
-import net.SelectMountain;
-import net.SelectNdb;
-import net.SelectVor;
 
 public class PaneIcaolAiport extends JFrame {
 
