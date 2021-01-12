@@ -62,7 +62,7 @@ public class SelectDB implements Info{
 	}
 	public void selectTimeZone(String where) {
 		timeZones = null;
-		String sql = "SELECT abbr, name, hour from time_zone where name = ' "+where+"'";
+		String sql = "SELECT abbr, name, hour from time_zone where name = '"+where+"'";
 				
 		try {
 			final PreparedStatement statement = this.connect().prepareStatement(sql);

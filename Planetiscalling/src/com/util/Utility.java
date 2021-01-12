@@ -486,7 +486,7 @@ public class Utility implements Info{
    }
 
    
-	  public void initLookAndFeel(PlanetIsCalling jFrame) {
+	  public void initLookAndFeel(PlanetIsCalling jFrame, int numColor) {
 	      String lookAndFeel = "";
 	      String LOOKANDFEEL = "Metal";
 	      String THEME = "Ocean";
@@ -557,9 +557,6 @@ public class Utility implements Info{
 	              e.printStackTrace();
 	          }          
 	      }
-			Utility.getInstance().readPrefProperties();
-			int numColor = Integer.parseInt(Utility.getInstance().getPrefs().getProperty("numcolor"));
-
 			
 			UIManager.put("OptionPane.background", colorBackground[numColor]);
 			UIManager.put("OptionPane.foreground", colorForground[numColor]);
@@ -574,10 +571,12 @@ public class Utility implements Info{
 		    UIManager.put("ComboBox.foreground", colorForground[numColor]);
 	
 		    UIManager.put("RadioButton.background", colorBackground[numColor]);
+		  //  UIManager.put("TitledBorder.border", colorBackground[numColor]);
 
-			UIManager.put("CheckBox.border", colorBackground[numColor]);
+			UIManager.put("CheckBox.background", colorBackground[numColor]);
 			UIManager.put("CheckBox.border", colorBackground[numColor]);
 			UIManager.put("CheckBox.foreground", colorBackground[numColor]);
+		    UIManager.put("CheckBox.select", Color.red);
 
 			
 		    UIManager.put("TitledBorder.titleColor", colorForground[numColor]);
@@ -598,7 +597,6 @@ public class Utility implements Info{
 
 			UIManager.put("Label.background", colorBackground[numColor]);
 		    UIManager.put("Label.foreground", colorForground[numColor]);
-		    UIManager.put("CheckBox.select", Color.red);
 		    
 		    SwingUtilities.updateComponentTreeUI(jFrame);
 
@@ -616,6 +614,7 @@ public class Utility implements Info{
 			 return panel;
 			
 		}
+	  
 
    
 }

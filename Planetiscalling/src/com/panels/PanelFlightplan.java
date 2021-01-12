@@ -60,8 +60,6 @@ public class PanelFlightplan {
 	private JButton askMeBt;
 	
 	private SelectAirport selectAirport;
-	private TimeZones timeZones;
-
 	
 	private JEditorPane jEditorPane;
 	
@@ -71,13 +69,12 @@ public class PanelFlightplan {
 		super();
 	}
 
-	public JPanel getPanel(TimeZones timeZones, SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
+	public JPanel getPanel(SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectVor = selectVor;
 		this.selectNdb = selectNdb;
 		this.flightPlanFile = "";
-		this.timeZones = timeZones;
 		this.selectAirport = new SelectAirport();
 
 		return createPanel();
@@ -89,8 +86,6 @@ public class PanelFlightplan {
 		distanceSpin.initPanelDistances("plan");
 		
 		jEditorPane = Utility.getInstance().initjEditorPane();
-
-		
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -123,7 +118,7 @@ public class PanelFlightplan {
 
 		result.setOutputPanel(outputPanel);
 		
-		flightPlanBt = Utility.getInstance().setButton("Select Flightplan");
+		flightPlanBt = new JButton("Select Flightplan");
 		
 		flightPlanBt.addActionListener(new ActionListener()
 	    {

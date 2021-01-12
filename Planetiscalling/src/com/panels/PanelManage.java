@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,7 +16,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -153,26 +153,16 @@ public class PanelManage implements Info {
 	      }
 	    });
 
+		labelDefaultColor.setText("GUI Colors");
+		labelDefaultColor.setToolTipText("Set color of GUI here");
 		comboColor.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				try {
-					labelDefaultColor.setText("GUI Colors");
-					labelDefaultColor.setToolTipText(e.getItem().toString());
-					Utility.getInstance().getPrefs().put("numcolor", e.getItem());
-					//Util.pause(3000);
-
+					Utility.getInstance().getPrefs().put("day.period", e.getItem());
 			    	Utility.getInstance().savePrefProperties();
-			    	
-				    Utility.getInstance().initLookAndFeel(frame);
-				    
+				    Utility.getInstance().initLookAndFeel(frame,Util.getStoredPeriodNumber());
 
-				    frame.validate();
-/*			    	JOptionPane.showMessageDialog(null, "You must restart the application to set the new color.", 
-							"PlanetIsCalling",
-							JOptionPane.INFORMATION_MESSAGE);
-*/				 //   LaunchPIC();
-			  		//System.exit(0);
 				} catch (Exception e1) {
 				//	System.err.println(e1);
 					// TODO Auto-generated catch block
@@ -342,10 +332,11 @@ public class PanelManage implements Info {
 	      comboKMLDir = new JComboBox<>(hashKML.keySet().toArray(new String[hashKML.size()]));
 	      comboKMLDir.setSelectedItem(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty("kmlflightplandir")));
 	 }
-      String[] colors = {"0","1","2","3","4"};
-      comboColor = new JComboBox<String>(colors);
+	    
+       String[] periods = {"Morning","Afternoon","Evening","Night"};
+      comboColor = new JComboBox<String>(periods);
       
-      comboColor.setSelectedItem(Utility.getInstance().getPrefs().getProperty("numcolor"));
+      comboColor.setSelectedItem(Utility.getInstance().getPrefs().getProperty("day.period"));
       
 
 	

@@ -20,11 +20,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.cfg.common.Info;
+import com.main.PlanetIsCalling;
 
 public class Util implements Info {
 
@@ -160,6 +162,16 @@ public class Util implements Info {
 		Collections.unmodifiableMap(COUNTRY_MAP);
 	}
 	
+    public static Map<String, Integer> DAY_PERIOD = new HashMap<String, Integer>();
+ 	static {
+ 		DAY_PERIOD.put("Morning", new Integer(0));
+ 		DAY_PERIOD.put("Afternoon", new Integer(1));
+ 		DAY_PERIOD.put("Evening", new Integer(2));
+ 		DAY_PERIOD.put("Night", new Integer(3));
+
+ 		Collections.unmodifiableMap(DAY_PERIOD);
+ 	}
+
 	public static Map<String, String> REGION_MAP = new HashMap<String, String>();
 	static {
 		REGION_MAP.put("AG","Solomon Islands");
@@ -475,7 +487,7 @@ public class Util implements Info {
 	private static String makeAbbreviation(String text) {
 		
 		String[] line = text.split(" ");
-		System.out.println(text);
+		//System.out.println(text);
 		try {
 			text = line[0].substring(0,1)+line[1].substring(0,1)+line[2].substring(0,1);
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -488,14 +500,11 @@ public class Util implements Info {
 	
 	
 	public static String getTime(String where ) {
-		String zone = "";
 		TimeZone timeZone = null ;
 		if ("local".equals(where)){
 	    	timeZone = TimeZone.getDefault();
-	    	 zone = makeAbbreviation(timeZone.getDisplayName());
 		} else if ("UTC".equals(where)){
 			timeZone = TimeZone.getTimeZone("UTC");
-			zone = "UTC";
 		}
 
 		
@@ -503,12 +512,64 @@ public class Util implements Info {
         int hour = calUTC.get(Calendar.HOUR_OF_DAY);
         int min = calUTC.get(Calendar.MINUTE);
         int sec = calUTC.get(Calendar.SECOND);
+        
+        if (min ==0 && sec == 0 ) {
+        	System.out.println(getPeriod());
+        }
 	
-        return String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec);
+        //return String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec);
+        return String.format("%02d",hour) + ":" +  String.format("%02d",min);
 
 		
 	}
 	
+	  public static String getPeriod() {
+		  String dayPeriod = "";
+		  String[] currentTimes = getTime("local").split(":");
+		  int hour = Integer.parseInt(currentTimes[0]);
+		  
+/*		  String[] periods = storePeriod.split(":");
+		  int min = Integer.parseInt(periods[0]);
+		  int max = Integer.parseInt(periods[1]);
+*/		  
+		  if (hour >= 6 && hour < 12 ) {
+			  dayPeriod = "Morning";
+		  } else if (hour >= 12 && hour < 17 ) {
+			  dayPeriod = "Afternoon";
+		  }else if (hour >= 17 && hour < 20 ) {
+			  dayPeriod = "Evening";
+		  }else if (hour >= 20) {
+			  dayPeriod = "Night";
+		  }
+		  
+		  return dayPeriod;
+	  }
+
+	  public static int getStoredPeriodNumber() {
+		  String storePeriod = Utility.getInstance().getPrefs().getProperty("day.period");
+		  return DAY_PERIOD.get(storePeriod);
+	  }
+	  
+	  public static String validgetDisplayName(String name) {
+		  
+		  int ind = name.indexOf("(");
+		  
+		  if (ind != -1) {
+			  name = name.substring(0,ind-1);
+		  }
+		  
+		  return name.trim();
+	  }
+
+	 public static String getTimer(long millis) {
+ 	    String hms = String.format("%02d:%02d:%02d", TimeUnit.MILLISECONDS.toHours(millis),
+ 	            TimeUnit.MILLISECONDS.toMinutes(millis) - TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+ 	            TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
+ 	    //System.out.println(hms);
+ 	    
+ 	    return hms;
+		 
+	 }
 	public static String formatMessageError(String message) {
 		if (message.length() > 40) {
 			message = message.substring(0, 40) + "...";

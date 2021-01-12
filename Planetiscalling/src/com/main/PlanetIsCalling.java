@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -18,7 +19,6 @@ import javax.swing.JTabbedPane;
 
 import com.cfg.common.Info;
 import com.model.Airport;
-import com.model.TimeZones;
 import com.panels.PaneIcaolAiport;
 import com.panels.PanelFlightplan;
 import com.panels.PanelLandmarks;
@@ -44,8 +44,8 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 	private SelectVor selectVor;
 	private SelectNdb selectNdb;
     private String time;
-    private TimeZones timeZones;	
-
+	private SelectDB selectDB;
+	private String abbreviation;
 
 	
 	private List<Airport> airports ;
@@ -74,15 +74,22 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 		selectVor = new SelectVor();
 		selectNdb = new SelectNdb();
 		airports = new ArrayList<>();
-		timeZones = new TimeZones();
 		
 		TimeZone timeZone = TimeZone.getDefault();
 		
-		SelectDB selectDB = new SelectDB();
+		String name = Util.validgetDisplayName(timeZone.getDisplayName());
 		
-		selectDB.selectTimeZone(timeZone.getDisplayName());
+		selectDB = new SelectDB();
+		selectDB.selectTimeZone(name);
 		
-		System.out.println(selectDB.getTimeZones().toString());
+		try {
+			abbreviation = selectDB.getTimeZones().getAbbr();
+		} catch (NullPointerException e1) {
+			System.out.println("Oups "+ timeZone.getDisplayName());
+			abbreviation = timeZone.getDisplayName();
+		}
+		
+		
 		
 		selectCity.selectAll("");
 		selectMountain.selectAll("");
@@ -95,10 +102,15 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 	    setResizable(false);
-	    setTitle("The Planet Is Calling 0.888 ");
+	    setTitle("The Planet Is Calling 0.9 ");
 	    
-	    
-	    Utility.getInstance().initLookAndFeel(this);
+		Utility.getInstance().readPrefProperties();
+	//	int numColor = Util.getStoredPeriodNumber();//Utility.getInstance().getPrefs().getProperty("day.period");
+
+	    Utility.getInstance().initLookAndFeel(this, Util.DAY_PERIOD.get(Util.getPeriod()) );
+		Utility.getInstance().getPrefs().put("day.period", Util.getPeriod());
+    	Utility.getInstance().savePrefProperties();
+
         Utility.getInstance().setIcon(this, imageLogo);
 	 
 		this.addWindowListener(new WindowAdapter() {
@@ -117,7 +129,7 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(timeZones, selectCity,selectMountain,selectVor, selectNdb));
+		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(selectCity,selectMountain,selectVor, selectNdb));
 		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(selectVor, selectNdb, selectMountain, selectCity));
 		tabPane.addTab( "Airport", new PanelLandmarks().getAirportPanel(selectCity,selectMountain,selectVor, selectNdb));
 		tabPane.addTab( "City", new PanelLandmarks().getCityPanel(selectCity, selectMountain,selectVor, selectNdb));
@@ -137,23 +149,22 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 	        int sec;
 	        String timeUTC;
 	        String timeLocal;
+	        long millis = 0;
+	        String timer = "";
 	        while(true) 
 	        {
-/*	        	TimeZone timeZone = TimeZone.getTimeZone("local");
-
-	            calUTC = new GregorianCalendar(timeZone);
-	            hour = calUTC.get(Calendar.HOUR_OF_DAY);
-	            min = calUTC.get(Calendar.MINUTE);
-	            sec = calUTC.get(Calendar.SECOND);
-*/
+	        	
+	        	millis += 1000;
+	        	timer = Util.getTimer(millis);
 	            timeUTC = Util.getTime("UTC");
 	            timeLocal = Util.getTime("local");
 	            //delay the loop for 1 sec
 	            try {
 	                Thread.currentThread().sleep(1000);
-	                //System.out.println(time);
-	               // timeZones.setUTC(time);
-	        	    setTitle("The Planet Is Calling 0.888                                              "+timeUTC+ "         "+timeLocal );
+	        	    setTitle("The Planet Is Calling 0.9"
+	               +"                                                          "+ timeUTC+ " UTC       "
+	               +timeLocal+" "+abbreviation+"        "+timer);
+	        	    
 
 	                } catch (InterruptedException e) {
 	                    // TODO Auto-generated catch block
