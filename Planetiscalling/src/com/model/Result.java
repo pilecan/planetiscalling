@@ -22,7 +22,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
@@ -42,6 +41,7 @@ import com.back.CreateKML;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
 import com.geo.util.Geoinfo;
+import com.metar.net.UtilityMetar;
 import com.util.FormUtility;
 import com.util.Util;
 import com.util.Utility;
@@ -51,7 +51,8 @@ public class Result implements Info {
 	private long altitude;
 	private String departure;
 	private String destination;
-
+	private String metar;
+	
 	private static Document doc;
 	private static HTMLEditorKit kit;
 	
@@ -99,6 +100,7 @@ public class Result implements Info {
 	private JButton askMeBt;
 	private JButton landAllBt;
 	private JButton delMeBt;
+	private JButton metarBt;
 
 	public Result() {
 		super();
@@ -117,10 +119,10 @@ public class Result implements Info {
 		this.askMeBt = askMe;
 	}
 	
-	public void setButtons(JButton landMeBt, JButton askMe, JButton landAllBt) {
+	public void setButtons(JButton landMeBt, JButton askMe, JButton metarBt) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
-		this.landAllBt = landAllBt;
+		this.metarBt = metarBt;
 	}
 
 	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe, JButton landAllBt) {
@@ -145,10 +147,16 @@ public class Result implements Info {
 	public JPanel getFlightPlanFormPanel() {
 		panelAltitude = new JPanel();
 		
+		askMeBt.setEnabled(false);
+		metarBt.setEnabled(false);
+		askMeBt.setText("Ask Me");
+		metarBt.setText("METAR Me");
+		
 		resultPanel = setBorderPanel(resultPanel);
 
 		checkAltitude = new JCheckBox();
-		checkAltitude.setToolTipText("Change altitude of Flight Plan file");
+		checkAltitude.setText("?");
+		checkAltitude.setToolTipText("Change Flight Plan Altitude");
 
 		formUtility = new FormUtility();
 
@@ -174,7 +182,7 @@ public class Result implements Info {
 
 		altitudeSpinner = new JSpinner(altitudeModel);
 		altitudeSpinner.setPreferredSize(new Dimension(65, 25));
-		altitudeSpinner.setToolTipText("Change altitude of KML");
+		altitudeSpinner.setToolTipText("Change KML Altitude");
 		formUtility.addLabel("Altitude:", resultPanel);
 		JPanel panelAltitude = new JPanel();
 		panelAltitude.setLayout(new BorderLayout());
@@ -603,13 +611,21 @@ public class Result implements Info {
 
 	}
 
-	public String panelAirport(String line) {
+	public String panelAirport(String icao) {
 		String varStr = null;
-		line = Utility.getInstance().findKeyICAO(line);
-		Airport airport = mapAirport.get(line);
+		icao = Utility.getInstance().findKeyICAO(icao);
+		
+		Airport airport = mapAirport.get(icao);
+		metar = UtilityMetar.getInstance().getMetar(icao);
+		metarBt.setEnabled(metar != null);
 
-		varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
-		varStr += airport.getDescription().replaceAll("\\|", "<br>");
+		try {
+			varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
+			varStr += airport.getDescription().replaceAll("\\|", "<br>");
+		} catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+		}
 		return varStr;
 
 	}
@@ -676,12 +692,16 @@ public class Result implements Info {
 	public void showAskMeAnswer( JPanel outputPanel, JEditorPane jEditorPane, JButton askMeBt, final JScrollPane askmeScrollPan ) {
 		String content = null;
 	    if ("Ask Me".equals(askMeBt.getText())) {
-			outputPanel.setVisible(false);
-			jEditorPane.setVisible(true);
-			askMeBt.setText("Back");
 			kit = new HTMLEditorKit();
 			doc = kit.createDefaultDocument();
 	        jEditorPane.setDocument(doc);
+	    	
+			metarBt.setEnabled(false);
+
+	    	outputPanel.setVisible(false);
+			jEditorPane.setVisible(true);
+			
+			askMeBt.setText("Back");
 	        if ("waypoint".equals(getCurrentView())) {
 	        	content = panelWaypoint(getCurrentSelection());
 	        } else if ("waypoint".equals(getCurrentView())) {
@@ -709,10 +729,47 @@ public class Result implements Info {
 			outputPanel.setVisible(true);
 			jEditorPane.setVisible(false);
 			askMeBt.setText("Ask Me");
+			metarBt.setText("METAR Me");
+			metarBt.setEnabled(false);
 	    }
 	
 	}
 	
+	public void showMetarMe( JPanel outputPanel, JEditorPane jEditorPane, final JScrollPane askmeScrollPan ) {
+		String content = null;
+	    if ("METAR Me".equals(metarBt.getText())) {
+			kit = new HTMLEditorKit();
+			doc = kit.createDefaultDocument();
+	        jEditorPane.setDocument(doc);
+	    	
+	    	outputPanel.setVisible(false);
+			jEditorPane.setVisible(true);
+			
+			askMeBt.setText("Ask Me");
+			metarBt.setText("Back");
+			askMeBt.setEnabled(false);
+
+			
+			content = UtilityMetar.getInstance().getMetarDecoded();
+	        	
+	        jEditorPane.setText(content);
+	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	        	   public void run() { 
+	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+	        	   }
+	        	});
+	    	
+	    } else {
+			outputPanel.setVisible(true);
+			jEditorPane.setVisible(false);
+			askMeBt.setText("Ask Me");
+			metarBt.setText("METAR Me");
+			metarBt.setEnabled(false);
+			askMeBt.setEnabled(true);
+
+	    }
+	
+	}
 	
 	public long getDistance() {
 		return distance;

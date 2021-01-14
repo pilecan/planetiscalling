@@ -1,16 +1,18 @@
 package com.panels;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -24,10 +26,13 @@ import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.metar.decoder.Decoder;
+import com.metar.download.Download;
 import com.model.Distance;
 import com.model.Result;
-import com.model.TimeZones;
+import com.model.WaitMessage;
 import com.util.Utility;
+import com.util.UtilityTimer;
 
 public class PanelFlightplan {
 
@@ -57,6 +62,7 @@ public class PanelFlightplan {
 	private JButton resetBt;
 	private JButton landMeBt;
 	private JButton askMeBt;
+	private JButton metarBt;
 	
 	private SelectAirport selectAirport;
 	
@@ -80,7 +86,6 @@ public class PanelFlightplan {
 	}
 	
 	public JPanel createPanel() {
-		
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
 		
@@ -90,7 +95,6 @@ public class PanelFlightplan {
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
         result = new Result();
-		
 		
 		panelFlightplan = new JPanel();
 		panelFlightplan.setLayout(null);
@@ -122,7 +126,10 @@ public class PanelFlightplan {
 		flightPlanBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
+	      
 	      {
+	          
+
 	    	  readData =  new ReadData(result, selectCity, selectMountain, selectVor, selectNdb,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -162,23 +169,62 @@ public class PanelFlightplan {
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-		    	 readData.createFlightplan(
-		    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
-		    			 (int)distanceSpin.getMountainSpinner().getValue(), 
-		    			 (int)distanceSpin.getAirportSpinner().getValue(),
-		    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-		    			 distanceSpin.getCheckTocTod().isSelected(),
-		    			 (double)result.getAltitudeModel().getValue())); 
-		    	 
-			  	 panelResult.removeAll();	
-			  	 
-				 result.getWaypointListModel();
-				  
-				 resetBt.setEnabled(true);
+	  	    final WaitMessage waitMessage = new WaitMessage(null);
+			final JDialog loading = new JDialog();
+	  		SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+				@Override
 
-		    	 panelResult.add(result.getFlightPlanFormPanel());
-				 panelResult.validate();
-				 panelFlightplan.validate();
+				protected String doInBackground() throws InterruptedException {
+		 
+					
+				    Runnable r = new Runnable() {
+				         public void run() {
+					    	 readData.createFlightplan(
+					    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+					    			 (int)distanceSpin.getMountainSpinner().getValue(), 
+					    			 (int)distanceSpin.getAirportSpinner().getValue(),
+					    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+					    			 distanceSpin.getCheckTocTod().isSelected(),
+					    			 (double)result.getAltitudeModel().getValue())); 
+					    	 
+						  	 panelResult.removeAll();	
+						  	 
+							 result.getWaypointListModel();
+							  
+							 resetBt.setEnabled(true);
+
+					    	 panelResult.add(result.getFlightPlanFormPanel());
+							 panelResult.validate();
+							 panelFlightplan.validate();
+				         }
+				     };
+
+				     new Thread(r).start();	
+					
+					return null;
+					
+
+				}
+
+				@Override
+				protected void done() {
+				    loading.dispose();
+					waitMessage.setVisible(false);
+				}
+			};
+		   worker.execute();
+		   loading.setVisible(true);
+		   
+		   
+		  try {
+		      worker.get();
+		  } catch (Exception e1) {
+				System.err.println(e1);
+		     // e1.printStackTrace();
+		  } finally {
+	
+		  }
+		  				 
 	      }
 	    });
 		
@@ -206,6 +252,7 @@ public class PanelFlightplan {
 
 				panelResult.validate();
 				panelFlightplan.validate();
+				UtilityTimer.getInstance().setMillis(0);
 			}
 		});		
 
@@ -271,11 +318,16 @@ public class PanelFlightplan {
 			}
 		});	
 			
+		metarBt = new JButton("METAR Me");
+		metarBt.setEnabled(false);
+		metarBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				result.showMetarMe(outputPanel, jEditorPane, askmeScrollPan);
+			}
+		});	
+			
 		
-		
-		
-		
-		result.setButtons(landMeBt, askMeBt);
+		result.setButtons(landMeBt, askMeBt, metarBt);
 
 		buttonLeftPanel.add(refreshBt);
 		buttonLeftPanel.add(resetBt);
@@ -302,9 +354,10 @@ public class PanelFlightplan {
 	  	outputPanel.setBounds(x, 260, 340, 130);	
 	  	askMePanel.setBounds(x, 260, 340, 130);	
 
-	  	x += 40;
+	  	x += 0;
 		landMeBt.setBounds(x, 400, 94, 23);
 		askMeBt.setBounds(x+120, 400, 94, 23);
+		metarBt.setBounds(x+240, 400, 94, 23);
 	  	
 
      	panelFlightplan.add(flightPlanBt);
@@ -314,6 +367,7 @@ public class PanelFlightplan {
 		
 		panelFlightplan.add(askMeBt);
 		panelFlightplan.add(landMeBt);
+		panelFlightplan.add(metarBt);
 		
 		//panelFlightplan.add(buttonRightPanel);
 
@@ -323,9 +377,6 @@ public class PanelFlightplan {
 		return panelFlightplan;					
 	}
 	
-
-		
-	}
-
+}
 
 

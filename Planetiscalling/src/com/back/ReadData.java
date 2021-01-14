@@ -898,16 +898,14 @@ public class ReadData implements Info{
  		    
  		    writer.write(CreateKML.createHeader((mapAirports!= null?mapAirports.size():1)));
  		    
- 		    if (dist.isAirport()){
-				writer.write("<Folder><name> Airports found ("+mapAirports.size()+") </name>");
-	
-	 		    for(Airport airport:mapAirports.values()){
-	 		    	//writer.write(placemark.buildXML("fsx_airport"));
- 			    	writer.write(createKML.buildAirportPlaceMark(airport));
+			writer.write("<Folder><name> Airports found ("+mapAirports.size()+") </name>");
 
-	 		    }
-				 writer.write("</Folder>"); 
+ 		    for(Airport airport:mapAirports.values()){
+ 		    	//writer.write(placemark.buildXML("fsx_airport"));
+		    	writer.write(createKML.buildAirportPlaceMark(airport));
+
  		    }
+			 writer.write("</Folder>"); 
  		    
  		    if (dist.isCity()){
  			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.cfg.common.Info;
-import com.main.PlanetIsCalling;
 
 public class Util implements Info {
 
@@ -498,6 +498,27 @@ public class Util implements Info {
 		
 	}
 	
+	
+	public static void getDateTime(BasicFileAttributes attr) {
+		TimeZone timeZone = null ;
+		timeZone = TimeZone.getTimeZone("UTC");
+
+		
+		Calendar calUTC = new GregorianCalendar(timeZone);
+        int year = calUTC.get(Calendar.DAY_OF_MONTH);
+        int month = calUTC.get(Calendar.MONTH);
+        int day = calUTC.get(Calendar.DAY_OF_MONTH);
+        int hour = calUTC.get(Calendar.HOUR_OF_DAY);
+        int min = calUTC.get(Calendar.MINUTE);
+        int sec = calUTC.get(Calendar.SECOND);
+        
+        System.out.println(String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec));
+        
+   	
+        //return String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec);
+        //return String.format("%02d",hour) + ":" +  String.format("%02d",min);
+
+	}
 	
 	public static String getTime(String where ) {
 		TimeZone timeZone = null ;

@@ -1,6 +1,7 @@
 package com.util;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.image.BufferedImage;
@@ -21,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,6 +52,8 @@ import javax.swing.text.html.HTMLEditorKit;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
 import com.main.PlanetIsCalling;
+import com.metar.decoder.Decoder;
+import com.metar.download.Download;
 import com.model.Airport;
 
 
@@ -60,8 +64,6 @@ public class Utility implements Info{
     private List <String>listDirectories = null;
     
 	private SelectAirport selectAiport;
-
-
 	
 	private StringBuilder builder;
 
@@ -614,6 +616,5 @@ public class Utility implements Info{
 			
 		}
 	  
-
    
 }

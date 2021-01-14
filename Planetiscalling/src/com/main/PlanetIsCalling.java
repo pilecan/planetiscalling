@@ -7,10 +7,8 @@ import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,9 +28,10 @@ import com.panels.PanelLandmarks;
 import com.panels.PanelManage;
 import com.util.Util;
 import com.util.Utility;
+import com.util.UtilityTimer;
 
 
-public class PlanetIsCalling extends JFrame implements Info, Runnable {
+public class PlanetIsCalling extends JFrame implements Info {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -44,7 +43,13 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 	private SelectNdb selectNdb;
     private String time;
 	private SelectDB selectDB;
-	private String abbreviation;
+	private String localAbbreviation;
+	
+	private String timeUTC;
+	private String timeLocal;
+	private long millis = 0;
+	private String timer = "";
+
 
 	
 	private List<Airport> airports ;
@@ -65,8 +70,6 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 	 * Create the frame.
 	 */
 	public PlanetIsCalling() {
-        Thread t1 =new Thread(this);    
-        t1.start();   
 
         selectCity = new SelectCity();
 		selectMountain = new SelectMountain();
@@ -74,27 +77,10 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 		selectNdb = new SelectNdb();
 		airports = new ArrayList<>();
 		
-		TimeZone timeZone = TimeZone.getDefault();
-		
-		String name = Util.validgetDisplayName(timeZone.getDisplayName());
-		
-		selectDB = new SelectDB();
-		selectDB.selectTimeZone(name);
-		
-		try {
-			abbreviation = selectDB.getTimeZones().getAbbr();
-		} catch (NullPointerException e1) {
-			System.out.println("Oups "+ timeZone.getDisplayName());
-			abbreviation = timeZone.getDisplayName();
-		}
-		
-		
-		
 		selectCity.selectAll("");
 		selectMountain.selectAll("");
 		selectVor.selectAll("");
 		selectNdb.selectAll("");
-
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(700, 510);
@@ -137,40 +123,11 @@ public class PlanetIsCalling extends JFrame implements Info, Runnable {
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);
 
+		UtilityTimer.getInstance().initTimer();
+		UtilityTimer.getInstance().startTimer(this);
+
 	}
 	
-	 public void run()
-	    {
-	        Calendar calUTC;
-	        Calendar calLocal;
-	        int hour;
-	        int min;
-	        int sec;
-	        String timeUTC;
-	        String timeLocal;
-	        long millis = 0;
-	        String timer = "";
-	        while(true) 
-	        {
-	        	
-	        	millis += 1000;
-	        	timer = Util.getTimer(millis);
-	            timeUTC = Util.getTime("UTC");
-	            timeLocal = Util.getTime("local");
-	            //delay the loop for 1 sec
-	            try {
-	                Thread.currentThread().sleep(1000);
-	        	    setTitle("The Planet Is Calling 0.9"
-	               +"                                                          "+ timeUTC+ " UTC       "
-	               +timeLocal+" "+abbreviation+"        "+timer);
-	        	    
-
-	                } catch (InterruptedException e) {
-	                    // TODO Auto-generated catch block
-	                    e.printStackTrace();
-	                }
-	        }
-	    }
 
 	public void itemTabPanel6()
 	{
