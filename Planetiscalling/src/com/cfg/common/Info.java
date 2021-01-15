@@ -41,7 +41,7 @@ public interface Info {
 
     String imageLogo = "/images/hello_here.jpg";
     String datadir  = "/data/";
-    
+    String metarFileName = "data/metar/metar.txt";
  	
 
 }

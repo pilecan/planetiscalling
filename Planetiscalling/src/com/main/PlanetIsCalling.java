@@ -91,6 +91,9 @@ public class PlanetIsCalling extends JFrame implements Info {
 	    
 		Utility.getInstance().readPrefProperties();
 	//	int numColor = Util.getStoredPeriodNumber();//Utility.getInstance().getPrefs().getProperty("day.period");
+		
+		
+		UtilityTimer.getInstance().setTimerSartAt(UtilityTimer.getInstance().getTime("local", true));
 
 	    Utility.getInstance().initLookAndFeel(this, Util.DAY_PERIOD.get(Util.getPeriod()) );
 		Utility.getInstance().getPrefs().put("day.period", Util.getPeriod());

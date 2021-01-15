@@ -83,10 +83,10 @@ public class Decoder {
 				String visibility_statute_mi = "<br>Visibility:\t           " + s[10] + " statue miles";
 				p[4] = visibility_statute_mi;
 				
-				String altim_in_hg = "<br>Altimeter:\t           " + s[11].substring(0, 5) + " mmHg";
+				String altim_in_hg = "<br>Barometric Pressure (Hg):\t           " + s[11].substring(0, 5) + " mmHg";
 				p[5] = altim_in_hg;
 				
-				String sea_level_pressure_mb = "<br>Pressure at sea level:  " + s[12] + " mb";
+				String sea_level_pressure_mb = "<br>Level of Sea im Millibars:  " + s[12] + " mB";
 				if (s[12].equals("")) {
 					sea_level_pressure_mb = "";
 				}

@@ -252,7 +252,6 @@ public class PanelFlightplan {
 
 				panelResult.validate();
 				panelFlightplan.validate();
-				UtilityTimer.getInstance().setMillis(0);
 			}
 		});		
 

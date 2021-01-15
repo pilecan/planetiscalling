@@ -74,8 +74,9 @@ public class PaneIcaolAiport extends JFrame {
 	private JButton resetBt;
 	private JButton landMeBt;
 	private JButton askMeBt;
-	private JButton landItBt;
 	private JButton delMeBt;
+	private JButton metarBt;
+
 
 	private JButton searchBt;
 
@@ -177,20 +178,17 @@ public class PaneIcaolAiport extends JFrame {
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-        	System.out.println("removeUpdate");
         	resetBt.setEnabled(!"".equals(textArea.getText()));
         }
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-        	System.out.println("insertUpdate");
         	resetBt.setEnabled(!"".equals(textArea.getText()));
 
         }
 
         @Override
         public void changedUpdate(DocumentEvent arg0) {
-        	System.out.println("changedUpdate");
         	resetBt.setEnabled(!"".equals(textArea.getText()));
 
         }
@@ -230,7 +228,7 @@ public class PaneIcaolAiport extends JFrame {
 			}
 			textArea.setText("");
 			
-			landItBt.setEnabled(false);
+			metarBt.setEnabled(false);
 			googleBt.setEnabled(false);
 			resetBt.setEnabled(false);
 
@@ -311,7 +309,7 @@ public class PaneIcaolAiport extends JFrame {
 		}
 	});	
 		
-	landItBt = new JButton("Land It");
+/*	landItBt = new JButton("Land It");
 	landItBt.setEnabled(false);
 	
 	landItBt.addActionListener(new ActionListener() {
@@ -334,7 +332,7 @@ public class PaneIcaolAiport extends JFrame {
 		   Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName)));
 		}
 	});		
-	
+*/	
 	 delMeBt = new JButton("Del Me");
 	 delMeBt.setEnabled(false);
 	 delMeBt.addActionListener(new ActionListener() {
@@ -364,8 +362,16 @@ public class PaneIcaolAiport extends JFrame {
 
 		}
 	});
+	 
+	metarBt = new JButton("METAR Me");
+	metarBt.setEnabled(false);
+	metarBt.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			result.showMetarMe(outputPanel, jEditorPane, askmeScrollPan);
+		}
+	});	
 	
-    result.setButtons(delMeBt,landMeBt, askMeBt, landItBt);
+    result.setButtons(delMeBt,landMeBt, askMeBt, metarBt);
 
 
 	inputIcaoPanel.setBounds(10, 10, 310, 120);
@@ -378,9 +384,9 @@ public class PaneIcaolAiport extends JFrame {
   	askMePanel.setBounds(x, 210, 340, 150);	
 
 	delMeBt.setBounds(x, y, 78, 23);
-	askMeBt.setBounds(x+86, y, 78, 23);
-	landMeBt.setBounds(x+170, y, 82, 23);
-	landItBt.setBounds(x+260, y, 80, 23);
+	askMeBt.setBounds(x+86, y, 77, 23);
+	metarBt.setBounds(x+170, y, 82, 23);
+	landMeBt.setBounds(x+260, y, 82, 23);
   	
 	distanceSpin.getSpinnerPanel().setBounds(10, 130, 310, 190);
     searchBt.setBounds(10, 330, 125, 23);
@@ -397,7 +403,7 @@ public class PaneIcaolAiport extends JFrame {
 	icaoPanel.add(delMeBt);
 	icaoPanel.add(landMeBt);
 	icaoPanel.add(askMeBt);
-	icaoPanel.add(landItBt);
+	icaoPanel.add(metarBt);
 	icaoPanel.add(googleBt);
 	
 	return icaoPanel;

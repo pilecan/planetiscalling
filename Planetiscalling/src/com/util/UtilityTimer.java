@@ -12,7 +12,7 @@ import com.db.SelectDB;
 import com.main.PlanetIsCalling;
 
 
-public class UtilityTimer implements Info, Runnable {
+public class UtilityTimer extends Thread implements Info {
 	
 	private JFrame planetIsCalling;
 	private String timeUTC;
@@ -20,6 +20,11 @@ public class UtilityTimer implements Info, Runnable {
 	private long millis = 0;
 	private String timer = "";
 	private String localAbbreviation;
+	private Calendar calUTC;
+	private TimeZone timeZone;
+	private Thread t1;
+	private long sequence = 1000;
+	private String timerSartAt = "";
 	
 	private static UtilityTimer instance = new UtilityTimer();
 	public static UtilityTimer getInstance(){
@@ -36,7 +41,8 @@ public class UtilityTimer implements Info, Runnable {
 			 
 		 }
   
-		public  String getTime(String where ) {
+		public  String getTime(String where, boolean isSecond ) {
+			String time = "";
 			TimeZone timeZone = null ;
 			if ("local".equals(where)){
 		    	timeZone = TimeZone.getDefault();
@@ -45,23 +51,30 @@ public class UtilityTimer implements Info, Runnable {
 			}
 
 			
-			Calendar calUTC = new GregorianCalendar(timeZone);
-	        int hour = calUTC.get(Calendar.HOUR_OF_DAY);
-	        int min = calUTC.get(Calendar.MINUTE);
-	        int sec = calUTC.get(Calendar.SECOND);
+			try {
+				calUTC = new GregorianCalendar(timeZone);
+				int hour = calUTC.get(Calendar.HOUR_OF_DAY);
+				int min = calUTC.get(Calendar.MINUTE);
+				int sec = calUTC.get(Calendar.SECOND);
+				
+				if (isSecond) {
+					time = String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" +   String.format("%02d",sec);
+				} else {
+					time = String.format("%02d",hour) + ":" +  String.format("%02d",min);
+
+				}
+			} catch (Exception e) {
+				time = "????";
+				//e.printStackTrace();
+			}
 	        
-	        if (min ==0 && sec == 0 ) {
-	        	System.out.println(getPeriod());
-	        }
-		
-	        //return String.format("%02d",hour) + ":" +  String.format("%02d",min) + ":" + String.format("%02d",sec);
-	        return String.format("%02d",hour) + ":" +  String.format("%02d",min);
+	        return time;
 
 			
 		}
 		  public String getPeriod() {
 			  String dayPeriod = "";
-			  String[] currentTimes = getTime("local").split(":");
+			  String[] currentTimes = getTime("local",false).split(":");
 			  int hour = Integer.parseInt(currentTimes[0]);
 	  
 			  if (hour >= 6 && hour < 12 ) {
@@ -77,8 +90,7 @@ public class UtilityTimer implements Info, Runnable {
 			  return dayPeriod;
 		  }
 		  public void initTimer( ) {
-				TimeZone timeZone = TimeZone.getDefault();
-				
+				timeZone = TimeZone.getDefault();
 				String name = Util.validgetDisplayName(timeZone.getDisplayName());
 				SelectDB selectDB = new SelectDB();
 				selectDB.selectTimeZone(name);
@@ -89,10 +101,11 @@ public class UtilityTimer implements Info, Runnable {
 					System.out.println("Oups "+ timeZone.getDisplayName());
 					localAbbreviation = timeZone.getDisplayName();
 				}
+
 		  }
 
 		  public void startTimer(PlanetIsCalling planetIsCalling) {
-		        Thread t1 =new Thread(this);  
+		        t1 =new Thread(this);  
 		        t1.start();
 		        
 		        this.planetIsCalling = planetIsCalling;
@@ -105,7 +118,7 @@ public class UtilityTimer implements Info, Runnable {
 		       PlanetIsCalling mc = null;
 		        if(o != null && o instanceof PlanetIsCalling)
 		        	mc = (PlanetIsCalling) o;
-		        mc.setTitle("Hello Word!");
+		        mc.setTitle("Good "+Util.getPeriod()+" World!");
 		        Util.pause(2000);
 	  
 	        while(true) 
@@ -113,11 +126,11 @@ public class UtilityTimer implements Info, Runnable {
 	        	
 	        	millis += 1000;
 	        	timer = getTimer(millis);
-	            timeUTC = getTime("UTC");
-	            timeLocal = getTime("local");
+	            timeUTC = getTime("UTC",false);
+	            timeLocal = getTime("local",false);
 	            //delay the loop for 1 sec
 	            try {
-	                Thread.currentThread().sleep(1000);
+	                Thread.currentThread().sleep(sequence);
 	                mc.setTitle("The Planet Is Calling 0.910"
 	               +"                                                               "+ timeUTC+ " UTC    "
 	               +timeLocal+" "+localAbbreviation+"                "+timer);
@@ -135,6 +148,14 @@ public class UtilityTimer implements Info, Runnable {
 
 		public void setMillis(long millis) {
 			this.millis = millis;
+		}
+
+		public String getTimerSartAt() {
+			return timerSartAt;
+		}
+
+		public void setTimerSartAt(String timerSartAt) {
+			this.timerSartAt = timerSartAt;
 		}
    
 }

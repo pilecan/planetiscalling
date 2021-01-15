@@ -2,13 +2,12 @@ package com.metar.net;
 
 import java.awt.EventQueue;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Scanner;
+import java.util.Date;
 
 import com.cfg.common.Info;
 import com.metar.decoder.Decoder;
@@ -25,6 +24,9 @@ public class UtilityMetar implements Info{
 	
 	private String raw = null;
 	private String metarDecoded = null;
+	
+	private static long oneHourMillis = 3600000;
+	//private static long oneHourMillis = 20000;
 
 	
 	public static UtilityMetar getInstance(){
@@ -56,8 +58,27 @@ public class UtilityMetar implements Info{
 
 	}
 	
+	private boolean isNeedUpdate() {
+		 Date date = new Date();
+         Path file = Paths.get(metarFileName);
+         long lastModifiedTime = 0; 
+         try {
+			BasicFileAttributes attr = Files.readAttributes(file, BasicFileAttributes.class);
+			lastModifiedTime = attr.lastModifiedTime().toMillis();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	      long timeMillisNow = date.getTime();
+
+	      
+	      return (timeMillisNow > oneHourMillis+lastModifiedTime) ;
+	}
+	
 	public void validMetar() {
-		if (!isMetarLoaded) {
+		
+		if (isNeedUpdate()) {
 			loadMetar();
 		} else {
 			System.out.println("meta was loaded");
@@ -66,11 +87,11 @@ public class UtilityMetar implements Info{
 
 	
 	private boolean loadMetar() {
-	     String fileName = "data/metar/metar.txt";
 
 	        try {
 
-	            Path file = Paths.get(fileName);
+	            Path file = Paths.get(metarFileName);
+
 	            BasicFileAttributes attr =
 	                Files.readAttributes(file, BasicFileAttributes.class);
 
@@ -80,6 +101,7 @@ public class UtilityMetar implements Info{
 	            System.out.println("creationTime: " + attr.creationTime());
 	            System.out.println("lastAccessTime: " + attr.lastAccessTime());
 	            System.out.println("lastModifiedTime: " + attr.lastModifiedTime());
+	            System.out.println("lastModifiedTime: " + attr.lastModifiedTime().toMillis());
 	            
 	            Util.getDateTime(attr);
 

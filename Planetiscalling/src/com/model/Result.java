@@ -125,10 +125,10 @@ public class Result implements Info {
 		this.metarBt = metarBt;
 	}
 
-	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe, JButton landAllBt) {
+	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe, JButton metarBt) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
-		this.landAllBt = landAllBt;
+		this.metarBt = metarBt;
 		this.delMeBt = delMeBt;
 	}
 
@@ -147,10 +147,6 @@ public class Result implements Info {
 	public JPanel getFlightPlanFormPanel() {
 		panelAltitude = new JPanel();
 		
-		askMeBt.setEnabled(false);
-		metarBt.setEnabled(false);
-		askMeBt.setText("Ask Me");
-		metarBt.setText("METAR Me");
 		
 		resultPanel = setBorderPanel(resultPanel);
 
@@ -243,6 +239,7 @@ public class Result implements Info {
 	/** Listens to the radio buttons. */
 	class RadioListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			initButtons() ;
 			if (e.getSource() == waypointBtn) {
 				getWaypointListModel();
 			} else if (e.getSource() == airportBtn) {
@@ -271,6 +268,19 @@ public class Result implements Info {
 		panel.add(radioBtn);
 		formUtility.addLastField(panel, resultPanel);
 
+	}
+	
+	private void initButtons() {
+		askMeBt.setEnabled(false);
+		metarBt.setEnabled(false);
+		askMeBt.setText("Ask Me");
+		metarBt.setText("METAR Me");
+		if (delMeBt != null) {
+			delMeBt.setEnabled(false);
+			delMeBt.setText("Del Me");
+
+		}
+		
 	}
 
 	public JPanel getIcaoFormPanel() {

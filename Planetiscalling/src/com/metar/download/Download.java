@@ -63,11 +63,13 @@ public class Download {
 */			}
 			bout.close();
 			in.close();
-			System.out.println("Download complete.");
+			System.out.println("Download complete!");
 
 		
-		}catch (IOException ex) {
-			ex.printStackTrace();
+		}catch (Exception ex) {
+			System.err.println("Download problem...");
+
+			//ex.printStackTrace();
 		}
 	}
 	
