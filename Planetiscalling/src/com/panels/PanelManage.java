@@ -227,7 +227,6 @@ public class PanelManage implements Info, Runnable {
 		int y = 20;
 		
 		folderPanel.setBounds(x,y, 330, 140);
-
 		
 		labelFP.setBounds(x+10, y+20, 300, 23);
 		buttonFPPerfs.setBounds(x+10, y+40, 150, 23);
