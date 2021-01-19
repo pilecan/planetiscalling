@@ -117,12 +117,12 @@ public class PlanetIsCalling extends JFrame implements Info {
 		itemTabPanel6();
 		
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab( "Fightplan", new PanelFlightplan().getPanel(selectCity,selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "ICAO", new PaneIcaolAiport().getPanel(selectVor, selectNdb, selectMountain, selectCity));
-		tabPane.addTab( "Airport", new PanelLandmarks().getAirportPanel(selectCity,selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "City", new PanelLandmarks().getCityPanel(selectCity, selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "Mountain",new PanelLandmarks().getMountainPanel(selectCity, selectMountain,selectVor, selectNdb));
-		tabPane.addTab( "Setting", new PanelManage().getSettingPanel(this));
+		tabPane.addTab( "Flightplan", null,new PanelFlightplan().getPanel(selectCity,selectMountain,selectVor, selectNdb),"Select your Flight Plan Here");
+		tabPane.addTab( "ICAO",null, new PaneIcaolAiport().getPanel(selectVor, selectNdb, selectMountain, selectCity),"Search Airport and More by ICAO Code(s)");
+		tabPane.addTab( "Airport",null, new PanelLandmarks().getAirportPanel(selectCity,selectMountain,selectVor, selectNdb),"Search Airport(s) and More by City airport");
+		tabPane.addTab( "City", null,new PanelLandmarks().getCityPanel(selectCity, selectMountain,selectVor, selectNdb),"Search Cities and More by Country and State");
+		tabPane.addTab( "Mountain",null,new PanelLandmarks().getMountainPanel(selectCity, selectMountain,selectVor, selectNdb),"Search Moutnains and More by Country");
+		tabPane.addTab( "Setting",null, new PanelManage().getSettingPanel(this),"Setup Application Folders and More");
 		tabPane.addTab( "About", panel6);
 		mainPanel.add(tabPane);
 

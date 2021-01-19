@@ -115,7 +115,12 @@ public class PaneIcaolAiport extends JFrame {
                 if (type == HyperlinkEvent.EventType.ENTERED) {
                     // do desired highlighting
                 } else if (type == HyperlinkEvent.EventType.ACTIVATED) {
-                	Util.openURL(url.toString());
+                	try {
+						Util.openURL(url.toString());
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						//e1.printStackTrace();
+					}
                 }
             }
           });
@@ -166,7 +171,33 @@ public class PaneIcaolAiport extends JFrame {
 
 	final JTextArea textArea = new JTextArea();
 	//textArea.setFont(textArea.getFont().deriveFont(14f));
-	textArea.setText("");
+	textArea.setText("RORK \r\n" + 
+			"ROMD \r\n" + 
+			"RKTU \r\n" + 
+			"RKTN \r\n" + 
+			"RKSS \r\n" + 
+			"RKSM \r\n" + 
+			"RKPK \r\n" + 
+			"RKPC \r\n" + 
+			"RKNY \r\n" + 
+			"RKJB \r\n" + 
+			"RJSM \r\n" + 
+			"RJOS \r\n" + 
+			"RJOH \r\n" + 
+			"RJNK \r\n" + 
+			"RJKI \r\n" + 
+			"RJFR \r\n" + 
+			"RJAW \r\n" + 
+			"RJAH \r\n" + 
+			"RCNN \r\n" + 
+			"RCMQ \r\n" + 
+			"PLCH \r\n" + 
+			"OTHH \r\n" + 
+			"OSLK \r\n" + 
+			"OSKL \r\n" + 
+			"OSAP \r\n" + 
+			"ORNI \r\n" + 
+			"ORMM ");
 	setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	textArea.setColumns(100);
 	textArea.setLineWrap(true);
@@ -374,7 +405,6 @@ public class PaneIcaolAiport extends JFrame {
     result.setButtons(delMeBt,landMeBt, askMeBt, metarBt);
 
 
-	inputIcaoPanel.setBounds(10, 10, 310, 120);
 	
 	int x = 330;
 	int y = 370;
@@ -388,10 +418,11 @@ public class PaneIcaolAiport extends JFrame {
 	metarBt.setBounds(x+170, y, 82, 23);
 	landMeBt.setBounds(x+260, y, 82, 23);
   	
-	distanceSpin.getSpinnerPanel().setBounds(10, 130, 310, 190);
-    searchBt.setBounds(10, 330, 125, 23);
-	resetBt.setBounds(150, 330, 125, 23);
-	googleBt.setBounds(100, 360, 160, 23);
+	distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
+	inputIcaoPanel.setBounds(10, 200, 310, 120);
+    searchBt.setBounds(30, 330, 125, 23);
+	resetBt.setBounds(180, 330, 125, 23);
+	googleBt.setBounds(90, 370, 180, 23);
 	
 	icaoPanel.add(inputIcaoPanel);
 	icaoPanel.add(distanceSpin.getSpinnerPanel());

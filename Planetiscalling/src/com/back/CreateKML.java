@@ -1,8 +1,10 @@
 package com.back;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream.GetField;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collections;
@@ -10,10 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.db.UtilityDB;
 import com.model.Airport;
 import com.model.City;
+import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
+import com.model.Result;
 import com.model.Vor;
 import com.util.Util;
 import com.util.Utility;
@@ -107,7 +112,19 @@ public class CreateKML {
 			
 			writer.write(createKMLHeader(1,title));
 			
-			if (object instanceof Airport) {
+			if (object instanceof Result) {
+				Result result = (Result)object;
+				for (LegPoint legPoint : result.getLegPoints()) {
+					///System.out.println(legPoint.getType()+" - "+legPoint.getIcaoIdent());
+						if (title.split("-")[1].equals(legPoint.getIcaoIdent())){
+							writer.write(legPoint.buildPoint());
+							break;
+						}
+					}
+				}
+				
+
+			 else if (object instanceof Airport) {
 				writer.write(buildAirportPlaceMark((Airport)object));
 
 			} else if (object instanceof Vor) {
@@ -133,6 +150,9 @@ public class CreateKML {
 			} catch (Exception ex) {
 			}
 		}
+     	
+        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(title+".kml")));
+
 	
 	}
 	
@@ -241,8 +261,30 @@ public class CreateKML {
 		return description;
 			
 	}
-	
+/*	
+	static public String buildWaypoint(LegPoint legPoint){
+		
+		String description = "";
 
+    	description += "<div>Ident: "+legPoint.getIdent()+"</div>";
+    	description += "<div>Name: "+legPoint.getName()+"</div>";
+    	description += "<div>Frequency: "+Util.formatVorFrequency(vor.getFrequency())+" MHz</div>";
+    	description += "<div>Range: "+vor.getRange()+"nm</div>";
+    	description += "<div>Mag. Var.: "+Util.formatMagvar(vor.getMagVar())+"</div>";
+    	description += "<div>Altitude: "+vor.getAltitude()+" ft ("+((int)Math.round(vor.getAltitude()/3.28084))+" m)</div>";
+    	description += "<div>Type: "+vor.getType()+"</div>";
+    	description += "<div>DME Only: "+(vor.getDmeOnly()==1?"Yes":"No")+"</div>";
+    	description += "<div>Region: "+vor.getRegion()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(vor.getLaty()+","+vor.getLonx())+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+
+		return description;
+			
+	}
+
+*/	
+	
 	
 	static public String buildNdbPlaceMark(Ndb ndb){
 		String icone = "";
@@ -341,6 +383,7 @@ public class CreateKML {
 				+ "<Point><coordinates>"+airport.getCoordinates()+"</coordinates></Point>\n"
 				+ "</Placemark>\n";
 	}
+
 	
 	
 

@@ -1,7 +1,6 @@
 package com.panels;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -26,13 +25,12 @@ import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
-import com.metar.decoder.Decoder;
-import com.metar.download.Download;
+import com.db.UtilityDB;
+import com.model.Airport;
 import com.model.Distance;
 import com.model.Result;
 import com.model.WaitMessage;
 import com.util.Utility;
-import com.util.UtilityTimer;
 
 public class PanelFlightplan {
 
@@ -288,8 +286,17 @@ public class PanelFlightplan {
 				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
 				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-
-				if ("airport".equals(result.getCurrentView())){
+				
+				if ("waypoint".equals(result.getCurrentView())){
+					UtilityDB.getInstance().selectAirport("where ident = '"+keyICAO+"'");
+					Airport airport = UtilityDB.getInstance().getAirport()	;
+					if (airport.getIdent() != null) {
+						CreateKML.makeOn(airport, result.getCurrentView());
+					} else {
+						CreateKML.makeOn(result, result.getCurrentView()+"-"+keyICAO);
+					}
+					
+				}  else if ("airport".equals(result.getCurrentView())){
 					selectAirport.select("where ident = '"+keyICAO+"'");
 					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
 				}  else if ("vor".equals(result.getCurrentView())){
@@ -303,7 +310,10 @@ public class PanelFlightplan {
 				 }
 				
 				
-		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+			//	if (!"waypoint".equals(currentView)){
+			//        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+					
+		//		}
 
 
 			}
@@ -336,15 +346,11 @@ public class PanelFlightplan {
 		buttonRightPanel.add(landMeBt);
 		
 
-		flightPlanBt.setBounds(50, 20, 200, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 60,  310, 190);
+		flightPlanBt.setBounds(70, 220, 200, 23);
+		distanceSpin.getSpinnerPanel().setBounds(10, 10,  310, 190);
 
-		buttonLeftPanel.setBounds(50, 260, 200, 100);
-		
-/*		refreshBt.setBounds(10, 270, 200, 23);
-		resetBt.setBounds(10, 300, 200, 23);
-		googleBt.setBounds(10, 330, 200, 23);
-*/		
+		buttonLeftPanel.setBounds(70, 260, 200, 100);
+	
 		buttonRightPanel.setBounds(290, 380, 300, 23);
 
 		int x = 330;

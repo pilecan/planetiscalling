@@ -223,6 +223,7 @@ public class ReadData implements Info{
 	public void resetCityResult(Result result) {
 		
 	    result.setMapAirport(new HashMap<String, Airport>());
+	    result.setSelectedMapAirports(new HashMap<String, Airport>());
 		//result.setSelectedCities(new HashMap<String, City>());
 		result.setSelectedMountains(new HashMap<String, Mountain>());
 		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
@@ -427,7 +428,7 @@ public class ReadData implements Info{
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
-						selectedAirports.put(airport.getName(), new Airport(airport));
+						selectedAirports.put(airport.getIdent(), new Airport(airport));
 						if (dist.isLine()) {
 							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
@@ -724,7 +725,7 @@ public class ReadData implements Info{
 		} 
 		
 		result.setSelectedMapAirports(selectedAirports);
-	    result.setMapAirport(selectAirport.getMapAirport());
+	    result.setMapAirport(selectedAirports);
 		result.setSelectedCities(selectedCities);
 		result.setSelectedMountains(selectedMountains);
 		result.setSelectedNdbs(selectedNdbs);

@@ -1,42 +1,46 @@
 package com.db;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JFrame;
 
 import com.cfg.common.Info;
+import com.db.SelectDB;
+import com.main.PlanetIsCalling;
 import com.model.Airport;
 import com.model.Runway;
-import com.util.Utility;
 
-/**
- *
- * @author sqlitetutorial.net
- */
-public class SelectAirport implements Info{
 
+public class UtilityDB extends Thread implements Info {
+	
+	
+	private static UtilityDB instance = new UtilityDB();
+	
 	private Airport airport;
 	private Runway runway;
 	private  List<Runway> listRunways;
 	private Map<String, Airport> mapAirport;
 	private List<Airport> airports;
 
-	/**
-	 * Connect to the test.db database
-	 * 
-	 * @return the Connection object
-	 */
+	
+	public static UtilityDB getInstance(){
+		return instance;
+	}
 	private Connection connect() {
 		// SQLite connection string
-		//String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
-		//String url = "jdbc:sqlite:data\\airport_runway.db";
+		String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url);
@@ -45,8 +49,7 @@ public class SelectAirport implements Info{
 		}
 		return conn;
 	}
-
-	public void select(String search) {
+	public void selectAirport(String search) {
 		listRunways = new ArrayList<>();
 		airports = new ArrayList<>();
 		airport = new Airport();
@@ -141,39 +144,35 @@ public class SelectAirport implements Info{
 		
 		
 	}
-
-	/**
-	 * @param args the command line arguments
-	 */
-	public static void main(String[] args) {
-	}
-
-
-	
 	public Airport getAirport() {
 		return airport;
 	}
-
 	public void setAirport(Airport airport) {
 		this.airport = airport;
 	}
-
+	public Runway getRunway() {
+		return runway;
+	}
+	public void setRunway(Runway runway) {
+		this.runway = runway;
+	}
+	public List<Runway> getListRunways() {
+		return listRunways;
+	}
+	public void setListRunways(List<Runway> listRunways) {
+		this.listRunways = listRunways;
+	}
 	public Map<String, Airport> getMapAirport() {
 		return mapAirport;
 	}
-
 	public void setMapAirport(Map<String, Airport> mapAirport) {
 		this.mapAirport = mapAirport;
 	}
-
 	public List<Airport> getAirports() {
 		return airports;
 	}
-
 	public void setAirports(List<Airport> airports) {
 		this.airports = airports;
 	}
-
 	
-
 }

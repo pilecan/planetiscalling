@@ -8,8 +8,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
@@ -434,6 +438,7 @@ public class Result implements Info {
 	public void getAirportListModel() {
 		listModel = new DefaultListModel<String>();
 		String info = "";
+	//	UtilityMetar.getInstance().validMetar();
 
 		for (Airport airport : mapAirport.values()) {
 				builder = Utility.getInstance().buildLine(airport.getIdent() , airport.getName(), airport.getCountry());
@@ -601,13 +606,13 @@ public class Result implements Info {
 
 	}
 
-	public String panelWaypoint(String line) {
+	public String panelWaypoint(String icao) {
 		String htmlString = null;
 		for (int i = 0; i < legPoints.size(); i++) {
 			
-			line = Utility.getInstance().findKeyICAO(line);
+			icao = Utility.getInstance().findKeyICAO(icao);
 
-			if (legPoints.get(i).toString().contains(line)) {
+			if (legPoints.get(i).toString().contains(icao)) {
 				htmlString = legPoints.get(i).getHmlString();
 				if ("Airport".equals(legPoints.get(i).getType())) {
 					htmlString = panelAirport(legPoints.get(i).getIcaoIdent());
@@ -625,10 +630,25 @@ public class Result implements Info {
 		String varStr = null;
 		icao = Utility.getInstance().findKeyICAO(icao);
 		
-		Airport airport = mapAirport.get(icao);
-		metar = UtilityMetar.getInstance().getMetar(icao);
-		metarBt.setEnabled(metar != null);
+		Airport airport;
+		try {
+			airport = selectedMapAirports.get(icao);
+		} catch (NullPointerException e1) {
+			airport = mapAirport.get(icao);
+		}
 
+		metar = UtilityMetar.getInstance().getDecodedMetar(icao);
+		UtilityMetar.getInstance().getRawMetar(icao);
+		
+	//	UtilityMetar.getInstance().getConditionCode(UtilityMetar.getInstance().getRawMetar(icao));
+		boolean isMetarVadid = (UtilityMetar.getInstance().getDecodedMetar(icao) != null && (!metar.contains("error")));
+		
+		
+		metarBt.setEnabled(isMetarVadid);
+/*		if (metarBt.isEnabled()) {
+			metarBt.setText("METAR Me");
+		}
+*/
 		try {
 			varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
 			varStr += airport.getDescription().replaceAll("\\|", "<br>");
@@ -761,14 +781,32 @@ public class Result implements Info {
 
 			
 			content = UtilityMetar.getInstance().getMetarDecoded();
-	        	
-	        jEditorPane.setText(content);
+		
+			String url = "file:/"+UtilityMetar.getInstance().getImageWeather().replace("\\", "/");
+			
+			String setColor[] = {"ffff00","ff0000"};
+			
+	        Random rand = new Random(); 
+	        int rand_int1 = rand.nextInt(setColor.length); 
+
+			String color = setColor[1];
+            try {
+            	jEditorPane.setToolTipText("Control A to Higthlight Text");
+				jEditorPane.setContentType("text/html");
+				jEditorPane.setText("<html><body style='font-weight: bold; color: #"+color+";  background-image: url(" + url + ");'>"+content+"</body></html>");
+	            jEditorPane.validate();;
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+ 			
+ 	       // jEditorPane.setText(content);
 	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        	   public void run() { 
 	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
 	        	   }
 	        	});
-	    	
+
 	    } else {
 			outputPanel.setVisible(true);
 			jEditorPane.setVisible(false);
@@ -778,9 +816,10 @@ public class Result implements Info {
 			askMeBt.setEnabled(true);
 
 	    }
+	    
 	
 	}
-	
+ 	
 	public long getDistance() {
 		return distance;
 	}

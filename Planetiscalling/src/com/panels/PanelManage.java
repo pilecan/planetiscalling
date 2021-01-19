@@ -2,12 +2,12 @@ package com.panels;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,15 +20,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.cfg.common.Info;
 import com.main.PlanetIsCalling;
-import com.metar.net.UtilityMetar;
 import com.model.Preference;
 import com.util.SwingUtils;
 import com.util.Util;
@@ -52,6 +48,8 @@ public class PanelManage implements Info, Runnable {
 	
 	private JPanel timerPanel;
 	private JPanel folderPanel;
+	private JPanel googlePanel;
+	private JPanel colorPanel;
 
 	private String timerSartAt = "";
 
@@ -81,6 +79,12 @@ public class PanelManage implements Info, Runnable {
 		folderPanel = new JPanel(new BorderLayout());
 		folderPanel.setBorder(new TitledBorder("Folders"));
 		
+		googlePanel = new JPanel(new BorderLayout());
+		googlePanel.setBorder(new TitledBorder("Google Earth"));
+		
+		colorPanel = new JPanel(new BorderLayout());
+		colorPanel.setBorder(new TitledBorder("Colors of the Day"));
+		
 		
 		JLabel labelHeader = new JLabel("Setting Panel");
 
@@ -95,7 +99,7 @@ public class PanelManage implements Info, Runnable {
 		comboColor = new JComboBox<>();
 		
 	
-		readPrefs() ;
+		readPreferences() ;
 
 		JButton saveButton = new JButton("Save");
 		JButton resetButton = new JButton("Reset");
@@ -103,7 +107,7 @@ public class PanelManage implements Info, Runnable {
   	    saveButton.setBounds(10, 245, 90, 23);
 
 		
-	    JButton buttonFPPerfs = new JButton("Add Flightplan Dir");
+	    JButton buttonFPPerfs = new JButton("Select Flightplan Folder");
 		buttonFPPerfs.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -114,24 +118,25 @@ public class PanelManage implements Info, Runnable {
 	      }
 	    });
 
-		JButton buttonKMLPerfs = new JButton("Add KML Dir");
+		JButton buttonKMLPerfs = new JButton("Select KML Folder");
 		buttonKMLPerfs.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
 			isFromAdd = true;
-	  		selectFlightplan("Select KML Directory","kmlflightplandir");
+	  		selectFlightplan("Select KML folder","kmlflightplandir");
 	     	Utility.getInstance().savePrefProperties();
 	      }
 	    });
 		
+		labelFP.setText("Current Flight Plan folder (?)");
 		comboFPDir.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 		        try {
 					if (!isFromAdd) {
-						labelFP.setText("Current dir :"+hashFP.get(e.getItem()).getPath());
 						labelFP.setToolTipText(hashFP.get(e.getItem()).getPath());
+						comboFPDir.setToolTipText(hashFP.get(e.getItem()).getPath());
 						Utility.getInstance().getPrefs().put("flightplandir", hashFP.get(e.getItem()).getPath());
 				     	Utility.getInstance().savePrefProperties();
 					}
@@ -145,13 +150,14 @@ public class PanelManage implements Info, Runnable {
 	
 		});
 
+		labelKML.setText("Current KML folder (?)");
 		comboKMLDir.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				try {
 					if (!isFromAdd) {
-						labelKML.setText("Current dir :" + hashKML.get(e.getItem()).getPath());
 						labelKML.setToolTipText(hashKML.get(e.getItem()).getPath());
+						comboKMLDir.setToolTipText(hashKML.get(e.getItem()).getPath());
 						Utility.getInstance().getPrefs().put("kmlflightplandir", hashKML.get(e.getItem()).getPath());
 				    	Utility.getInstance().savePrefProperties();
 
@@ -165,7 +171,8 @@ public class PanelManage implements Info, Runnable {
 
 		});
 		
-		JButton buttonGoogle = new JButton("Google Earth Dir");
+		labelGoogle.setText("Current Google Earth.exe (?)");
+		JButton buttonGoogle = new JButton("Select Google Earth (googleearth.exe)");
 		buttonGoogle.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
@@ -178,8 +185,8 @@ public class PanelManage implements Info, Runnable {
 	      }
 	    });
 
-		labelColor.setText("GUI Colors");
-		labelColor.setToolTipText("Set color of GUI here");
+		labelColor.setText("Time of Day Now");
+		labelColor.setToolTipText("Morning, Afternoon, Evening, Night");
 		comboColor.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -221,30 +228,40 @@ public class PanelManage implements Info, Runnable {
 	      }
 	    });
 
-		labelHeader.setBounds(200, 5, 120, 23);
 		
 		int x = 10;
-		int y = 20;
+		int y = 60;
+		int w = 320;
 		
-		folderPanel.setBounds(x,y, 330, 140);
 		
-		labelFP.setBounds(x+10, y+20, 300, 23);
-		buttonFPPerfs.setBounds(x+10, y+40, 150, 23);
-		comboFPDir.setBounds(180, y+40, 120, 23);
-		
-		labelKML.setBounds(x+10, y+70, 300, 23);
-		buttonKMLPerfs.setBounds(x+10, y+90, 150, 23);
-		comboKMLDir.setBounds(180, y+90, 120, 23);
-		
-		labelGoogle.setBounds(10, 160, 300, 23);
-		buttonGoogle.setBounds(10, 180, 150, 23);
+		labelHeader.setFont( new Font("SansSerif", Font.BOLD, 18));
 
-		timerPanel.setBounds(380, y, 222, 100);
+		labelHeader.setBounds(310, 12, 200, 40);
+
+		
+		folderPanel.setBounds(x,y, 340, 160);
+		
+		labelFP.setBounds(      x+20, y+20, 320, 23);
+		buttonFPPerfs.setBounds(x+20, y+45, 180, 23);
+		comboFPDir.setBounds(    210, y+45, 120, 23);
+		
+		labelKML.setBounds(      x+20, y+90, 320, 23);
+		buttonKMLPerfs.setBounds(x+20, y+115, 180, 23);
+		comboKMLDir.setBounds(    210, y+115, 120, 23);
+		
+		googlePanel.setBounds(x,y+180, 340, 90);
+
+		labelGoogle.setBounds(x+20, y+200, 320, 23);
+		buttonGoogle.setBounds(x+20, y+225, 280, 23);
+
+		
+		timerPanel.setBounds(380, y, 300, 100);
 		labelTimer.setBounds(400, y+20, 200, 23);
 		resetTimerBt.setBounds(400, y+50, 120, 23);
 
-		labelColor.setBounds(380, 120, 300, 23);
-		comboColor.setBounds(380, 140, 120, 23);
+		colorPanel.setBounds(380, y+110, 300, 100);
+		labelColor.setBounds(400, y+135, 300, 23);
+		comboColor.setBounds(400, y+160, 150, 23);
 
 		panelManage.add(labelHeader);
 		panelManage.add(labelFP);
@@ -263,6 +280,8 @@ public class PanelManage implements Info, Runnable {
 		panelManage.add(resetTimerBt);
 		panelManage.add(timerPanel);
 		panelManage.add(folderPanel);
+		panelManage.add(googlePanel);
+		panelManage.add(colorPanel);
 
 		return panelManage;
 	}
@@ -291,7 +310,6 @@ public class PanelManage implements Info, Runnable {
 				 } else if ("googleearth".equals(key)) {
 						System.out.println("key = "+key);
 						Utility.getInstance().getPrefs().put(key, chooser.getSelectedFile().toString());
-						labelGoogle.setText("Current dir :"+chooser.getSelectedFile().toString());
 						labelGoogle.setToolTipText(chooser.getSelectedFile().toString());
 						
 					       for(Entry<Object, Object> e : Utility.getInstance().getPrefs().entrySet()) {
@@ -353,14 +371,11 @@ public class PanelManage implements Info, Runnable {
     	
     }
 	
-	private void readPrefs() {
+	private void readPreferences() {
 		
 		Utility.getInstance().readPrefProperties();
-		//Utility.getInstance().getPrefs();
 		
-		labelFP.setText("Current dir :"+Utility.getInstance().getPrefs().getProperty("flightplandir"));
 		labelFP.setToolTipText(Utility.getInstance().getPrefs().getProperty("flightplandir"));
-		labelKML.setText("Current dir :"+Utility.getInstance().getPrefs().getProperty("kmlflightplandir"));
 		labelKML.setToolTipText(Utility.getInstance().getPrefs().getProperty("kmlflightplandir"));
 		labelGoogle.setToolTipText(Utility.getInstance().getPrefs().getProperty("googleearth"));
 		labelGoogle.setText(Utility.getInstance().getPrefs().getProperty("googleearth"));
@@ -382,8 +397,11 @@ public class PanelManage implements Info, Runnable {
 	   
 	      comboFPDir = new JComboBox<>(hashFP.keySet().toArray(new String[hashFP.size()]));
 	      comboFPDir.setSelectedItem(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty("flightplandir")));
+		  comboFPDir.setToolTipText(Utility.getInstance().getPrefs().getProperty("flightplandir"));
+
 	      comboKMLDir = new JComboBox<>(hashKML.keySet().toArray(new String[hashKML.size()]));
 	      comboKMLDir.setSelectedItem(Util.extractLastPath(Utility.getInstance().getPrefs().getProperty("kmlflightplandir")));
+	      comboKMLDir.setToolTipText(Utility.getInstance().getPrefs().getProperty("kmlflightplandir"));
 	 }
 	    
        String[] periods = {"Morning","Afternoon","Evening","Night"};

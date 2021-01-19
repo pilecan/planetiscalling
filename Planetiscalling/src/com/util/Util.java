@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +31,8 @@ import com.cfg.common.Info;
 
 public class Util implements Info {
 
-	private static String decoration = "style=\"text-decoration: none;background-color:white;\" onMouseOver=\"this.style.backgroundColor='#999999'\" onMouseOut=\"this.style.backgroundColor='#FFFFFF'\"";
+	private static String decoration = "style=\"a:visited:color:red; text-decoration: none;background-color:white;\" onMouseOver=\"this.style.backgroundColor='#999999'\" onMouseOut=\"this.style.backgroundColor='#FFFFFF'\"";
+	private static String decorationFake = "style=\"text-decoration: none;background-color:gray;\" onMouseOver=\"this.style.backgroundColor='#999999'\" onMouseOut=\"this.style.backgroundColor='#FFFFFF'\"";
 
 	public static String aviationWeather = " <a "
 			+ decoration
@@ -251,7 +253,14 @@ public class Util implements Info {
 		REGION_MAP.put("HS","South Sudan");
 		REGION_MAP.put("HT","Tanzania");
 		REGION_MAP.put("HU","Uganda");
-		REGION_MAP.put("K","United States");
+		REGION_MAP.put(null,"Colorado");
+		REGION_MAP.put("K1","Washington");
+		REGION_MAP.put("K2","Arizona");
+		REGION_MAP.put("K3","Missouri");
+		REGION_MAP.put("K4","Louisiana");
+		REGION_MAP.put("K5","Ohio");
+		REGION_MAP.put("K6","New York");
+		REGION_MAP.put("K7","Florida");
 		REGION_MAP.put("LA","Albania");
 		REGION_MAP.put("LB","Bulgaria");
 		REGION_MAP.put("LC","Cyprus");
@@ -559,7 +568,7 @@ public class Util implements Info {
 			  dayPeriod = "Afternoon";
 		  }else if (hour >= 17 && hour < 20 ) {
 			  dayPeriod = "Evening";
-		  }else if (hour >= 20) {
+		  }else if (hour >= 20 || hour >= 0) {
 			  dayPeriod = "Night";
 		  }
 		  
@@ -697,6 +706,7 @@ public class Util implements Info {
 	}
 	
 	public static String extractLastPath(String str){
+		str = str.replace("\\", "/");
 		return str.substring(str.lastIndexOf("/")+1);
 	}
 	
@@ -779,6 +789,11 @@ public class Util implements Info {
 		return "<a " + decoration + " href=\"" +url + "\"> "+message+"  </a>";
 	}
 
+	public static String createFakeLink(String text) {
+		return "<a " + decorationFake + " href=\"\"> "+text+"  </a>";
+	}
+
+	
 	public static void openWebpage(String search, int numPage) {
 		try {
 
@@ -900,6 +915,45 @@ public class Util implements Info {
 
 		mapListArea.clear();
 		mapListArea.putAll(mapListWork);
+	}
+	
+	public static String listFilesForFolder(final File folder) {
+		List <String> list = new ArrayList<String>();
+        Random rand = new Random(); 
+
+	    for (final File fileEntry : folder.listFiles()) {
+	        if (fileEntry.isDirectory()) {
+	            listFilesForFolder(fileEntry);
+	        } else {
+	            System.out.println(fileEntry.getName());
+	            list.add(fileEntry.getName());
+	        }
+	    }
+	    
+	    int rand_int1 = 0;
+	    if (list.size() > 1) {
+	        rand_int1 = rand.nextInt(list.size()); 
+	    }
+	    
+	    System.out.println(list.get(rand_int1));
+	    
+	    return folder+"\\"+list.get(rand_int1);
+/*
+		   InputStream is = PlanetIsCalling.class.getResourceAsStream("/images/weather/va");
+       	InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
+       	BufferedReader reader = new BufferedReader(streamReader);
+       	for (String line; (line = reader.readLine()) != null;) {
+       		System.out.println(line);
+       	}    			
+
+*/	
+	}
+
+	
+	public static String readAndTakePic() {
+		
+		
+		return "";
 	}
 
 	public static String getComputerName() {

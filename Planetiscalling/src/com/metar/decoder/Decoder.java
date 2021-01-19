@@ -25,7 +25,13 @@ public class Decoder {
 	
 	//save first part of text - raw metar
 	public String showRawMetar(String allLine) {
-		String rawMetar = allLine.substring(0, allLine.indexOf(","));
+		String rawMetar = null;
+		try {
+			rawMetar = allLine.substring(0, allLine.indexOf(","));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			rawMetar = allLine;
+		}
 		return rawMetar;
 	}
 	
@@ -86,7 +92,7 @@ public class Decoder {
 				String altim_in_hg = "<br>Barometric Pressure (Hg):\t           " + s[11].substring(0, 5) + " mmHg";
 				p[5] = altim_in_hg;
 				
-				String sea_level_pressure_mb = "<br>Level of Sea im Millibars:  " + s[12] + " mB";
+				String sea_level_pressure_mb = "<br>Level of Sea in Millibars:  " + s[12] + " QNH";
 				if (s[12].equals("")) {
 					sea_level_pressure_mb = "";
 				}

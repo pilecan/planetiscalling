@@ -505,24 +505,6 @@ public class CreateKmlFSPlan{
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) throws FileNotFoundException, NullPointerException, NoPoints, IOException {
-
-		SelectAirport selectAiport = new SelectAirport();
-		selectAiport.selectAll("");
-		
-		SelectCity selectCity = new SelectCity();
-		selectCity.selectAll("");
-		
-		SelectMountain selectMountain = new SelectMountain();
-		selectMountain.selectAll("");
-		
-		Distance dist = new Distance(10, 100, 20, true);
-		
-
-	/*	new CreateKmlFSPlan(flightPlan, dist, 
-				manageXMLFile, 
-				selectCity.getCities(), 
-				selectMountain.getMountains());
-*/		
 	}
 	
 	public LinkedList<LegPoint> getLegPoints() {
