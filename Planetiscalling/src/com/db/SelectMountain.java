@@ -64,7 +64,6 @@ public class SelectMountain implements Info{
 				
 
 			}
-			System.out.println("mountains  = "+mountains.size());
 			} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

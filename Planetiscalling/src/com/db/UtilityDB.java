@@ -6,20 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.JFrame;
 
 import com.cfg.common.Info;
-import com.db.SelectDB;
-import com.main.PlanetIsCalling;
+import com.geo.util.Geoinfo;
 import com.model.Airport;
+import com.model.City;
+import com.model.CityWeather;
 import com.model.Runway;
 
 
@@ -29,10 +25,12 @@ public class UtilityDB extends Thread implements Info {
 	private static UtilityDB instance = new UtilityDB();
 	
 	private Airport airport;
+	private CityWeather cityWeather;
 	private Runway runway;
 	private  List<Runway> listRunways;
 	private Map<String, Airport> mapAirport;
 	private List<Airport> airports;
+	private List<CityWeather> cityWeathers;
 
 	
 	public static UtilityDB getInstance(){
@@ -142,8 +140,54 @@ public class UtilityDB extends Thread implements Info {
 			//e1.printStackTrace();
 		}
 		
+	}
+
+	public CityWeather selectCityWeather(City city) {
+		cityWeather = null;
+		cityWeathers = new ArrayList<CityWeather>();
+		Map<Double,CityWeather> orderDistance = new TreeMap<>(); 
+		String sql = "SELECT distinct " + 
+				"c2.id id, " + 
+				"c2.name name, " + 
+				"c2.iso2 iso2, " + 
+				"c2.lonx lonx, " + 
+				"c2.laty laty" + 
+				"  FROM world_city_new c1" + 
+				"  INNER JOIN  city_weather c2 ON c1.city_ascii = c2.name and c1.iso2 = c2.iso2 "
+				+ "and c2.name = '"+city.getCityAscii()+"' and c2.iso2 = '"+city.getIso2()+"'";
+		
+		System.out.println(sql);
+	
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					cityWeather = new CityWeather(rs.getLong("id"), rs.getString("name"), rs.getString("iso2") , rs.getDouble("lonx"), rs.getDouble("laty"));
+					System.out.println(Geoinfo.distance(city.getLaty(), rs.getDouble("laty"), city.getLonx(), rs.getDouble("lonx"))+" - "+cityWeather.toString());
+					cityWeathers.add(cityWeather);
+					orderDistance.put(Geoinfo.distance(city.getLaty(), rs.getDouble("laty"), city.getLonx(), rs.getDouble("lonx")), cityWeather);
+				}
+
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		}
+		
+		if (orderDistance.size() > 0) {
+			 Map.Entry<Double,CityWeather> entry = orderDistance.entrySet().iterator().next();
+			cityWeather = entry.getValue();
+		}
+		
+		return cityWeather; 
 		
 	}
+
+	
 	public Airport getAirport() {
 		return airport;
 	}
@@ -173,6 +217,12 @@ public class UtilityDB extends Thread implements Info {
 	}
 	public void setAirports(List<Airport> airports) {
 		this.airports = airports;
+	}
+	public CityWeather getCityWeather() {
+		return cityWeather;
+	}
+	public void setCityWeather(CityWeather cityWeather) {
+		this.cityWeather = cityWeather;
 	}
 	
 }

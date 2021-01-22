@@ -455,8 +455,17 @@ public class Util implements Info {
 	public static String formatAltitude(Double value){
 		 DecimalFormat myFormatter = new DecimalFormat("000000.00");
 		 return myFormatter.format(value).replace(",", ".");
-   }
+  }
 
+	public static String formatDistance(Double value){
+		 DecimalFormat myFormatter = new DecimalFormat("0.0");
+		 return myFormatter.format(value).replace(",", ".");
+  }
+
+	public static String formatRain(Double value){
+		 DecimalFormat myFormatter = new DecimalFormat("0.00");
+		 return myFormatter.format(value).replace(",", ".");
+ }
 	
 	public static String formatTimeZone(Double hourZone) {
 		DecimalFormat myFormatter = new DecimalFormat("00.00");

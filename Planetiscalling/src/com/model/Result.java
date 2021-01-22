@@ -8,12 +8,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
@@ -41,14 +41,16 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
-import com.back.CreateKML;
+import com.backend.CreateKML;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
 import com.geo.util.Geoinfo;
-import com.metar.net.UtilityMetar;
 import com.util.FormUtility;
 import com.util.Util;
 import com.util.Utility;
+
+import net.metar.UtilityMetar;
+import net.weather.UtilityWeather;
 
 public class Result implements Info {
 	private long distance;
@@ -70,6 +72,10 @@ public class Result implements Info {
 	private JPanel panel;
 	private JLabel label;
 	private JCheckBox checkAltitude;
+
+	private JEditorPane jEditorPane;
+	private JScrollPane askmeScrollPan;
+	private JPanel askMePanel;
 
 	private SortedListModel listResultModel;
 
@@ -104,7 +110,6 @@ public class Result implements Info {
 	private JButton askMeBt;
 	private JButton landAllBt;
 	private JButton delMeBt;
-	private JButton metarBt;
 
 	public Result() {
 		super();
@@ -118,21 +123,15 @@ public class Result implements Info {
 
 	}
 
+	
 	public void setButtons(JButton landMeBt, JButton askMe) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
 	}
-	
-	public void setButtons(JButton landMeBt, JButton askMe, JButton metarBt) {
-		this.leftBtn = landMeBt;
-		this.askMeBt = askMe;
-		this.metarBt = metarBt;
-	}
 
-	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe, JButton metarBt) {
+	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
-		this.metarBt = metarBt;
 		this.delMeBt = delMeBt;
 	}
 
@@ -276,9 +275,7 @@ public class Result implements Info {
 	
 	private void initButtons() {
 		askMeBt.setEnabled(false);
-		metarBt.setEnabled(false);
 		askMeBt.setText("Ask Me");
-		metarBt.setText("METAR Me");
 		if (delMeBt != null) {
 			delMeBt.setEnabled(false);
 			delMeBt.setText("Del Me");
@@ -461,10 +458,12 @@ public class Result implements Info {
 			builder = new StringBuilder();
 			if (i < legPoints.size() - 1) {
 
-				distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(),legPoints.get(i + 1).getLaty(), legPoints.get(i + 1).getLonx(), 'N');
-				info = legPoints.get(i).getId() + "   " + Math.round(distance) + " - " + Math.round(distanceCumul)+ " - " + Math.round(legPoints.get(i).getAltitude() * 3.28084) + "ft";
-				distanceCumul += distance;
-				builder = Utility.getInstance().buildLine(legPoints.get(i).getId(), Math.round(distance), Math.round(distanceCumul));
+				if ("1".equals(legPoints.get(i).getVisible())){
+					distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(),legPoints.get(i + 1).getLaty(), legPoints.get(i + 1).getLonx(), 'N');
+					info = legPoints.get(i).getId() + "   " + Math.round(distance) + " - " + Math.round(distanceCumul)+ " - " + Math.round(legPoints.get(i).getAltitude() * 3.28084) + "ft";
+					distanceCumul += distance;
+					builder = Utility.getInstance().buildLine(legPoints.get(i).getId(), Math.round(distance), Math.round(distanceCumul));
+				}
 			} else {
 				builder = Utility.getInstance().buildLine(legPoints.get(legPoints.size() - 1).getId(), 0, Math.round(distanceCumul));
 
@@ -569,9 +568,11 @@ public class Result implements Info {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
+				showAskMeAnswer();
 				if (e.getClickCount() == 2) {
 					currentSelection = (String) currentList.getSelectedValue();
-					askMeBt.doClick();
+					//showAskMeAnswer();
+				//askMeBt.doClick();
 
 				}
 			}
@@ -589,6 +590,7 @@ public class Result implements Info {
 					if (!"airport".equals(currentView)){
 						delMeBt.setEnabled(false);
 					}
+					askMeBt.setText("Close Me");
 				} catch (NullPointerException e) {
 				}
 				askMeBt.setEnabled(!currentList.isSelectionEmpty());
@@ -644,7 +646,6 @@ public class Result implements Info {
 		boolean isMetarVadid = (UtilityMetar.getInstance().getDecodedMetar(icao) != null && (!metar.contains("error")));
 		
 		
-		metarBt.setEnabled(isMetarVadid);
 /*		if (metarBt.isEnabled()) {
 			metarBt.setText("METAR Me");
 		}
@@ -652,6 +653,13 @@ public class Result implements Info {
 		try {
 			varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
 			varStr += airport.getDescription().replaceAll("\\|", "<br>");
+			
+			if (isMetarVadid) {
+				varStr += metar;
+			} else {
+				varStr += "<b>METAR Not Available for "+icao+" Airport</b>"; 
+
+			}
 		} catch (NullPointerException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
@@ -690,13 +698,14 @@ public class Result implements Info {
 	}
 
 	public String panelCity(String line) {
-		String htmlString = null;
+		String htmlString = "";
 		line = Utility.getInstance().findKeyICAO(line);
 
 		for (City city : selectedCities.values()) {
 			if (city.getCityName().equals(line)) {
-				htmlString = CreateKML.buildCityDescription(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
-
+				htmlString += CreateKML.buildCityDescriptionPlane(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
+				UtilityWeather.getInstance().searchCityWeather(city);
+				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
 			}
 		}
 
@@ -725,13 +734,12 @@ public class Result implements Info {
 			kit = new HTMLEditorKit();
 			doc = kit.createDefaultDocument();
 	        jEditorPane.setDocument(doc);
-	    	
-			metarBt.setEnabled(false);
-
-	    	outputPanel.setVisible(false);
+			jEditorPane.setContentType("text/html");
+	    	//outputPanel.setVisible(true);
 			jEditorPane.setVisible(true);
 			
-			askMeBt.setText("Back");
+			askMeBt.setText("Close");
+			
 	        if ("waypoint".equals(getCurrentView())) {
 	        	content = panelWaypoint(getCurrentSelection());
 	        } else if ("waypoint".equals(getCurrentView())) {
@@ -747,8 +755,10 @@ public class Result implements Info {
 	        }   else if ("mountain".equals(getCurrentView())) {
 	        	content = panelMountain(getCurrentSelection());
 	        }  
-	        	
-	        jEditorPane.setText(content);
+	        
+	        //jEditorPane.setText(content);
+	        showPanelInfo(content);
+	        
 	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	        	   public void run() { 
 	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
@@ -756,44 +766,87 @@ public class Result implements Info {
 	        	});
 	    	
 	    } else {
-			outputPanel.setVisible(true);
+			//outputPanel.setVisible(true);
+			
 			jEditorPane.setVisible(false);
 			askMeBt.setText("Ask Me");
-			metarBt.setText("METAR Me");
-			metarBt.setEnabled(false);
 	    }
 	
 	}
 	
-	public void showMetarMe( JPanel outputPanel, JEditorPane jEditorPane, final JScrollPane askmeScrollPan ) {
+
+	public void showAskMeAnswer() {
 		String content = null;
-	    if ("METAR Me".equals(metarBt.getText())) {
+		jEditorPane.setVisible(true);
+		askMePanel.setVisible(true);
+		askMeBt.setText("Close Me");
+		
+        if ("waypoint".equals(getCurrentView())) {
+        	content = panelWaypoint(getCurrentSelection());
+        } else if ("waypoint".equals(getCurrentView())) {
+        	content = panelWaypoint(getCurrentSelection());
+        } else if ("airport".equals(getCurrentView())) {
+        	content = panelAirport(getCurrentSelection());
+        }  else if ("vor".equals(getCurrentView())) {
+        	content = panelVor(getCurrentSelection());
+        }   else if ("ndb".equals(getCurrentView())) {
+        	content = panelNdb(getCurrentSelection());
+        }   else if ("city".equals(getCurrentView())) {
+        	content = panelCity(getCurrentSelection());
+        }   else if ("mountain".equals(getCurrentView())) {
+        	content = panelMountain(getCurrentSelection());
+        }  
+        	
+       jEditorPane.setText(content);
+        showPanelInfo(content);
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+     	   public void run() { 
+     		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+     	   }
+     	});
+	
+	}
+	
+	
+		public void showPanelInfo( String content) {
 			kit = new HTMLEditorKit();
 			doc = kit.createDefaultDocument();
 	        jEditorPane.setDocument(doc);
 	    	
-	    	outputPanel.setVisible(false);
 			jEditorPane.setVisible(true);
 			
-			askMeBt.setText("Ask Me");
-			metarBt.setText("Back");
-			askMeBt.setEnabled(false);
+			String image = "";
+			try {
+				//System.out.println("image ->"+content.substring(content.indexOf("<!--")+4,content.indexOf("-->")));
+				image = content.substring(content.indexOf("<!--")+4,content.indexOf("-->"));
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+			}
+			
+	    	URL url = null;
+			try {
+				File background = new File(Info.weatherPath+image+"@2x.png");
+				//url = background.toURI().toURL();
+				url = background.getCanonicalFile().toURI().toURL();
+			} catch (IOException e) {
+			}
+			
+			
+			String urlString = url.toString().replace("\\", "/");
 
 			
-			content = UtilityMetar.getInstance().getMetarDecoded();
-		
-			String url = "file:/"+UtilityMetar.getInstance().getImageWeather().replace("\\", "/");
-			
-			String setColor[] = {"ffff00","ff0000"};
+			String setColor[] = {"#E6E6E6","ff0000"};
 			
 	        Random rand = new Random(); 
 	        int rand_int1 = rand.nextInt(setColor.length); 
+			String color = setColor[0];
 
-			String color = setColor[1];
-            try {
+			try {
             	jEditorPane.setToolTipText("Control A to Higthlight Text");
 				jEditorPane.setContentType("text/html");
-				jEditorPane.setText("<html><body style='font-weight: bold; color: #"+color+";  background-image: url(" + url + ");'>"+content+"</body></html>");
+				jEditorPane.setText("<html><body style='font-weight: bold; color: #"+color+"; background-position: 200px 0; background-image: url(" + urlString + "); background-repeat: no-repeat;'>"+content+"</body></html>");
 	            jEditorPane.validate();;
 
 			} catch (Exception e) {
@@ -807,15 +860,7 @@ public class Result implements Info {
 	        	   }
 	        	});
 
-	    } else {
-			outputPanel.setVisible(true);
-			jEditorPane.setVisible(false);
-			askMeBt.setText("Ask Me");
-			metarBt.setText("METAR Me");
-			metarBt.setEnabled(false);
-			askMeBt.setEnabled(true);
-
-	    }
+	    
 	    
 	
 	}
@@ -1025,6 +1070,21 @@ public class Result implements Info {
 
 	public void setSelectedMapAirports(Map<String, Airport> selectedMapAirports) {
 		this.selectedMapAirports = selectedMapAirports;
+	}
+
+
+	public void setjEditorPane(JEditorPane jEditorPane) {
+		this.jEditorPane = jEditorPane;
+	}
+
+
+	public void setAskmeScrollPan(JScrollPane askmeScrollPan) {
+		this.askmeScrollPan = askmeScrollPan;
+	}
+
+
+	public void setAskMePanel(JPanel askMePanel) {
+		this.askMePanel = askMePanel;
 	}
 
 }

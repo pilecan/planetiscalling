@@ -13,7 +13,7 @@ public interface Info {
 	Color[] colorForground = {new Color(255,196,52),new ColorUIResource(222,231,239),new ColorUIResource(255,253,195),new ColorUIResource(222,231,239),Color.lightGray,new ColorUIResource(22,105,23)};
 	Color[] colorForgroundBtn = {Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY};
 	Color[] colorBack = {new Color(165,181,214),new Color(165,181,214),new Color(165,181,214)};
-	Color[] colorBackList = {new Color(253,248,138),new Color(222,231,239),new Color(222,231,239),new Color(253,248,138),new Color(146,63,22)};
+	Color[] colorBackList = {new Color(253,248,138),new Color(222,231,239),new Color(222,231,239),Color.lightGray,new Color(146,63,22)};
 	Color[] colorFrontList = {new ColorUIResource(255,253,195),new ColorUIResource(222,231,239),Color.lightGray,new ColorUIResource(22,105,23),new Color(255,196,52)};
 	Color[] colorBackMenu = {new Color(222,231,239),new Color(222,231,239),new Color(222,231,239)};
 	Color[] colorBackArea = {new Color(247,247,255),new Color(247,247,255),new Color(247,247,255)};
@@ -43,6 +43,8 @@ public interface Info {
     String datadir  = "/data/";
     String metarFileName = "data/metar/metar.txt";
     String weatherPath = "image/weather/";
+	String meteoline = "<div style='display: block; clear: left; font-size: small;'>#value</div>\n\r";
+
  	
 
 }

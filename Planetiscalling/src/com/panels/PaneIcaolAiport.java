@@ -28,8 +28,8 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
-import com.back.CreateKML;
-import com.back.ReadData;
+import com.backend.CreateKML;
+import com.backend.ReadData;
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
@@ -75,7 +75,6 @@ public class PaneIcaolAiport extends JFrame {
 	private JButton landMeBt;
 	private JButton askMeBt;
 	private JButton delMeBt;
-	private JButton metarBt;
 
 
 	private JButton searchBt;
@@ -259,7 +258,6 @@ public class PaneIcaolAiport extends JFrame {
 			}
 			textArea.setText("");
 			
-			metarBt.setEnabled(false);
 			googleBt.setEnabled(false);
 			resetBt.setEnabled(false);
 
@@ -336,34 +334,17 @@ public class PaneIcaolAiport extends JFrame {
 	askMeBt.setEnabled(false);
 	askMeBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
+			if ("Ask Me".equals(askMeBt.getText())) {
+				result.showAskMeAnswer();
+			} else {
+			  askMeBt.setText("Ask Me");
+			  askMePanel.setVisible(false);
+			}
+
 		}
 	});	
 		
-/*	landItBt = new JButton("Land It");
-	landItBt.setEnabled(false);
 	
-	landItBt.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			System.out.println("land It");
-			System.out.println(result.getCurrentView());
-			Distance dist = null;
-			if ("airport".equals(result.getCurrentView())){
-				dist = new Distance(0, 0, 1, 0, false, 0);
-			} else if ("vor".equals(result.getCurrentView())){
-				dist = new Distance(0, 0, 0, 1, false, 0);
-			} else if ("ndb".equals(result.getCurrentView())){
-				dist = new Distance(0, 0, 0, 1, false, 0);
-			}else if ("city".equals(result.getCurrentView())){
-				dist = new Distance(1, 0, 0, 0, false, 0);
-			}else if ("mountain".equals(result.getCurrentView())){
-				dist = new Distance(0, 1, 0, 0, false, 0);
-			}
-		   readData.saveKMLFileICAO( result.getMapAirport(), Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName),dist);
-		   Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName)));
-		}
-	});		
-*/	
 	 delMeBt = new JButton("Del Me");
 	 delMeBt.setEnabled(false);
 	 delMeBt.addActionListener(new ActionListener() {
@@ -394,16 +375,11 @@ public class PaneIcaolAiport extends JFrame {
 		}
 	});
 	 
-	metarBt = new JButton("METAR Me");
-	metarBt.setEnabled(false);
-	metarBt.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			result.showMetarMe(outputPanel, jEditorPane, askmeScrollPan);
-		}
-	});	
-	
-    result.setButtons(delMeBt,landMeBt, askMeBt, metarBt);
-
+    result.setButtons(delMeBt,landMeBt, askMeBt);
+    result.setjEditorPane(jEditorPane);
+    result.setAskmeScrollPan(askmeScrollPan);
+	result.setAskMePanel(askMePanel);
+	result.setOutputPanel(outputPanel);
 
 	
 	int x = 330;
@@ -411,12 +387,12 @@ public class PaneIcaolAiport extends JFrame {
 	
 	panelResult.setBounds(x, 10, 340, 190);	
   	outputPanel.setBounds(x, 210, 340, 150);	
-  	askMePanel.setBounds(x, 210, 340, 150);	
+  	//askMePanel.setBounds(x, 210, 340, 150);	
+  	askMePanel.setBounds(x, 10, 340, 190);	
 
 	delMeBt.setBounds(x, y, 78, 23);
-	askMeBt.setBounds(x+86, y, 77, 23);
-	metarBt.setBounds(x+170, y, 82, 23);
-	landMeBt.setBounds(x+260, y, 82, 23);
+	askMeBt.setBounds(x+130, y, 77, 23);
+	landMeBt.setBounds(x+258, y, 82, 23);
   	
 	distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
 	inputIcaoPanel.setBounds(10, 200, 310, 120);
@@ -434,7 +410,6 @@ public class PaneIcaolAiport extends JFrame {
 	icaoPanel.add(delMeBt);
 	icaoPanel.add(landMeBt);
 	icaoPanel.add(askMeBt);
-	icaoPanel.add(metarBt);
 	icaoPanel.add(googleBt);
 	
 	return icaoPanel;

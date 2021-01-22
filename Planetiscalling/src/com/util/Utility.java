@@ -427,6 +427,7 @@ public class Utility implements Info{
 	public JEditorPane initjEditorPane() {
 		
 		JEditorPane jEditorPane = new JEditorPane();
+		jEditorPane.setContentType("text/html");
 	     Border border = jEditorPane.getBorder();
 		 Border margin = new EmptyBorder(5,5,5,5);
 		 jEditorPane.setBorder(new CompoundBorder(border, margin));
@@ -435,8 +436,9 @@ public class Utility implements Info{
 		HTMLEditorKit kit = new HTMLEditorKit();
 		jEditorPane.setEditorKit(kit);
 		jEditorPane.setVisible(false);
-	       jEditorPane.addHyperlinkListener(new HyperlinkListener() {
+	     jEditorPane.addHyperlinkListener(new HyperlinkListener() {
 
+	    	 
 	            @Override
 	            public void hyperlinkUpdate(HyperlinkEvent e) {
 	                HyperlinkEvent.EventType type = e.getEventType();

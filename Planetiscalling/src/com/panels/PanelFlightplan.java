@@ -17,8 +17,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import com.back.CreateKML;
-import com.back.ReadData;
+import com.backend.CreateKML;
+import com.backend.ReadData;
 import com.cfg.common.DistanceSpinner;
 import com.db.SelectAirport;
 import com.db.SelectCity;
@@ -60,13 +60,12 @@ public class PanelFlightplan {
 	private JButton resetBt;
 	private JButton landMeBt;
 	private JButton askMeBt;
-	private JButton metarBt;
 	
 	private SelectAirport selectAirport;
 	
 	private JEditorPane jEditorPane;
 	
-	JScrollPane askmeScrollPan;
+	private JScrollPane askmeScrollPan;
 
 	public PanelFlightplan() {
 		super();
@@ -88,12 +87,19 @@ public class PanelFlightplan {
 		distanceSpin.initPanelDistances("plan");
 		
 		jEditorPane = Utility.getInstance().initjEditorPane();
+		
+		
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	
-        result = new Result();
-		
+
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+     	   public void run() { 
+     		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+     	   }
+     	});
+    	
+        
 		panelFlightplan = new JPanel();
 		panelFlightplan.setLayout(null);
 		
@@ -117,6 +123,10 @@ public class PanelFlightplan {
 			
 		askMePanel.add(askmeScrollPan);
 
+        result = new Result();
+        result.setjEditorPane(jEditorPane);
+        result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
 		result.setOutputPanel(outputPanel);
 		
 		flightPlanBt = new JButton("Select Flightplan");
@@ -323,20 +333,19 @@ public class PanelFlightplan {
 		askMeBt.setEnabled(false);
 		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
+				if ("Ask Me".equals(askMeBt.getText())) {
+					result.showAskMeAnswer();
+				} else {
+				  askMeBt.setText("Ask Me");
+				  askMePanel.setVisible(false);
+				}
+
 			}
 		});	
 			
-		metarBt = new JButton("METAR Me");
-		metarBt.setEnabled(false);
-		metarBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result.showMetarMe(outputPanel, jEditorPane, askmeScrollPan);
-			}
-		});	
-			
-		
-		result.setButtons(landMeBt, askMeBt, metarBt);
+		askMePanel.setVisible(false);
+
+		result.setButtons(landMeBt, askMeBt);
 
 		buttonLeftPanel.add(refreshBt);
 		buttonLeftPanel.add(resetBt);
@@ -356,14 +365,13 @@ public class PanelFlightplan {
 		int x = 330;
 		
 	  	panelResult.setBounds(x, 10, 340, 240);	
-	  	outputPanel.setBounds(x, 260, 340, 130);	
-	  	askMePanel.setBounds(x, 260, 340, 130);	
+		outputPanel.setBounds(x, 260, 340, 130);	
+		  //	askMePanel.setBounds(x, 260, 340, 130);	
+		askMePanel.setBounds(x, 10, 340, 240);	
 
 	  	x += 0;
 		landMeBt.setBounds(x, 400, 94, 23);
-		askMeBt.setBounds(x+120, 400, 94, 23);
-		metarBt.setBounds(x+240, 400, 94, 23);
-	  	
+		askMeBt.setBounds(x+248, 400, 94, 23);
 
      	panelFlightplan.add(flightPlanBt);
 		panelFlightplan.add(panelResult);
@@ -372,7 +380,6 @@ public class PanelFlightplan {
 		
 		panelFlightplan.add(askMeBt);
 		panelFlightplan.add(landMeBt);
-		panelFlightplan.add(metarBt);
 		
 		//panelFlightplan.add(buttonRightPanel);
 

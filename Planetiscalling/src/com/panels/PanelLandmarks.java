@@ -22,8 +22,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 import javax.swing.text.html.HTMLEditorKit;
 
-import com.back.CreateKML;
-import com.back.ReadData;
+import com.backend.CreateKML;
+import com.backend.ReadData;
 import com.cfg.common.Dataline;
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
@@ -79,7 +79,6 @@ public class PanelLandmarks implements Info {
 	private JButton googleBt;
 	private JButton resetBt;
 	private JButton searchBt;
-	private JButton metarBt;
 
 	private JEditorPane jEditorPane;
 	private HTMLEditorKit kit;
@@ -300,29 +299,33 @@ public class PanelLandmarks implements Info {
 			}
 		});		
 
-		askMeBt = new JButton("Ask Me");
-		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
-			}
-		});	
 			
 
 	   return setLandmarkPanel(distanceSpin);
 	}
 	
 	private JPanel setLandmarkPanel(DistanceSpinner distanceSpin) {
-		
-		metarBt = new JButton("METAR Me");
-		metarBt.setEnabled(false);
-		metarBt.addActionListener(new ActionListener() {
+
+		askMeBt = new JButton("Ask Me");
+		askMeBt.setEnabled(false);
+		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				result.showMetarMe(outputPanel, jEditorPane, askmeScrollPan);
+				if ("Ask Me".equals(askMeBt.getText())) {
+					result.showAskMeAnswer();
+				} else {
+				  askMeBt.setText("Ask Me");
+				  askMePanel.setVisible(false);
+				}
+
 			}
 		});	
+
+	    result.setButtons(landMeBt, askMeBt);
+	    result.setjEditorPane(jEditorPane);
+	    result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
+		result.setOutputPanel(outputPanel);
 		
-		result.setButtons(landMeBt, askMeBt, metarBt);
 		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
 		panelCombo.setBounds(10, 200, 240, 90);
 		
@@ -330,12 +333,11 @@ public class PanelLandmarks implements Info {
 		
 	  	panelResult.setBounds(x, 10, 340, 190);	
 	  	outputPanel.setBounds(x, 210, 340, 150);	
-	  	askMePanel.setBounds(x, 210, 340, 150);	
+	  	askMePanel.setBounds(x, 10, 340, 190);	
 
 	  	x += 0;
 		landMeBt.setBounds(x, 370, 94, 23);
-		askMeBt.setBounds(x+120, 370, 94, 23);
-		metarBt.setBounds(x+240, 370, 94, 23);
+		askMeBt.setBounds(x+244, 370, 94, 23);
 
 		resetBt.setBounds(120, 300, 90, 23);
   	    searchBt.setBounds(10, 300, 90, 23);
@@ -351,7 +353,6 @@ public class PanelLandmarks implements Info {
 		panelLandMark.add(askMePanel);
 		panelLandMark.add(landMeBt);
 		panelLandMark.add(askMeBt);
-		panelLandMark.add(metarBt);
   	    panelLandMark.add(googleBt);
 		
 		return panelLandMark;
@@ -585,17 +586,7 @@ public class PanelLandmarks implements Info {
 			}
 		});		
 
-		askMeBt = new JButton("Ask Me");
-		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
-			}
-		});	
-			
 		
-		result.setButtons(landMeBt, askMeBt);
-	    
 		
 		return setLandmarkPanel(distanceSpin);
 	
@@ -795,18 +786,6 @@ public class PanelLandmarks implements Info {
 			}
 		});		
 
-		askMeBt = new JButton("Ask Me");
-		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				result.showAskMeAnswer(outputPanel, jEditorPane, askMeBt, askmeScrollPan);
-			}
-		});	
-			
-		
-		result.setButtons(landMeBt, askMeBt);
-	    
-		
 		return setLandmarkPanel(distanceSpin);
 	}
 	
