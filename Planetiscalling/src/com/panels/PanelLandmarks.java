@@ -67,13 +67,6 @@ public class PanelLandmarks implements Info {
 	private ReadData readData;
 	
 
-	private Dataline dataline;
-
-
-	private JLabel labelHeader;
-	private JScrollPane jScrollPane1;
-	//private JTextArea textArea;
-
 	private JButton landMeBt;
 	private JButton askMeBt;
 	private JButton googleBt;
@@ -81,8 +74,6 @@ public class PanelLandmarks implements Info {
 	private JButton searchBt;
 
 	private JEditorPane jEditorPane;
-	private HTMLEditorKit kit;
-	private Document doc;
 	
 	private JScrollPane askmeScrollPan;
 	private SelectAirport selectAirport;
@@ -107,26 +98,35 @@ public class PanelLandmarks implements Info {
 		
 		readData = new ReadData();
 		
-		jEditorPane = Utility.getInstance().initjEditorPane();
+		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
- 		result = new Result();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      	   public void run() { 
+      		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+      	   }
+      	});
+    	
+        
+		askMePanel = new JPanel(new BorderLayout());
+		askMePanel.setBorder(new TitledBorder(""));
+        askMePanel.add(askmeScrollPan);
+
+    	
+    	outputPanel = new JPanel(new BorderLayout());
+		outputPanel.setBorder(new TitledBorder(""));
+
+    	result = new Result();
+	    result.setjEditorPane(jEditorPane);
+	    result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
+		result.setOutputPanel(outputPanel);
 		
 		panelResult = new JPanel(new BorderLayout());
 		panelResult.setBorder(new TitledBorder("Searh Result"));
-		
-		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
-		
-		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder(""));
-		askMePanel.add(askmeScrollPan);
-		
-		result.setOutputPanel(outputPanel);
 
-		labelHeader = new JLabel("Select Airport cities to find their surrounding Cities and Mountains :");
 		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
 		panelLandMark.setLayout(null);
@@ -135,11 +135,9 @@ public class PanelLandmarks implements Info {
 		selectDB = new SelectDB();
 		selectDB.selectAirportTableNew();
 
-		this.selectAiport = selectAiport;
-		
-		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountry());
-		final JComboBox<String> comboState = new JComboBox<>(selectDB.getStates(comboCountry.getSelectedItem()));
-		final JComboBox<String> comboCity = new JComboBox<>();
+		comboCountry = new JComboBox<>(selectDB.getCountry());
+		comboState = new JComboBox<>(selectDB.getStates(comboCountry.getSelectedItem()));
+		comboCity = new JComboBox<>();
 		comboCity.addItem(" All");
 
         selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
@@ -308,23 +306,11 @@ public class PanelLandmarks implements Info {
 
 		askMeBt = new JButton("Ask Me");
 		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if ("Ask Me".equals(askMeBt.getText())) {
-					result.showAskMeAnswer();
-				} else {
-				  askMeBt.setText("Ask Me");
-				  askMePanel.setVisible(false);
-				}
 
-			}
-		});	
-
+		askMePanel.setVisible(false);
+		
 	    result.setButtons(landMeBt, askMeBt);
-	    result.setjEditorPane(jEditorPane);
-	    result.setAskmeScrollPan(askmeScrollPan);
-		result.setAskMePanel(askMePanel);
-		result.setOutputPanel(outputPanel);
+
 		
 		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
 		panelCombo.setBounds(10, 200, 240, 90);
@@ -375,27 +361,35 @@ public class PanelLandmarks implements Info {
 		
 		readData = new ReadData();
 
-		jEditorPane = Utility.getInstance().initjEditorPane();
+		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
 		
 		panelResult = new JPanel(new BorderLayout());
 		panelResult.setBorder(new TitledBorder("Searh Result"));
 
 
+		askMePanel = new JPanel(new BorderLayout());
+		askMePanel.setBorder(new TitledBorder(""));
+
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
- 		result = new Result();
- 		
- 		
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      	   public void run() { 
+      		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+      	   }
+      	});
+    	askMePanel.add(askmeScrollPan);
+
 		outputPanel = new JPanel(new BorderLayout());
 		outputPanel.setBorder(new TitledBorder(""));
-		
-		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder(""));
-		askMePanel.add(askmeScrollPan);
-		
-		result.setOutputPanel(outputPanel);
 
+		result = new Result();
+	    result.setjEditorPane(jEditorPane);
+	    result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
+		result.setOutputPanel(outputPanel);
+ 		
+		
 
 	//	labelHeader = new JLabel("Select Cities or States to find their surrounding Airports and Mountains :");
 		panelLandMark = new JPanel();
@@ -408,9 +402,9 @@ public class PanelLandmarks implements Info {
 		final SelectDB selectDB = new SelectDB();
 		selectDB.selectCityTable();
 		
-		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryCity());
-		final JComboBox<String> comboState = new JComboBox<>(selectDB.getStateCity("Afghanistan"));
-		final JComboBox<String> comboCity = new JComboBox<>();
+		comboCountry = new JComboBox<>(selectDB.getCountryCity());
+		comboState = new JComboBox<>(selectDB.getStateCity("Afghanistan"));
+		comboCity = new JComboBox<>();
 		comboCity.addItem(" All");
 	    comboState.addItem(" All");
 
@@ -587,7 +581,6 @@ public class PanelLandmarks implements Info {
 		});		
 
 		
-		
 		return setLandmarkPanel(distanceSpin);
 	
 	}
@@ -606,28 +599,34 @@ public class PanelLandmarks implements Info {
 		selectAirport = new SelectAirport();
 		readData = new ReadData();
 
-		jEditorPane = Utility.getInstance().initjEditorPane();
+		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
+	   	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
+	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	      	   public void run() { 
+	      		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+	      	   }
+	     });
+	        
 		panelResult = new JPanel(new BorderLayout());
 		panelResult.setBorder(new TitledBorder("Searh Result"));
 
 
-    	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	
- 		result = new Result();
- 		
-		
-		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
-		
 		askMePanel = new JPanel(new BorderLayout());
 		askMePanel.setBorder(new TitledBorder(""));
-		askMePanel.add(askmeScrollPan);
-		
+
+ 
+    	askMePanel.add(askmeScrollPan);
+
+    	outputPanel = new JPanel(new BorderLayout());
+		outputPanel.setBorder(new TitledBorder(""));
+
+        result = new Result();
+	    result.setjEditorPane(jEditorPane);
+	    result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
 		result.setOutputPanel(outputPanel);
-	
-	
 		
 		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
@@ -639,8 +638,8 @@ public class PanelLandmarks implements Info {
 		final SelectDB selectDB = new SelectDB();
 		selectDB.selectMountainTable();
 		
-		final JComboBox<String> comboCountry = new JComboBox<>(selectDB.getCountryMountain());
-		final JComboBox<String> comboMountain = new JComboBox<>(selectDB.getMountain("Afghanistan"));
+		comboCountry = new JComboBox<>(selectDB.getCountryMountain());
+		comboMountain = new JComboBox<>(selectDB.getMountain("Afghanistan"));
 		comboMountain.addItem(" All");
 		
 		comboCountry.setPreferredSize(new Dimension(240,25));

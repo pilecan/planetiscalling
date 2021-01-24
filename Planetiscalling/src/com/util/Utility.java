@@ -424,9 +424,9 @@ public class Utility implements Info{
 	
 	}
 	
-	public JEditorPane initjEditorPane() {
+	public JEditorPane initjEditorPane(JEditorPane jEditorPane) {
 		
-		JEditorPane jEditorPane = new JEditorPane();
+		jEditorPane = new JEditorPane();
 		jEditorPane.setContentType("text/html");
 	     Border border = jEditorPane.getBorder();
 		 Border margin = new EmptyBorder(5,5,5,5);

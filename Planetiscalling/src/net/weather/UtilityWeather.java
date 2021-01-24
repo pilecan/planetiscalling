@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -17,8 +16,10 @@ import javax.json.JsonReader;
 import com.cfg.common.Info;
 import com.db.UtilityDB;
 import com.geo.util.Geoinfo;
+import com.model.Airport;
 import com.model.City;
 import com.model.CityWeather;
+import com.model.Mountain;
 import com.model.Weather;
 import com.util.Util;
 
@@ -36,20 +37,16 @@ public class UtilityWeather implements Info {
 		CityWeather cityWeather = UtilityDB.getInstance().selectCityWeather(city);
 		if (cityWeather != null) {
 			System.out.println(cityWeather.toString());
-			callOpenweathermap(cityWeather.getId());
+			callOpenweathermapId(cityWeather.getId());
 		} else {
-			System.out.println("data from coord");
-			callOpenweathermap(city.getLaty(), city.getLonx());
-			
-			System.out.println(weather.getName() +" weather at " +Util.formatDistance(Geoinfo.distance(city.getLaty(), weather.getLaty(), city.getLonx(),weather.getLonx()))+" miles from "+city.getCityAscii());
-			
+			callOpenweathermapObject(city);
 		}
 
 		System.out.println();
 		System.out.println();
 	}
 
-	public void callOpenweathermap(long id) {
+	public void callOpenweathermapId(long id) {
         String currStr = null;
         weather = new Weather();
 		try {
@@ -79,18 +76,37 @@ public class UtilityWeather implements Info {
 		
 	}
 	
-	public void callOpenweathermap(double lat, double lon) {
+	public void callOpenweathermapObject(Object object) {
+		double lat = 0;
+		double lon = 0;
+		String name = "";
+		String message = "";
+		if (object instanceof City) {
+			lon = ((City)object).getLonx();
+			lat = ((City)object).getLaty();
+			name = ((City)object).getCityAscii(); 
+			message = "No weather station at "+name+" but found it at ";
+		} else if (object instanceof Airport) {
+			lon = ((Airport)object).getLonx();
+			lat = ((Airport)object).getLaty();
+			name = ((Airport)object).getName(); 
+			message = "No METAR at "+name+" Airport but Weather Station found at ";
+
+		} else if (object instanceof Mountain) {
+			lon = ((Mountain)object).getLonx();
+			lat = ((Mountain)object).getLaty();
+			name = ((Mountain)object).getName(); 
+			message = "Weather Station found at ";
+
+		} 
+		
         String currStr = null;
         weather = new Weather();
+        
 		try {
-			System.out.println("http://api.openweathermap.org/data/2.5/find?lat="+lat+"&lon="+lon+"&cnt=1&APPID=3506dfa8bbebf7709e6fba904a68559a");
 			currStr = getData("http://api.openweathermap.org/data/2.5/find?lat="+lat+"&lon="+lon+"&cnt=1&APPID=3506dfa8bbebf7709e6fba904a68559a");
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
 		}
         JsonReader reader = Json.createReader(new StringReader(currStr));
         JsonObject data = reader.readObject();
@@ -103,10 +119,18 @@ public class UtilityWeather implements Info {
 		}
         
         if(code == 200) {
-        	System.out.println(data);
         	weather.setData(data.getJsonArray("list").getJsonObject(0));
-        	
+        	System.out.println(data.getJsonArray("list").getJsonObject(0));
+
         	System.out.println(weather.toString());
+        	
+		//	String message = weather.getName() +" at " +Util.formatDistance(Geoinfo.distance(lat, weather.getLaty(), lon,weather.getLonx()))+" miles.";
+	        weather.setMessage(message+
+	        		weather.getName() +" at " +Util.formatDistance(Geoinfo.distance(lat, weather.getLaty(), lon,weather.getLonx()))+" miles "
+	        				+Util.formatAngle(Geoinfo.calculateAngle(lon, lat, weather.getLonx(), weather.getLaty())) +" degrees.");
+
+		    System.out.println(weather.getMessage());
+        	
         }
         reader.close();
 		

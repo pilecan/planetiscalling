@@ -73,8 +73,6 @@ public class DistanceSpinner implements Info {
  	     Border border = spinnerPanel.getBorder();
  		 Border margin = new EmptyBorder(10,10,10,10);
          spinnerPanel.setBorder(new CompoundBorder(border, margin));
-
-
          
         spinnerPanel.setLayout(new GridBagLayout());
         
@@ -118,7 +116,7 @@ public class DistanceSpinner implements Info {
     private JSpinner makeSpinner(String text1, String text2, JSpinner spin, SpinnerModel model, JPanel panel, FormUtility formUtility) {
         spin=new JSpinner(model);
         spin.setPreferredSize( new Dimension (45,20) );
-        spin.setToolTipText(text1);
+     //   spin.setToolTipText(text1);
         formUtility.addLabel(text2+"                                       ",spinnerPanel);
         panel = new JPanel();
         panel.setPreferredSize( new Dimension (300,30) );
@@ -133,7 +131,7 @@ public class DistanceSpinner implements Info {
     private JCheckBox makeCheckbox(String text1, String text2, JCheckBox check, boolean isChecked, JPanel panel, FormUtility formUtility) {
      	check = new JCheckBox();
     	check.setSelected(isChecked);
-    	check.setToolTipText(text1);
+    //	check.setToolTipText(text1);
 
         formUtility.addLabel(text2,spinnerPanel);
         panel = new JPanel();

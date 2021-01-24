@@ -1,7 +1,6 @@
 package com.model;
 
 import java.text.DecimalFormat;
-import java.util.Date;
 
 import javax.json.JsonObject;
 
@@ -16,10 +15,10 @@ public class Weather implements Info{
 	private String country;
 	private String state;
 	
-	private String date;
-	private String timezone;
-	private String sunrise;
-	private String sunset;
+	private long dayDate;
+	private long sunrise;
+	private long sunset;
+	private long timezone;
 	
 
 	private String weatherDescription;
@@ -45,6 +44,8 @@ public class Weather implements Info{
 
 	private String icon;
 	
+	private String message;
+	
 	public Weather() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -53,12 +54,13 @@ public class Weather implements Info{
 	public void setData(JsonObject data ) {
         DecimalFormat d = new DecimalFormat("#.#");
         
+
         
-        Date date = new Date(1611252833);
-        System.out.println(date);
-        
+         
         name =  data.getString("name");
         id =  data.getInt("id");
+        
+
         
 		pressure = d.format(data.getJsonObject("main").getJsonNumber("pressure").doubleValue());
         temp = d.format(data.getJsonObject("main").getJsonNumber("temp").doubleValue()-273);
@@ -101,17 +103,33 @@ public class Weather implements Info{
         
         try {
             country = data.getJsonObject("sys").getString("country");
-			sunrise = d.format(data.getJsonObject("sys").getJsonNumber("sunrise").doubleValue());
-			sunset = d.format(data.getJsonObject("sys").getJsonNumber("sunset").doubleValue());
-			timezone = d.format(data.getJsonObject("sys").getJsonNumber("sunset").doubleValue());
+			sunrise = data.getJsonObject("sys").getInt("sunrise");
+			sunset = data.getJsonObject("sys").getInt("sunset");
+			timezone = data.getInt("timezone");
+	        Util.convertUnixDate(sunrise+timezone);
+
 		} catch (Exception e) {
 		}
+        dayDate = data.getInt("dt");
 
-        
+        Util.convertUnixDate(dayDate);
+/*		
+        Calendar mydate = Calendar.getInstance();
+		mydate.setTimeInMillis(timestamp*1000);
+		System.out.println(mydate.get(Calendar.DAY_OF_MONTH)+"."+mydate.get(Calendar.MONTH)+"."+mydate.get(Calendar.YEAR)
+		+" > "+mydate.get(Calendar.HOUR_OF_DAY)+":"+mydate.get(Calendar.MINUTE));
+		const sunrise = new Date((data.sys.sunrise + data.timezone) * 1000)
+				You will get the local time
+		
+*/   
 
 	}
 	
 	public String htmlData() {
+		
+		//System.out.println(weather.getName() +" weather at " +Util.formatDistance(Geoinfo.distance(city.getLaty(), weather.getLaty(), city.getLonx(),weather.getLonx()))+" miles from "+city.getCityAscii());
+
+		
 		String url1 = UtilityWeather.getInstance().getCanonicalFile(icon+"@2x.png").toString();
 		//url1 = "http://openweathermap.org/imgxx/w/04d.png";
 		String url2 = UtilityWeather.getInstance().getCanonicalFile("transparent.png").toString();
@@ -151,19 +169,16 @@ public class Weather implements Info{
 		if (pressure != null) {
 			lines += detailLine.replace("#value", "Pressure: "+pressure+" hPa");
 		}
+		if (message != null) {
+			message = detailLine.replace("#value", "Note: <i>"+message+"</i>");
+		} else {
+			message = "";
+		}
 		
-		
-		String html = "" + 
-				" <div style='float: left; width: 130px;'>\r\n" + 
-				"    <div style='display: block; clear: left;'>\r\n" + 
-				"      <div style='float: left;' title='Titel'>\r\n" + 
-				"                <img height='45' width='45' style='border: medium none; width: 45px; height: 45px; background:url(\""+url1+"\") repeat scroll 0% 0% transparent;' alt='title' src='"+url2+"'>\r\n" + 
-				"      </div>\r\n" + 
-				"      <div style='float: left;'>\r\n" + 
-				"        <div style='display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 3pt;' title='Current Temperature'>"+temp+"°C</div>\r\n" + 
-				"        <div style='display: block; width: 85px; overflow: visible;'></div>\r\n" + 
-				"      </div>\r\n" + 
-				"    </div>\r\n" +  lines +
+		String html = "<br>"
+				+"<div style='display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> Temperature now for "+name+" is "+temp+"°C</div>\r\n"  
+				+ message 
+				+lines +
 				"  </div>\r\n" + 
 				"  <div style='display: block; clear: left; color: gray; font-size: x-small;'>\r\n" + 
 				"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>More..</a>\r\n" + 
@@ -178,16 +193,7 @@ public class Weather implements Info{
 	
 
 
-	@Override
-	public String toString() {
-		return "Weather [id=" + id + ", name=" + name + ", country=" + country + ", state=" + state + ", date=" + date
-				+ ", timezone=" + timezone + ", sunrise=" + sunrise + ", sunset=" + sunset + ", weatherDescription="
-				+ weatherDescription + ", temp=" + temp + ", tempMax=" + tempMax + ", tempMin=" + tempMin
-				+ ", humidity=" + humidity + ", feelLike=" + feelLike + ", pressure=" + pressure + ", weatherMain="
-				+ weatherMain + ", windDirection=" + windDirection + ", windSpeed=" + windSpeed + ", visibility="
-				+ visibility + ", clouds=" + clouds + ", rain=" + rain + ", lonx=" + lonx + ", laty=" + laty
-				+ ", station=" + station + ", icon=" + icon + "]";
-	}
+	
 
 	public Double getLonx() {
 		return lonx;
@@ -209,21 +215,11 @@ public class Weather implements Info{
 		return state;
 	}
 
-	public String getDate() {
-		return date;
+	public Long getDayDate() {
+		return dayDate;
 	}
 
-	public String getTimezone() {
-		return timezone;
-	}
-
-	public String getSunrise() {
-		return sunrise;
-	}
-
-	public String getSunset() {
-		return sunset;
-	}
+	
 
 	public String getWeatherDescription() {
 		return weatherDescription;
@@ -279,6 +275,25 @@ public class Weather implements Info{
 
 	public String getClouds() {
 		return clouds;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	@Override
+	public String toString() {
+		return "Weather [id=" + id + ", name=" + name + ", country=" + country + ", state=" + state + ", dayDate="
+				+ dayDate + ", sunrise=" + sunrise + ", sunset=" + sunset + ", timezone=" + timezone
+				+ ", weatherDescription=" + weatherDescription + ", temp=" + temp + ", tempMax=" + tempMax
+				+ ", tempMin=" + tempMin + ", humidity=" + humidity + ", feelLike=" + feelLike + ", pressure="
+				+ pressure + ", weatherMain=" + weatherMain + ", windDirection=" + windDirection + ", windSpeed="
+				+ windSpeed + ", visibility=" + visibility + ", clouds=" + clouds + ", rain=" + rain + ", lonx=" + lonx
+				+ ", laty=" + laty + ", station=" + station + ", icon=" + icon + ", message=" + message + "]";
 	}
 	
 	

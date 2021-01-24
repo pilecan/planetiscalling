@@ -34,6 +34,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -127,12 +128,40 @@ public class Result implements Info {
 	public void setButtons(JButton landMeBt, JButton askMe) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
+		askMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if ("Ask Me".equals(askMeBt.getText())) {
+					 resultPanel.setVisible(false);
+					showAskMeAnswer();
+					 askMePanel.setVisible(true);
+			} else {
+				  askMeBt.setText("Ask Me");
+				  askMePanel.setVisible(false);
+				  resultPanel.setVisible(true);
+				}
+
+			}
+		});	
 	}
 
 	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
 		this.delMeBt = delMeBt;
+		askMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if ("Ask Me".equals(askMeBt.getText())) {
+					resultPanel.setVisible(false);
+					 askMePanel.setVisible(true);
+					showAskMeAnswer();
+				} else {
+				  askMeBt.setText("Ask Me");
+				  askMePanel.setVisible(false);
+				  resultPanel.setVisible(true);
+				}
+
+			}
+		});	
 	}
 
 	private JPanel setBorderPanel(JPanel resultPanel) {
@@ -155,13 +184,13 @@ public class Result implements Info {
 
 		checkAltitude = new JCheckBox();
 		checkAltitude.setText("?");
-		checkAltitude.setToolTipText("Change Flight Plan Altitude");
+		//checkAltitude.setToolTipText("Change Flight Plan Altitude");
 
 		formUtility = new FormUtility();
 
 		formUtility.addLabel("Title:", resultPanel);
 		label = new JLabel(this.flightplan.getTitle());
-		label.setToolTipText(this.flightplan.getDepartureName() + "/" + this.flightplan.getDestinationName());
+	//	label.setToolTipText(this.flightplan.getDepartureName() + "/" + this.flightplan.getDestinationName());
 		panel = new JPanel();
 		panel.setLayout(new BorderLayout());
 		panel.add(label, BorderLayout.WEST);
@@ -181,7 +210,7 @@ public class Result implements Info {
 
 		altitudeSpinner = new JSpinner(altitudeModel);
 		altitudeSpinner.setPreferredSize(new Dimension(65, 25));
-		altitudeSpinner.setToolTipText("Change KML Altitude");
+	//	altitudeSpinner.setToolTipText("Change KML Altitude");
 		formUtility.addLabel("Altitude:", resultPanel);
 		JPanel panelAltitude = new JPanel();
 		panelAltitude.setLayout(new BorderLayout());
@@ -254,7 +283,7 @@ public class Result implements Info {
 			} else if (e.getSource() == cityBtn) {
 				getCityListModel();
 			} else if (e.getSource() == mountainBtn) {
-				getMountainListModel();
+				 getMountainListModel();
 			}
 
 		}
@@ -436,6 +465,7 @@ public class Result implements Info {
 		listModel = new DefaultListModel<String>();
 		String info = "";
 	//	UtilityMetar.getInstance().validMetar();
+		outputPanel.setBorder(new TitledBorder("Airports ("+mapAirport.size()+")"));
 
 		for (Airport airport : mapAirport.values()) {
 				builder = Utility.getInstance().buildLine(airport.getIdent() , airport.getName(), airport.getCountry());
@@ -454,6 +484,7 @@ public class Result implements Info {
 		Double distanceCumul = 0.0;
 		builder = new StringBuilder();
 
+		outputPanel.setBorder(new TitledBorder("Waypoints ("+legPoints.size()+")"));
 		for (int i = 0; i < legPoints.size(); i++) {
 			builder = new StringBuilder();
 			if (i < legPoints.size() - 1) {
@@ -484,6 +515,7 @@ public class Result implements Info {
 		listModel = new DefaultListModel<String>();
 		String info = "";
 
+		outputPanel.setBorder(new TitledBorder("VORs ("+selectedVors.size()+")"));
 		for (Vor vor : selectedVors.values()) {
 			String cap = vor.getName();
 			cap = cap.substring(0, 1) + cap.substring(1).toLowerCase();
@@ -501,6 +533,7 @@ public class Result implements Info {
 	public void geNdbListModel() {
 		listModel = new DefaultListModel<String>();
 		String info = "";
+		outputPanel.setBorder(new TitledBorder("VORs ("+selectedNdbs.size()+")"));
 
 		for (Ndb ndb : selectedNdbs.values()) {
 			String cap = ndb.getName();
@@ -519,6 +552,7 @@ public class Result implements Info {
 		listModel = new DefaultListModel<String>();
 		String info = "";
 
+		outputPanel.setBorder(new TitledBorder("Cities ("+selectedCities.size()+")"));
 		for (City city : selectedCities.values()) {
 			builder = Utility.getInstance().buildLine(city.getCityName() , city.getCountry(), city.getPopulation());
 			((DefaultListModel) listModel).addElement(builder.toString());
@@ -532,6 +566,7 @@ public class Result implements Info {
 	public void getMountainListModel() {
 		listModel = new DefaultListModel<String>();
 		String info = "";
+		outputPanel.setBorder(new TitledBorder("Mountains ("+selectedMountains.size()+")"));
 
 		for (Mountain mountain : selectedMountains.values()) {
 			//info = mountains.getName() + "   " + mountains.getCountry();
@@ -559,8 +594,10 @@ public class Result implements Info {
 		if (landAllBt != null) {
 			this.landAllBt.setEnabled(true);
 		}
-			
-		this.leftBtn.setEnabled(false);
+		if (leftBtn != null) {
+			this.leftBtn.setEnabled(false);
+		}
+		
 		this.askMeBt.setEnabled(false);
 
 		currentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -568,6 +605,7 @@ public class Result implements Info {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
+				 resultPanel.setVisible(false);
 				showAskMeAnswer();
 				if (e.getClickCount() == 2) {
 					currentSelection = (String) currentList.getSelectedValue();
@@ -640,25 +678,21 @@ public class Result implements Info {
 		}
 
 		metar = UtilityMetar.getInstance().getDecodedMetar(icao);
-		UtilityMetar.getInstance().getRawMetar(icao);
-		
-	//	UtilityMetar.getInstance().getConditionCode(UtilityMetar.getInstance().getRawMetar(icao));
 		boolean isMetarVadid = (UtilityMetar.getInstance().getDecodedMetar(icao) != null && (!metar.contains("error")));
 		
-		
-/*		if (metarBt.isEnabled()) {
-			metarBt.setText("METAR Me");
-		}
-*/
 		try {
 			varStr = "<b>" + airport.getIdent() + " " + airport.getName() + "</b><br>";
-			varStr += airport.getDescription().replaceAll("\\|", "<br>");
+			varStr += airport.getDescriptionNoWeather().replaceAll("\\|", "<br>");
 			
 			if (isMetarVadid) {
-				varStr += metar;
-			} else {
-				varStr += "<b>METAR Not Available for "+icao+" Airport</b>"; 
+				UtilityWeather.getInstance().callOpenweathermapObject(airport);
+				System.out.println("<!--"+UtilityWeather.getInstance().getWeather().getIcon()+"-->");
 
+				varStr += metar+"<!--"+UtilityWeather.getInstance().getWeather().getIcon()+"-->";
+			} else {
+				//varStr += "<b>METAR Not Available for "+icao+" Airport</b><br>";
+				UtilityWeather.getInstance().callOpenweathermapObject(airport);
+				varStr += UtilityWeather.getInstance().getWeather().htmlData();
 			}
 		} catch (NullPointerException e) {
 			// TODO Auto-generated catch block
@@ -719,7 +753,9 @@ public class Result implements Info {
 
 		for (Mountain mountain : selectedMountains.values()) {
 			if (mountain.getName().equals(line)) {
-				htmlString = CreateKML.buildMountainDescription(mountain).replaceAll("12px", "10px").replaceAll("\\|","<br>");
+				htmlString = CreateKML.buildMountainDescriptionNoWeather(mountain).replaceAll("12px", "10px").replaceAll("\\|","<br>");
+				UtilityWeather.getInstance().callOpenweathermapObject(mountain);
+				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
 
 			}
 		}
@@ -728,7 +764,7 @@ public class Result implements Info {
 
 	}
 
-	public void showAskMeAnswer( JPanel outputPanel, JEditorPane jEditorPane, JButton askMeBt, final JScrollPane askmeScrollPan ) {
+/*	public void showAskMeAnswer( JPanel outputPanel, JEditorPane jEditorPane, JButton askMeBt, final JScrollPane askmeScrollPan ) {
 		String content = null;
 	    if ("Ask Me".equals(askMeBt.getText())) {
 			kit = new HTMLEditorKit();
@@ -774,7 +810,7 @@ public class Result implements Info {
 	
 	}
 	
-
+*/
 	public void showAskMeAnswer() {
 		String content = null;
 		jEditorPane.setVisible(true);
@@ -816,6 +852,8 @@ public class Result implements Info {
 	    	
 			jEditorPane.setVisible(true);
 			
+		//	resultPanel.setVisible(false);
+			
 			String image = "";
 			try {
 				//System.out.println("image ->"+content.substring(content.indexOf("<!--")+4,content.indexOf("-->")));
@@ -823,6 +861,11 @@ public class Result implements Info {
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				//e1.printStackTrace();
+			}
+			
+			if ("".equals(image)) {
+				System.out.println();
+				image = "01n";
 			}
 			
 	    	URL url = null;
@@ -844,7 +887,7 @@ public class Result implements Info {
 			String color = setColor[0];
 
 			try {
-            	jEditorPane.setToolTipText("Control A to Higthlight Text");
+            	//jEditorPane.setToolTipText("Control A to Higthlight Text");
 				jEditorPane.setContentType("text/html");
 				jEditorPane.setText("<html><body style='font-weight: bold; color: #"+color+"; background-position: 200px 0; background-image: url(" + urlString + "); background-repeat: no-repeat;'>"+content+"</body></html>");
 	            jEditorPane.validate();;

@@ -481,6 +481,20 @@ public class Util implements Info {
 		return myFormatter.format(coord);
 	}
 
+	public static String formatAngle(Double angle) {
+		DecimalFormat myFormatter = new DecimalFormat("000");
+		return  myFormatter.format(angle);
+	}
+    
+	public static String convertUnixDate(long dayDate) {
+		  Calendar mydate = Calendar.getInstance();
+		  mydate.setTimeInMillis(dayDate*1000);
+			System.out.println(mydate.get(Calendar.YEAR)+"."+(mydate.get(Calendar.MONTH)+1)+"."+mydate.get(Calendar.DAY_OF_MONTH)
+			+"  "+mydate.get(Calendar.HOUR_OF_DAY)+":"+mydate.get(Calendar.MINUTE));
+		
+		return "";
+	}
+	
 	public static String formatGPS(String coord) {
 		String[] array = coord.split(",");
 		return formatGPS(Double.valueOf(array[0]))+","+formatGPS(Double.valueOf(array[1]));

@@ -332,7 +332,7 @@ public class PaneIcaolAiport extends JFrame {
 
 	askMeBt = new JButton("Ask Me");
 	askMeBt.setEnabled(false);
-	askMeBt.addActionListener(new ActionListener() {
+/*	askMeBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			if ("Ask Me".equals(askMeBt.getText())) {
 				result.showAskMeAnswer();
@@ -343,8 +343,9 @@ public class PaneIcaolAiport extends JFrame {
 
 		}
 	});	
-		
-	
+*/		
+	askMePanel.setVisible(false);
+
 	 delMeBt = new JButton("Del Me");
 	 delMeBt.setEnabled(false);
 	 delMeBt.addActionListener(new ActionListener() {

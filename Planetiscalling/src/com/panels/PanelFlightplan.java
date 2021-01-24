@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -86,10 +87,8 @@ public class PanelFlightplan {
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
 		
-		jEditorPane = Utility.getInstance().initjEditorPane();
+		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
 		
-		
-
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
@@ -150,7 +149,7 @@ public class PanelFlightplan {
 		    	 flightPlanFile = new File(result.getFlightplan().getFlightplanFile()).getName();
 			    	
 		 		 panelResult.setBorder(new TitledBorder(flightPlanFile));
-		 		 panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
+		 	//	 panelResult.setToolTipText((result.getFlightplan().getDescr()!= null?result.getFlightplan().getDescr():""));
 
 		  		 panelResult.removeAll();	
 				 panelResult.add(result.getFlightPlanFormPanel());
@@ -331,7 +330,7 @@ public class PanelFlightplan {
 
 		askMeBt = new JButton("Ask Me");
 		askMeBt.setEnabled(false);
-		askMeBt.addActionListener(new ActionListener() {
+/*		askMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if ("Ask Me".equals(askMeBt.getText())) {
 					result.showAskMeAnswer();
@@ -342,7 +341,7 @@ public class PanelFlightplan {
 
 			}
 		});	
-			
+*/			
 		askMePanel.setVisible(false);
 
 		result.setButtons(landMeBt, askMeBt);

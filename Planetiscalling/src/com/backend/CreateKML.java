@@ -400,7 +400,34 @@ public class CreateKML {
 		
 		
 	}
-	
+	static public String buildMountainDescriptionNoWeather(Mountain mountain){
+		
+		String description = "";
+
+		description += "<div>Mountain Name: "+Util.createHref(mountain.getName(),mountain.getName()+" "+mountain.getCountry()+" wikipedia", 0);
+		if (!"no".equals(mountain.getAlt_name())) {
+			description += "<div>Alternate Name:"+Util.createHref(mountain.getAlt_name(),mountain.getAlt_name()+" "+mountain.getCountry()+" wikipedia", 0)+"</div>";
+		}
+		description += "<div>Elevation: "+mountain.getElevation()+"m"+" ("+Math.round(mountain.getElevation()*3.28084)+"ft)</div>";
+		if (mountain.getProminence() > 0) {
+			description += "<div>Prominence: "+mountain.getProminence()+"m"+" ("+Math.round(mountain.getProminence()*3.28084)+"ft)"+Util.createHref(" (?)","prominence wikipedia", 0)+" </div>";
+		}
+
+		description += "<div>Country: "+mountain.getCountry()+"</div>";
+		if (!"no".equals(mountain.getComment())) {
+			description += "<div>Comment: "+mountain.getComment()+"</div>";
+		}
+    	description += "<div>Author: "+mountain.getAuthor()+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(mountain.getLaty()+","+mountain.getLonx())+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		
+		return description;
+		
+		
+		
+	}
+
 	static public String buildAirportPlaceMark(Airport airport){
 		return "<Placemark><name>"+airport.getIdent()+" "+airport.getName()+"</name>\n"
 				+ "<description><![CDATA["+airport.getDescription().replaceAll("\\|", "<br>")+"]]></description>\n"
