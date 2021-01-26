@@ -33,8 +33,8 @@ import com.db.SelectDB;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.main.form.Result;
 import com.model.Distance;
-import com.model.Result;
 import com.util.Utility;
 
 public class PanelCity implements Info {
@@ -96,10 +96,10 @@ public class PanelCity implements Info {
 		panelResult.setBorder(new TitledBorder("Searh Result"));
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
 		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder("test"));
+		askMePanel.setBorder(new TitledBorder("Res"));
    	    askMePanel.add(askmeScrollPan);
 
 		outputPanel = new JPanel(new BorderLayout());

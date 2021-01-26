@@ -233,10 +233,8 @@ public String getPlaceMarkName() {
 					+ (state!=null?"|State: "+state:"")
 					+ (country!=null?"|Country: "+country:"")
 					+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
-					+ "|"
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
 					+ "|Magnetic Variation: "+Util.formatMagvar(magVar)
-					+ "|"
 					+ (atisFrequency!=null && atisFrequency > 0?"|ATIS: "+Util.formatFrequency(atisFrequency):"")
 					+ (towerFrequency!=null && towerFrequency > 0?"|Tower: "+Util.formatFrequency(towerFrequency):"")
 					+ "|"
@@ -260,10 +258,8 @@ public String getPlaceMarkName() {
 					+ (state!=null?"|State: "+state:"")
 					+ (country!=null?"|Country: "+country:"")
 					+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
-					+ "|"
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
 					+ "|Magnetic Variation: "+Util.formatMagvar(magVar)
-					+ "|"
 					+ (atisFrequency!=null && atisFrequency > 0?"|ATIS: "+Util.formatFrequency(atisFrequency):"")
 					+ (towerFrequency!=null && towerFrequency > 0?"|Tower: "+Util.formatFrequency(towerFrequency):"")
 					+ "|"
@@ -289,12 +285,12 @@ private String makeRunways(){
 			if (runway.getIlsIdent() != null){
 				runstr +=  "|"+runway.getIlsName()+"("+runway.getIlsIdent()+") "+Util.formatFrequency(runway.getIlsFrequency());
 			}
-			runstr += "|";
+			//runstr += "|";
 		}
 	
 	}
 	
-	return runstr;
+	return runstr +"|";
 }
 
 

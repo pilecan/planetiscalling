@@ -21,6 +21,7 @@ public class Weather implements Info{
 	private long timezone;
 	
 
+	private String dateHourMin;
 	private String weatherDescription;
 	private String temp;
 	private String tempMax;
@@ -53,20 +54,14 @@ public class Weather implements Info{
 
 	public void setData(JsonObject data ) {
         DecimalFormat d = new DecimalFormat("#.#");
-        
-
-        
          
         name =  data.getString("name");
         id =  data.getInt("id");
-        
-
-        
 		pressure = d.format(data.getJsonObject("main").getJsonNumber("pressure").doubleValue());
-        temp = d.format(data.getJsonObject("main").getJsonNumber("temp").doubleValue()-273);
-        feelLike = d.format(data.getJsonObject("main").getJsonNumber("feels_like").doubleValue()-273);
-        tempMax = d.format(data.getJsonObject("main").getJsonNumber("temp_max").doubleValue()-273);
-        tempMin = d.format(data.getJsonObject("main").getJsonNumber("temp_min").doubleValue()-273);
+        temp = Util.formatDegree(data.getJsonObject("main").getJsonNumber("temp").doubleValue()-273);
+        feelLike = Util.formatDegree(data.getJsonObject("main").getJsonNumber("feels_like").doubleValue()-273);
+        tempMax = Util.formatDegree(data.getJsonObject("main").getJsonNumber("temp_max").doubleValue()-273);
+        tempMin = Util.formatDegree(data.getJsonObject("main").getJsonNumber("temp_min").doubleValue()-273);
         humidity = d.format(data.getJsonObject("main").getJsonNumber("humidity").doubleValue());
 		try {
 			visibility = (data.getJsonNumber("visibility").doubleValue()/1000)+" km";
@@ -112,16 +107,7 @@ public class Weather implements Info{
 		}
         dayDate = data.getInt("dt");
 
-        Util.convertUnixDate(dayDate);
-/*		
-        Calendar mydate = Calendar.getInstance();
-		mydate.setTimeInMillis(timestamp*1000);
-		System.out.println(mydate.get(Calendar.DAY_OF_MONTH)+"."+mydate.get(Calendar.MONTH)+"."+mydate.get(Calendar.YEAR)
-		+" > "+mydate.get(Calendar.HOUR_OF_DAY)+":"+mydate.get(Calendar.MINUTE));
-		const sunrise = new Date((data.sys.sunrise + data.timezone) * 1000)
-				You will get the local time
-		
-*/   
+        dateHourMin = Util.convertUnixDate(dayDate);
 
 	}
 	
@@ -152,13 +138,13 @@ public class Weather implements Info{
 			lines += detailLine.replace("#value", "Visibility: "+visibility);
 		}
 		if (feelLike != null) {
-			lines += detailLine.replace("#value", "Feel Like: "+feelLike+"°C");
+			lines += detailLine.replace("#value", "Feel Like: "+feelLike+"°C (" + Util.celciusToFarenheit(feelLike)+")");
 		}
 		if (tempMax != null) {
-			lines += detailLine.replace("#value", "Maximum: "+tempMax+"°C");
+			lines += detailLine.replace("#value", "Maximum: "+tempMax+"°C ("+ Util.celciusToFarenheit(tempMax)+")");
 		}
 		if (tempMin != null) {
-			lines += detailLine.replace("#value", "Minimum: "+tempMin+"°C");
+			lines += detailLine.replace("#value", "Minimum: "+tempMin+"°C ("+ Util.celciusToFarenheit(tempMin)+")");
 		}
 		if (windSpeed != null) {
 			lines += detailLine.replace("#value", "Wind: "+windSpeed);
@@ -170,24 +156,23 @@ public class Weather implements Info{
 			lines += detailLine.replace("#value", "Pressure: "+pressure+" hPa");
 		}
 		if (message != null) {
-			message = detailLine.replace("#value", "Note: <i>"+message+"</i>");
+			message =  "Note: <i>"+message+"</i>";
 		} else {
 			message = "";
 		}
 		
 		String html = "<br>"
-				+"<div style='display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> Temperature now for "+name+" is "+temp+"°C</div>\r\n"  
-				+ message 
+				+"<div style=' border: 1px solid black; display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> "
+				+ "Weather for "+name+" is "+temp+"°C ("+ Util.celciusToFarenheit(temp)+") "
+				+ "<br>"+dateHourMin
+				+ "<br>"+message 
+				+"</div>"
 				+lines +
 				"  </div>\r\n" + 
 				"  <div style='display: block; clear: left; color: gray; font-size: x-small;'>\r\n" + 
 				"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>More..</a>\r\n" + 
 				"  </div>\r\n" + 
 				"<!--"+icon+"-->";
-		
-		
-		
-		
 		return html;
 	}
 	

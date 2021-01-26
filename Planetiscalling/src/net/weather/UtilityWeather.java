@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -19,6 +20,7 @@ import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
 import com.model.CityWeather;
+import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Weather;
 import com.util.Util;
@@ -34,16 +36,11 @@ public class UtilityWeather implements Info {
 	}
 
 	public void searchCityWeather(City city) {
-		CityWeather cityWeather = UtilityDB.getInstance().selectCityWeather(city);
-		if (cityWeather != null) {
-			System.out.println(cityWeather.toString());
-			callOpenweathermapId(cityWeather.getId());
-		} else {
+		 try {
+			callOpenweatherName(city.getCityAscii(), city.getIso2());
+		} catch (Exception e) {
 			callOpenweathermapObject(city);
 		}
-
-		System.out.println();
-		System.out.println();
 	}
 
 	public void callOpenweathermapId(long id) {
@@ -65,13 +62,36 @@ public class UtilityWeather implements Info {
 		}
        
        if(code == 200) {
-        	System.out.println(data.getString("name"));
-        	System.out.println(data);
         	weather.setData(data);
         	
-        	System.out.println(weather.toString());
+        	//System.out.println(weather.toString());
            // currDataBuilder.add(data);
         }
+        reader.close();
+		
+	}
+	public void callOpenweatherName(String cityName, String country) throws NullPointerException {
+        String currStr = null;
+        weather = new Weather();
+		try {
+			currStr = getData("http://api.openweathermap.org/data/2.5/weather?q=" + cityName+","+country +"&APPID=3506dfa8bbebf7709e6fba904a68559a");
+		} catch (MalformedURLException e) {
+		} catch (IOException e) {
+		}
+        JsonReader reader = null;
+		reader = Json.createReader(new StringReader(currStr));
+		JsonObject data = reader.readObject();
+		
+		int code = 0;
+		try {
+			code = data.getInt("cod");
+		} catch (Exception e) {
+			code = Integer.parseInt(data.getString("cod"));
+			}
+  
+			if(code == 200) {
+			weather.setData(data);
+		}
         reader.close();
 		
 	}
@@ -98,6 +118,12 @@ public class UtilityWeather implements Info {
 			name = ((Mountain)object).getName(); 
 			message = "Weather Station found at ";
 
+		}  else if (object instanceof LegPoint) {
+			lon = ((LegPoint)object).getLonx();
+			lat = ((LegPoint)object).getLaty();
+			name = ((LegPoint)object).getIcaoIdent(); 
+			message = "Weather Station found at ";
+
 		} 
 		
         String currStr = null;
@@ -120,17 +146,9 @@ public class UtilityWeather implements Info {
         
         if(code == 200) {
         	weather.setData(data.getJsonArray("list").getJsonObject(0));
-        	System.out.println(data.getJsonArray("list").getJsonObject(0));
-
-        	System.out.println(weather.toString());
-        	
-		//	String message = weather.getName() +" at " +Util.formatDistance(Geoinfo.distance(lat, weather.getLaty(), lon,weather.getLonx()))+" miles.";
 	        weather.setMessage(message+
-	        		weather.getName() +" at " +Util.formatDistance(Geoinfo.distance(lat, weather.getLaty(), lon,weather.getLonx()))+" miles "
+	        		weather.getName() +" at " +Util.formatDistance(Geoinfo.distance(lat, weather.getLaty(), lon,weather.getLonx()))+" nm "
 	        				+Util.formatAngle(Geoinfo.calculateAngle(lon, lat, weather.getLonx(), weather.getLaty())) +" degrees.");
-
-		    System.out.println(weather.getMessage());
-        	
         }
         reader.close();
 		
@@ -139,7 +157,7 @@ public class UtilityWeather implements Info {
 	public String getData(String urlstr) throws MalformedURLException, IOException {
 		URL url = new URL(urlstr);
 		URLConnection yc = url.openConnection();
-		BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream(),StandardCharsets.UTF_8));
 		String inputLine;
 		String data = "";
 		while ((inputLine = in.readLine()) != null)
@@ -166,7 +184,8 @@ public class UtilityWeather implements Info {
 		return url;
 
     }
-
+    
+ 
 	public Weather getWeather() {
 		return weather;
 	}

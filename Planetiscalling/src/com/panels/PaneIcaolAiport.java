@@ -37,8 +37,8 @@ import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.main.form.Result;
 import com.model.Distance;
-import com.model.Result;
 import com.util.Util;
 import com.util.Utility;
 
@@ -332,18 +332,7 @@ public class PaneIcaolAiport extends JFrame {
 
 	askMeBt = new JButton("Ask Me");
 	askMeBt.setEnabled(false);
-/*	askMeBt.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			if ("Ask Me".equals(askMeBt.getText())) {
-				result.showAskMeAnswer();
-			} else {
-			  askMeBt.setText("Ask Me");
-			  askMePanel.setVisible(false);
-			}
-
-		}
-	});	
-*/		
+	
 	askMePanel.setVisible(false);
 
 	 delMeBt = new JButton("Del Me");

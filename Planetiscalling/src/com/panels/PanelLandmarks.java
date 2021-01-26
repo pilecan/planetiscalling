@@ -14,17 +14,13 @@ import java.util.TreeMap;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
 
 import com.backend.CreateKML;
 import com.backend.ReadData;
-import com.cfg.common.Dataline;
 import com.cfg.common.DistanceSpinner;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
@@ -33,8 +29,9 @@ import com.db.SelectDB;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.db.UtilityDB;
+import com.main.form.Result;
 import com.model.Distance;
-import com.model.Result;
 import com.util.Utility;
 
 public class PanelLandmarks implements Info {
@@ -61,6 +58,8 @@ public class PanelLandmarks implements Info {
 	
 	private JComboBox<String> comboCountry;
 	private JComboBox<String> comboState;
+	private JComboBox<String> comboGeoterm;
+	private JComboBox<String> comboGeoname;
 	private JComboBox<String> comboCity;
 	private JComboBox<String> comboMountain;
 
@@ -77,19 +76,249 @@ public class PanelLandmarks implements Info {
 	
 	private JScrollPane askmeScrollPan;
 	private SelectAirport selectAirport;
+	
+	String [] provArray;
+	String [] geoTermArray; 
+	String [] geoNameArray;
 
 	
 	public PanelLandmarks() {
 		
 	}
-	/**
-	 * getCityAirport
-	 * 
-	 * 
-	 * 
-	 * 
-	 * @return
-	 */
+
+	public JPanel getLandMarkPanel() {
+		final DistanceSpinner distanceSpin = new DistanceSpinner();
+		distanceSpin.initPanelDistances("landmark");
+
+		this.selectAirport = new SelectAirport();
+		
+		readData = new ReadData();
+		
+		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
+
+    	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      	   public void run() { 
+      		   askmeScrollPan.getVerticalScrollBar().setValue(0);
+      	   }
+      	});
+    	
+        
+		askMePanel = new JPanel(new BorderLayout());
+		askMePanel.setBorder(new TitledBorder("Result"));
+        askMePanel.add(askmeScrollPan);
+
+    	
+    	outputPanel = new JPanel(new BorderLayout());
+		outputPanel.setBorder(new TitledBorder("Topic"));
+
+    	result = new Result();
+	    result.setjEditorPane(jEditorPane);
+	    result.setAskmeScrollPan(askmeScrollPan);
+		result.setAskMePanel(askMePanel);
+		result.setOutputPanel(outputPanel);
+		
+		panelResult = new JPanel(new BorderLayout());
+		panelResult.setBorder(new TitledBorder("Searh Result"));
+
+		panelLandMark = new JPanel();
+		panelCombo = new  JPanel();
+		panelLandMark.setLayout(null);
+
+
+		selectDB = new SelectDB();
+		selectDB.selectAirportTableNew();
+
+		provArray = UtilityDB.getInstance().getProvinces(); 
+		geoTermArray = UtilityDB.getInstance().getGeoterm(provArray[0]); 
+		geoNameArray = UtilityDB.getInstance().getGeoname(provArray[0],geoTermArray[0]); 
+
+		comboCountry = new JComboBox<>(UtilityDB.getInstance().getCountryCgn());
+		comboState = new JComboBox<>(provArray);
+		comboGeoterm  = new JComboBox<>(geoTermArray);
+		comboGeoname = new JComboBox<>(geoNameArray);
+
+        selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+
+        int widht = 300;
+		comboCountry.setPreferredSize(new Dimension(widht,25));
+        comboState.setPreferredSize(new Dimension(widht,25));
+        comboGeoterm.setPreferredSize(new Dimension(widht,25));
+        comboGeoname.setPreferredSize(new Dimension(widht,25));
+        
+        
+		comboState.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				comboGeoterm.removeAllItems();
+				comboGeoname.removeAllItems();
+
+				int totalCity = 0;
+				if (comboState.getSelectedItem() != null) {
+					geoTermArray = UtilityDB.getInstance().getGeoterm((String) comboState.getSelectedItem());
+					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboState.getSelectedItem(),
+							geoTermArray[0]);
+
+					for (String string : geoTermArray) {
+						comboGeoterm.addItem(string);
+					}
+					for (String string : geoNameArray) {
+						comboGeoname.addItem(string);
+					}
+
+				}
+
+			}
+
+		});
+		
+		comboGeoterm.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				comboGeoname.removeAllItems();
+
+				int totalCity = 0;
+				if (comboGeoterm.getSelectedItem() != null) {
+					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboState.getSelectedItem(),
+							(String) comboGeoterm.getSelectedItem());
+
+					for (String string : geoNameArray) {
+						comboGeoname.addItem(string);
+					}
+
+				}
+
+			}
+
+		});
+
+   	    panelCombo.add(comboCountry);
+		panelCombo.add(comboState);
+		panelCombo.add(comboGeoterm);
+		panelCombo.add(comboGeoname);
+
+		searchBt = new JButton("Search");
+		searchBt.addActionListener(new ActionListener()
+		    {
+		      public void actionPerformed(ActionEvent e)
+		      {
+		    	  /*
+		    	   * 		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
+		        		 selectMountain, selectVor,selectNdb,
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
+		        				 0, 
+		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				 distanceSpin.getCheckLinedist().isSelected(),
+		        				 0.0));
+		         
+*/		         searchBt.setText("Update");
+		         panelResult.removeAll();	
+				 panelResult.add(result.getAiportFormPanel());
+				 panelResult.validate();
+				 
+				 googleBt.setEnabled(true);
+				 resetBt.setEnabled(true);
+
+				 
+			  	result.getAirportListModel();
+			  	panelLandMark.validate();
+
+	         
+		      }
+		    });
+
+		resetBt = new JButton("Reset");
+		resetBt.setEnabled(false);
+		
+		resetBt.addActionListener(new ActionListener()
+	    {
+	      public void actionPerformed(ActionEvent e)
+	      {
+				distanceSpin.getCitySpinner().setValue(0);
+				distanceSpin.getVorNdbSpinner().setValue(0);
+				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getCheckLinedist().setSelected(false);
+
+				readData.resetAirportResult();
+				panelResult.removeAll();
+				result.getAiportFormPanel();
+				result.getAirportListModel();
+				
+				googleBt.setEnabled(false);
+				panelResult.add(result.getAiportFormPanel());
+
+				panelResult.validate();
+				panelLandMark.validate();
+	      }
+	    });
+		
+		googleBt = new JButton("Land All on Google Earth");
+		googleBt.setEnabled(false);
+		googleBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+	/*	         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
+		        		 selectMountain, selectVor,selectNdb,
+		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
+		        				 0, 
+		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				 distanceSpin.getCheckLinedist().isSelected(),
+		        				 0.0));
+*/		         panelResult.removeAll();	
+				 panelResult.add(result.getAiportFormPanel());
+				 panelResult.validate();
+				 
+			  	result.getAirportListModel();
+			  	panelLandMark.validate();
+
+				Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlAirportCityName)));
+
+			}
+		});
+		
+		
+		
+		landMeBt = new JButton("Land Me");
+		landMeBt.setEnabled(false);
+		landMeBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(result.getCurrentView());
+				System.out.println(result.getCurrentSelection());
+				
+				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
+				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
+				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
+/*				
+				if ("airport".equals(result.getCurrentView())){
+					selectAirport.select("where ident = '"+keyICAO+"'");
+					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
+				}  else if ("vor".equals(result.getCurrentView())){
+						CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
+				 } else if ("ndb".equals(result.getCurrentView())){
+						CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
+				 }else if ("city".equals(result.getCurrentView())){
+						CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
+				 }else if ("mountain".equals(result.getCurrentView())){
+						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+				 }
+*/		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+
+			}
+		});		
+
+			
+
+	   return setLandmarkPanel(distanceSpin);
+	}
+	
+	private void selectOtherCombo(String province, String [] geoTermArray, String [] geoNameArray) {
+		geoTermArray = UtilityDB.getInstance().getGeoterm(province); 
+		geoNameArray = UtilityDB.getInstance().getGeoname(province,geoTermArray[0]); 
+	}
+	
 	public JPanel getAirportPanel(final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("airport");
@@ -111,12 +340,12 @@ public class PanelLandmarks implements Info {
     	
         
 		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder(""));
+		askMePanel.setBorder(new TitledBorder("Result"));
         askMePanel.add(askmeScrollPan);
 
     	
     	outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
+		outputPanel.setBorder(new TitledBorder("Topic"));
 
     	result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -289,10 +518,7 @@ public class PanelLandmarks implements Info {
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
-				
-				
 		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
-
 
 			}
 		});		
@@ -313,7 +539,7 @@ public class PanelLandmarks implements Info {
 
 		
 		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
-		panelCombo.setBounds(10, 200, 240, 90);
+		panelCombo.setBounds(10, 200, 310, 120);
 		
 		int x = 330;
 		
@@ -325,9 +551,9 @@ public class PanelLandmarks implements Info {
 		landMeBt.setBounds(x, 370, 94, 23);
 		askMeBt.setBounds(x+244, 370, 94, 23);
 
-		resetBt.setBounds(120, 300, 90, 23);
-  	    searchBt.setBounds(10, 300, 90, 23);
-		googleBt.setBounds(10, 330, 200, 23);
+		resetBt.setBounds(120, 360, 90, 23);
+  	    searchBt.setBounds(10, 360, 90, 23);
+		googleBt.setBounds(10, 380, 200, 23);
 
 		
 		panelLandMark.add(panelCombo);
@@ -368,7 +594,7 @@ public class PanelLandmarks implements Info {
 
 
 		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder(""));
+		askMePanel.setBorder(new TitledBorder("Result"));
 
     	askmeScrollPan = new JScrollPane(jEditorPane, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -381,7 +607,7 @@ public class PanelLandmarks implements Info {
     	askMePanel.add(askmeScrollPan);
 
 		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
+		outputPanel.setBorder(new TitledBorder("Topic"));
 
 		result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -614,13 +840,13 @@ public class PanelLandmarks implements Info {
 
 
 		askMePanel = new JPanel(new BorderLayout());
-		askMePanel.setBorder(new TitledBorder(""));
+		askMePanel.setBorder(new TitledBorder("Result"));
 
  
     	askMePanel.add(askmeScrollPan);
 
     	outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
+		outputPanel.setBorder(new TitledBorder("Topic"));
 
         result = new Result();
 	    result.setjEditorPane(jEditorPane);

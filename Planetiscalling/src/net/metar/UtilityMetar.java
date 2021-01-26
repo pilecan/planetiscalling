@@ -197,10 +197,16 @@ public class UtilityMetar implements Info{
 			{
 				read = buffer.readLine();
 				if (i == 0) {
-					read = "<b>METAR Available for "+icao+" Airport:</b><br>"; 
+					read = "<div style=' border: 1px solid black; display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'>"
+							+ "METAR for "+read;
+				} else if (i == 1) {
+					read += "</div>";
+				} else {
+					//read = Info.meteoline.replace("#value",read);
 				}
+
 				if (read == null) break;
-				metar += read + "<br>\n";
+				metar += read+"<br>";
 			} 
 			
 			

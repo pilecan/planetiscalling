@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
@@ -485,19 +486,38 @@ public class Util implements Info {
 		DecimalFormat myFormatter = new DecimalFormat("000");
 		return  myFormatter.format(angle);
 	}
+	
+	public static String formatDate(int unit) {
+		DecimalFormat myFormatter = new DecimalFormat("00");
+		return  myFormatter.format(unit);
+	}
+	public static String formatDegree(double value){
+		 DecimalFormat myFormatter = new DecimalFormat("0");
+		 return myFormatter.format(value);
+ }
+	
+	public static String celciusToFarenheit(String strCelcius) {
+		double celcius = Double.valueOf(strCelcius.replace(",", "."));
+		double fahrenheit = 0;
+         if ( celcius < 0) {
+        	fahrenheit  = celcius*1.8f;
+        	fahrenheit = fahrenheit+32;
+        } else {
+        	fahrenheit = (celcius*9f/5f)+32;
+        }
+ 	   return formatDegree(fahrenheit)+"°F";
+	}
     
 	public static String convertUnixDate(long dayDate) {
 		  Calendar mydate = Calendar.getInstance();
 		  mydate.setTimeInMillis(dayDate*1000);
-			System.out.println(mydate.get(Calendar.YEAR)+"."+(mydate.get(Calendar.MONTH)+1)+"."+mydate.get(Calendar.DAY_OF_MONTH)
-			+"  "+mydate.get(Calendar.HOUR_OF_DAY)+":"+mydate.get(Calendar.MINUTE));
-		
-		return "";
+		return mydate.get(Calendar.YEAR)+"."+ formatDate((mydate.get(Calendar.MONTH)+1))+"."+ formatDate(mydate.get(Calendar.DAY_OF_MONTH))
+		+"  "+ formatDate(mydate.get(Calendar.HOUR_OF_DAY))+"h"+ formatDate(mydate.get(Calendar.MINUTE));
 	}
 	
 	public static String formatGPS(String coord) {
 		String[] array = coord.split(",");
-		return formatGPS(Double.valueOf(array[0]))+","+formatGPS(Double.valueOf(array[1]));
+		return formatGPS(Double.valueOf(array[0]))+" / "+formatGPS(Double.valueOf(array[1]));
 		
 	}
 
@@ -509,6 +529,7 @@ public class Util implements Info {
 		int val = (int) (heading - (inverse?180:0)-result);
 		return Integer.toString(val);
 	}
+	
 
 	public static String formatLenght(Integer length,Integer width, String surface){
 		

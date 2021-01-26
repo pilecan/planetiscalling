@@ -13,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.db.UtilityDB;
+import com.main.form.Result;
 import com.model.Airport;
 import com.model.City;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
-import com.model.Result;
 import com.model.Vor;
 import com.util.Util;
 import com.util.Utility;
@@ -238,7 +238,7 @@ public class CreateKML {
 			description += "<div>Capital: "+city.getCapital()+"</div>";
 		}
     	description += "<div>Abreviations: "+city.getIso2()+"/"+city.getIso3()+"</div>";
-		description += "<div>GPS: "+Util.formatGPS(city.getLaty()+","+city.getLonx())+"</div>";
+		description += "<div>GPS: "+Util.formatGPS(city.getLaty()+" , "+city.getLonx())+"</div>";
 		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
 
 		return description;

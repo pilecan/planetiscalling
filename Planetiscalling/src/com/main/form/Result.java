@@ -1,4 +1,4 @@
-package com.model;
+package com.main.form;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -46,6 +46,14 @@ import com.backend.CreateKML;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
 import com.geo.util.Geoinfo;
+import com.model.Airport;
+import com.model.City;
+import com.model.Flightplan;
+import com.model.LegPoint;
+import com.model.Mountain;
+import com.model.Ndb;
+import com.model.SortedListModel;
+import com.model.Vor;
 import com.util.FormUtility;
 import com.util.Util;
 import com.util.Utility;
@@ -656,7 +664,10 @@ public class Result implements Info {
 				htmlString = legPoints.get(i).getHmlString();
 				if ("Airport".equals(legPoints.get(i).getType())) {
 					htmlString = panelAirport(legPoints.get(i).getIcaoIdent());
-				}
+				} else {
+					UtilityWeather.getInstance().callOpenweathermapObject(legPoints.get(i));
+					htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+				} 
 
 				break;
 			}
@@ -686,17 +697,12 @@ public class Result implements Info {
 			
 			if (isMetarVadid) {
 				UtilityWeather.getInstance().callOpenweathermapObject(airport);
-				System.out.println("<!--"+UtilityWeather.getInstance().getWeather().getIcon()+"-->");
-
 				varStr += metar+"<!--"+UtilityWeather.getInstance().getWeather().getIcon()+"-->";
 			} else {
-				//varStr += "<b>METAR Not Available for "+icao+" Airport</b><br>";
 				UtilityWeather.getInstance().callOpenweathermapObject(airport);
 				varStr += UtilityWeather.getInstance().getWeather().htmlData();
 			}
 		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
 		}
 		return varStr;
 

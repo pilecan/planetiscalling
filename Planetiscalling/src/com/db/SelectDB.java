@@ -163,8 +163,6 @@ public class SelectDB implements Info{
 					countryState.add(rs.getString("admin_name"));
 				}
 				mapCountry.put(lastCountry, countryState);
-
-				
 			}
 			
 					
@@ -224,82 +222,8 @@ public class SelectDB implements Info{
 		
 	}
 	
-	/**
-	 * select all rows in the warehouses table
-	 */
-/*	public void selectAirportTable() {
-
-		String sql = "SELECT country, state, city from airport order by country, state";
-		//where country in ('United States','Canada','France')
-				
-		try {
-			final PreparedStatement statement = this.connect().prepareStatement(sql);
-
-			try (ResultSet rs = statement.executeQuery()) {
-				int cpt = 0;
-				String lastCountry = "";
-				String lastState = "";
-				String state = "";
-				List<String> listCities = new ArrayList<String>();
-				while (rs.next()) {
-					//System.out.println(rs.getString("country")+" - "+rs.getString("state")+" - "+rs.getString("city"));
-					
-					if (rs.getString("country") != null) {
-						if ("Armenia".equals(rs.getString("country"))){
-						}
-						if (!lastCountry.equals(rs.getString("country"))) {
-							if (!"".equals(lastCountry)) {
-								if (mapState.size() == 0) {
-									mapState.put(" All", null);
-								}
-								mapCountryAirport.put(lastCountry, mapState);
-							}
-						    mapState = new TreeMap<String, List<String>>();
-						 //   mapState.put(" All", null);
-							listCities = new ArrayList<String>();
-							
-							lastState = "";
-							lastCountry = rs.getString("country");
-						}
-
-					    if (rs.getString("state") == null) {
-							state = " All";
-						} else {
-							state = rs.getString("state");
-						}
-
-						
-						if (!lastState.equals(rs.getString("state"))) {
-							if (!"".equals(lastState)) {
-							    mapState.put(lastState,listCities);
-								
-							}
-
-							listCities = new ArrayList<String>();
-							lastState = state;
-						}
-							
-						listCities.add(rs.getString("city"));
-						
-
-						cpt++;
-						
-					}
-				}
-				mapCountryAirport.put(lastCountry, mapState);
-
-			}
-			
-					
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
-	}
 	
-*/	public List<String> selectDBCity(String sql) {
+	public List<String> selectDBCity(String sql) {
 
 		mapCities = new TreeMap<String, City>();
 	//	mapCities.put(" All", null);

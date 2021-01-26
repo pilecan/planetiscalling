@@ -121,7 +121,7 @@ public class LegPoint {
 	            + "Type: "+getType()+"<br>\n"
 	            + "Altitude: "+Math.round(getAltitude()*3.28084)+"<br>\n"
 	            + "GPS: "+Util.formatGPS(getLonx())+","+Util.formatGPS(getLaty())+"<br>\n"
-	            + "</body>\n";
+	            + "";
 	}
 
 	

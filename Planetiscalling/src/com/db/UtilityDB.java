@@ -9,13 +9,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.cfg.common.Info;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
 import com.model.CityWeather;
+import com.model.Landmark;
 import com.model.Runway;
 
 
@@ -27,11 +30,13 @@ public class UtilityDB extends Thread implements Info {
 	private Airport airport;
 	private CityWeather cityWeather;
 	private Runway runway;
-	private  List<Runway> listRunways;
+	private List<Runway> listRunways;
 	private Map<String, Airport> mapAirport;
 	private List<Airport> airports;
 	private List<CityWeather> cityWeathers;
-
+	private List<Landmark> landmarks;
+	private Map<String, Landmark> mapLandmark;
+	
 	
 	public static UtilityDB getInstance(){
 		return instance;
@@ -47,11 +52,72 @@ public class UtilityDB extends Thread implements Info {
 		}
 		return conn;
 	}
+	
+	public void selectLandmark(String search) {
+		landmarks = new ArrayList<>();
+		mapLandmark = new TreeMap<>();
+		Landmark landmark;
+		
+		String sql = "SELECT cgn_id, geo_name, geo_term, category,code, laty, lonx, admin, decision_date, source " + 
+				"FROM cgn_canada ";
+		
+		if (!"".equals(search)) {
+			sql += search;
+		}
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					landmark = new Landmark( rs.getString("cgn_id"),  rs.getString("geo_name"),  rs.getString("geo_term"),  rs.getString("category"),  rs.getString("code"), 
+							rs.getString("admin"),  rs.getDouble("lonx"),  rs.getDouble("laty"),rs.getString("decision_date"), rs.getString("source") );
+					landmarks.add(landmark);
+					mapLandmark.put(rs.getString("cgn_id"), landmark);
+				}
+
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		}
+		
+
+	}
+	public List<String> selectListLandmark(String sql) {
+		List<String> list = new ArrayList<>(); 
+		
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					list.add(rs.getString(1));
+				}
+
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		}
+		
+		return list;
+		
+
+	}
+
 	public void selectAirport(String search) {
 		listRunways = new ArrayList<>();
 		airports = new ArrayList<>();
 		airport = new Airport();
 		mapAirport = new TreeMap<String, Airport>();
+		
+		
 		
 		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
 				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name, hour_zone, time_zone  "
@@ -156,7 +222,7 @@ public class UtilityDB extends Thread implements Info {
 				"  INNER JOIN  city_weather c2 ON c1.city_ascii = c2.name and c1.iso2 = c2.iso2 "
 				+ "and c2.name = '"+city.getCityAscii()+"' and c2.iso2 = '"+city.getIso2()+"'";
 		
-		System.out.println(sql);
+		//System.out.println(sql);
 	
 		try {
 			final PreparedStatement statement = this.connect().prepareStatement(sql);
@@ -165,7 +231,6 @@ public class UtilityDB extends Thread implements Info {
 
 				while (rs.next()) {
 					cityWeather = new CityWeather(rs.getLong("id"), rs.getString("name"), rs.getString("iso2") , rs.getDouble("lonx"), rs.getDouble("laty"));
-					System.out.println(Geoinfo.distance(city.getLaty(), rs.getDouble("laty"), city.getLonx(), rs.getDouble("lonx"))+" - "+cityWeather.toString());
 					cityWeathers.add(cityWeather);
 					orderDistance.put(Geoinfo.distance(city.getLaty(), rs.getDouble("laty"), city.getLonx(), rs.getDouble("lonx")), cityWeather);
 				}
@@ -185,6 +250,29 @@ public class UtilityDB extends Thread implements Info {
 		
 		return cityWeather; 
 		
+	}
+
+	public String[] getCountryCgn() {
+		String[] countries= {"Canada"};
+		return countries;
+	}
+	
+	public String[] getProvinces() {
+		List <String> list = selectListLandmark("SELECT admin FROM cgn_canada group by admin");
+		return list.toArray(new String[list.size()]);
+	}
+
+	public String[] getGeoterm(String admin) {
+		String sql = "SELECT geo_term FROM cgn_canada where admin = '"+admin+"' group by geo_term order by geo_term ";
+		List <String> list = selectListLandmark("SELECT geo_term FROM cgn_canada where admin = '"+admin+"' group by geo_term order by geo_term ");
+		return list.toArray(new String[list.size()]);
+	}
+
+	public String[] getGeoname(String admin, String geoTerm) {
+		List <String> list = selectListLandmark("SELECT geo_name FROM cgn_canada  where admin = '"+admin+"' and geo_term = '"+geoTerm+"'");
+		list.add(0,"All");
+
+		return list.toArray(new String[list.size()]);
 	}
 
 	
