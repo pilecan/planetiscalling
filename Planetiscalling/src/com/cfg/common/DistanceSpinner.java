@@ -109,8 +109,8 @@ public class DistanceSpinner implements Info {
 
           }else  if ("landmark".equals(topic)) {
            	airportSpinner = makeSpinner("Airport distances in Nautical Miles", "Airport (nm)", airportSpinner, distanceAirport, panel, formUtility);
-          	vorNdbSpinner =  makeSpinner("Vor/NDB distances in Nautical Miles", "Vor/NDB (nm)", vorNdbSpinner, distanceVorNdb, panel, formUtility);
            	citySpinner = makeSpinner("City distances in Nautical Miles", "City (nm)", citySpinner, distanceCity, panel, formUtility);
+        	mountainSpinner = makeSpinner("Moutain distances in Nautical Miles", "Mountain (nm)", mountainSpinner, distanceMountain, panel, formUtility);
         	checkLinedist = makeCheckbox("Check it to see lines between placemarks", "Line Between", checkLinedist, false, panel, formUtility);
 
          }

@@ -49,6 +49,7 @@ import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
 import com.model.Flightplan;
+import com.model.Landmark;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
@@ -96,6 +97,8 @@ public class Result implements Info {
 	private Map<Integer, Ndb> selectedNdbs;
 	private LinkedList<LegPoint> legPoints;
 	private Map<String, Airport> mapAirport;
+	
+	private Map<String, Landmark> selectedLandmarks;
 
 	private StringBuilder builder;
 	
@@ -114,6 +117,7 @@ public class Result implements Info {
 	private JRadioButton ndbBtn;
 	private JRadioButton cityBtn;
 	private JRadioButton mountainBtn;
+	private JRadioButton landmarkBtn;
 
 	private JButton leftBtn;
 	private JButton askMeBt;
@@ -292,6 +296,8 @@ public class Result implements Info {
 				getCityListModel();
 			} else if (e.getSource() == mountainBtn) {
 				 getMountainListModel();
+			} else if (e.getSource() == landmarkBtn) {
+				 getLandmarkListModel();
 			}
 
 		}
@@ -467,11 +473,43 @@ public class Result implements Info {
 
 	}
 
+	public JPanel getLandmarkFormPanel() {
+		resultPanel = setBorderPanel(resultPanel);
+
+		formUtility = new FormUtility();
+
+		ButtonGroup bgroup = new ButtonGroup();
+
+		landmarkBtn = new JRadioButton("", true);
+		mountainBtn = new JRadioButton("");
+		cityBtn = new JRadioButton("");
+		airportBtn = new JRadioButton("");
+
+		bgroup.add(landmarkBtn);
+		bgroup.add(airportBtn);
+		bgroup.add(mountainBtn);
+		bgroup.add(cityBtn);
+
+		RadioListener myListener = new RadioListener();
+		landmarkBtn.addActionListener(myListener);
+		airportBtn.addActionListener(myListener);
+		cityBtn.addActionListener(myListener);
+		mountainBtn.addActionListener(myListener);
+
+	    setformLine(resultPanel, "Landmarks:", this.selectedLandmarks.size(), landmarkBtn);
+	    setformLine(resultPanel, "Airports:", this.selectedMapAirports.size(), airportBtn);
+		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+      	setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
+	
+		resultPanel.validate();
+		return resultPanel;
+
+	}
+
 
 
 	public void getAirportListModel() {
 		listModel = new DefaultListModel<String>();
-		String info = "";
 	//	UtilityMetar.getInstance().validMetar();
 		outputPanel.setBorder(new TitledBorder("Airports ("+mapAirport.size()+")"));
 
@@ -487,7 +525,6 @@ public class Result implements Info {
 	public void getWaypointListModel() {
 		listModel = new DefaultListModel<String>();
 		Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
-		String info = "";
 		Double distance = 0.0;
 		Double distanceCumul = 0.0;
 		builder = new StringBuilder();
@@ -499,7 +536,6 @@ public class Result implements Info {
 
 				if ("1".equals(legPoints.get(i).getVisible())){
 					distance = Geoinfo.distance(legPoints.get(i).getLaty(), legPoints.get(i).getLonx(),legPoints.get(i + 1).getLaty(), legPoints.get(i + 1).getLonx(), 'N');
-					info = legPoints.get(i).getId() + "   " + Math.round(distance) + " - " + Math.round(distanceCumul)+ " - " + Math.round(legPoints.get(i).getAltitude() * 3.28084) + "ft";
 					distanceCumul += distance;
 					builder = Utility.getInstance().buildLine(legPoints.get(i).getId(), Math.round(distance), Math.round(distanceCumul));
 				}
@@ -521,7 +557,6 @@ public class Result implements Info {
 
 	public void getVorListModel() {
 		listModel = new DefaultListModel<String>();
-		String info = "";
 
 		outputPanel.setBorder(new TitledBorder("VORs ("+selectedVors.size()+")"));
 		for (Vor vor : selectedVors.values()) {
@@ -540,7 +575,6 @@ public class Result implements Info {
 
 	public void geNdbListModel() {
 		listModel = new DefaultListModel<String>();
-		String info = "";
 		outputPanel.setBorder(new TitledBorder("VORs ("+selectedNdbs.size()+")"));
 
 		for (Ndb ndb : selectedNdbs.values()) {
@@ -558,7 +592,6 @@ public class Result implements Info {
 
 	public void getCityListModel() {
 		listModel = new DefaultListModel<String>();
-		String info = "";
 
 		outputPanel.setBorder(new TitledBorder("Cities ("+selectedCities.size()+")"));
 		for (City city : selectedCities.values()) {
@@ -573,7 +606,6 @@ public class Result implements Info {
 
 	public void getMountainListModel() {
 		listModel = new DefaultListModel<String>();
-		String info = "";
 		outputPanel.setBorder(new TitledBorder("Mountains ("+selectedMountains.size()+")"));
 
 		for (Mountain mountain : selectedMountains.values()) {
@@ -584,6 +616,21 @@ public class Result implements Info {
 		}
 
 		currentView = "mountain";
+		showList((DefaultListModel<String>) listModel);
+
+	}
+	public void getLandmarkListModel() {
+		listModel = new DefaultListModel<String>();
+		outputPanel.setBorder(new TitledBorder("Landmarks ("+selectedLandmarks.size()+")"));
+
+		for (Landmark landmark: selectedLandmarks.values()) {
+			//info = mountains.getName() + "   " + mountains.getCountry();
+			builder = Utility.getInstance().buildLine(landmark.getGeoName() , landmark.getGeoTerm(), landmark.getCode());
+
+			((DefaultListModel) listModel).addElement(builder.toString());
+		}
+
+		currentView = "landmark";
 		showList((DefaultListModel<String>) listModel);
 
 	}
@@ -770,53 +817,24 @@ public class Result implements Info {
 
 	}
 
-/*	public void showAskMeAnswer( JPanel outputPanel, JEditorPane jEditorPane, JButton askMeBt, final JScrollPane askmeScrollPan ) {
-		String content = null;
-	    if ("Ask Me".equals(askMeBt.getText())) {
-			kit = new HTMLEditorKit();
-			doc = kit.createDefaultDocument();
-	        jEditorPane.setDocument(doc);
-			jEditorPane.setContentType("text/html");
-	    	//outputPanel.setVisible(true);
-			jEditorPane.setVisible(true);
-			
-			askMeBt.setText("Close");
-			
-	        if ("waypoint".equals(getCurrentView())) {
-	        	content = panelWaypoint(getCurrentSelection());
-	        } else if ("waypoint".equals(getCurrentView())) {
-	        	content = panelWaypoint(getCurrentSelection());
-	        } else if ("airport".equals(getCurrentView())) {
-	        	content = panelAirport(getCurrentSelection());
-	        }  else if ("vor".equals(getCurrentView())) {
-	        	content = panelVor(getCurrentSelection());
-	        }   else if ("ndb".equals(getCurrentView())) {
-	        	content = panelNdb(getCurrentSelection());
-	        }   else if ("city".equals(getCurrentView())) {
-	        	content = panelCity(getCurrentSelection());
-	        }   else if ("mountain".equals(getCurrentView())) {
-	        	content = panelMountain(getCurrentSelection());
-	        }  
-	        
-	        //jEditorPane.setText(content);
-	        showPanelInfo(content);
-	        
-	        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	        	   public void run() { 
-	        		   askmeScrollPan.getVerticalScrollBar().setValue(0);
-	        	   }
-	        	});
-	    	
-	    } else {
-			//outputPanel.setVisible(true);
-			
-			jEditorPane.setVisible(false);
-			askMeBt.setText("Ask Me");
-	    }
-	
+	public String panelLandmark(String line) {
+		String htmlString = null;
+		line = Utility.getInstance().findKeyICAO(line);
+
+		for (Landmark landmark: selectedLandmarks.values()) {
+			if (landmark.getGeoName().equals(line)) {
+				htmlString = CreateKML.buildLandmarkDescriptionPlane(landmark).replaceAll("12px", "10px").replaceAll("\\|","<br>");
+				UtilityWeather.getInstance().callOpenweathermapObject(landmark);
+				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+
+			}
+		}
+
+		return htmlString;
+
 	}
-	
-*/
+
+
 	public void showAskMeAnswer() {
 		String content = null;
 		jEditorPane.setVisible(true);
@@ -837,6 +855,8 @@ public class Result implements Info {
         	content = panelCity(getCurrentSelection());
         }   else if ("mountain".equals(getCurrentView())) {
         	content = panelMountain(getCurrentSelection());
+        }   else if ("landmark".equals(getCurrentView())) {
+        	content = panelLandmark(getCurrentSelection());
         }  
         	
        jEditorPane.setText(content);
@@ -1134,6 +1154,16 @@ public class Result implements Info {
 
 	public void setAskMePanel(JPanel askMePanel) {
 		this.askMePanel = askMePanel;
+	}
+
+
+	public Map<String, Landmark> getSelectedLandmarks() {
+		return selectedLandmarks;
+	}
+
+
+	public void setSelectedLandmarks(Map<String, Landmark> selectedLandmarks) {
+		this.selectedLandmarks = selectedLandmarks;
 	}
 
 }

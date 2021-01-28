@@ -479,7 +479,7 @@ public class Util implements Info {
 	}
 	public static String formatGPS(Double coord) {
 		DecimalFormat myFormatter = new DecimalFormat("0.000000");
-		return myFormatter.format(coord);
+		return myFormatter.format(coord).replace(",", ".");
 	}
 
 	public static String formatAngle(Double angle) {
@@ -517,7 +517,7 @@ public class Util implements Info {
 	
 	public static String formatGPS(String coord) {
 		String[] array = coord.split(",");
-		return formatGPS(Double.valueOf(array[0]))+" / "+formatGPS(Double.valueOf(array[1]));
+		return formatGPS(Double.valueOf(array[0]))+","+formatGPS(Double.valueOf(array[1]));
 		
 	}
 

@@ -103,7 +103,7 @@ public class PanelCity implements Info {
    	    askMePanel.add(askmeScrollPan);
 
 		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("Topic"));
+		outputPanel.setBorder(new TitledBorder("List"));
 
 		result = new Result();
 	    result.setjEditorPane(jEditorPane);

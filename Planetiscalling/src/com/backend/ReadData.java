@@ -22,17 +22,19 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.cfg.common.Dataline;
 import com.cfg.common.Info;
 import com.db.CreateKmlFSPlan;
+import com.db.CreateKmlFSPlan.NoPoints;
 import com.db.SelectAirport;
 import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
-import com.db.CreateKmlFSPlan.NoPoints;
+import com.db.UtilityDB;
 import com.geo.util.Geoinfo;
 import com.main.form.Result;
 import com.model.Airport;
 import com.model.City;
 import com.model.Distance;
+import com.model.Landmark;
 import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Vor;
@@ -48,6 +50,7 @@ public class ReadData implements Info{
 	private String kmlFlightPlanFile;
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
+	private Map<String, Landmark> selectedLandmarks;
 	private Map<String, Airport> selectedAirports ;
 	private Map<String, Airport> selectedMapAirports;
 
@@ -220,6 +223,15 @@ public class ReadData implements Info{
 		result.setSelectedVors(new HashMap<Integer, Vor>());
 		//setResult();
 	}
+	
+	public void resetLandmarkResult() {
+		//result.seta
+		result.setMapAirport(new HashMap<String, Airport>());
+	    result.setSelectedMapAirports(new HashMap<String, Airport>());
+		result.setSelectedCities(new HashMap<String, City>());
+		result.setSelectedMountains(new HashMap<String, Mountain>());
+		//setResult();
+	}
 	public void resetCityResult(Result result) {
 		
 	    result.setMapAirport(new HashMap<String, Airport>());
@@ -371,6 +383,60 @@ public class ReadData implements Info{
      * @param selectCity
      * @param selectMoutain
      */
+    private void searchLandmarkNeighbor() {
+
+    	if (dist.isCity()) {
+ 			for(City city : UtilityDB.getInstance().getCities()){
+ 				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
+ 				
+ 				for(Landmark landmark : UtilityDB.getInstance().getLandmarks()){
+ 					Double[] dd2 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
+ 					
+ 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
+ 						selectedCities.put(city.getCityName(),new City(city));
+						if (dist.isLine()) {
+							dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+					}
+ 				}
+ 			}
+ 		}
+		if (dist.isMountain()) {
+			for(Mountain mountain : UtilityDB.getInstance().getMountains()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
+
+ 				for(Landmark landmark : UtilityDB.getInstance().getLandmarks()){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
+
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()) {
+						selectedMountains.put(mountain.getName(), new Mountain(mountain));
+						if (dist.isLine()) {
+							dataline.setData("mountain",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+					}
+				}
+			}
+		}
+		if (dist.isAirport()) {
+			for(Airport airport: UtilityDB.getInstance().getMapAirport().values()){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
+
+ 				for(Landmark landmark : UtilityDB.getInstance().getLandmarks()){
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
+
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
+						selectedAirports.put(airport.getIdent(), new Airport(airport));
+						if (dist.isLine()) {
+							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+					}
+				}
+			}
+		}
+
+ 		
+     }	
+
     private void searchAiportNeighbor(List<Airport> airports,SelectCity selectCity,SelectMountain selectMoutain) {
 		
     	selectedCities = new HashMap<String, City>();
@@ -410,7 +476,6 @@ public class ReadData implements Info{
 
  		
      }	
-
     /**
      * 
      * @param placemarks
@@ -735,6 +800,59 @@ public class ReadData implements Info{
 
 	}
 	
+	public void createKMLLandmark(Result result, 
+			JComboBox<?> comboCountry, JComboBox<?> comboState, JComboBox<?> comboGeoterm, JComboBox<?> comboGeoname, Distance dist) {
+		this.dataline = new Dataline();
+		this.dist = dist;
+		this.result = result;
+	   	selectedCities = new HashMap<>();
+		selectedMountains = new HashMap<>();
+		selectedAirports = new HashMap<>();
+
+
+		String sql = "";	
+		String strQuote = "";
+
+		strQuote = ((String) comboGeoterm.getSelectedItem()).replace("'", "''");
+		
+		 if ("All".equals(comboGeoname.getSelectedItem())) { 
+		    	sql = "where admin = '"+((String) comboState.getSelectedItem()).replace("'", "''")+"' "
+		    			+ "and geo_term = '"+((String) comboGeoterm.getSelectedItem()).replace("'", "''")+"'";
+		} else {
+			strQuote = ((String) comboGeoname.getSelectedItem()).replace("'", "''");
+
+	    	sql = "where admin = '"+((String) comboState.getSelectedItem()).replace("'", "''")+"' "
+	    			+ "and geo_term = '"+((String) comboGeoterm.getSelectedItem()).replace("'", "''")+"'"
+	    			+ "and geo_name = '"+strQuote+"'";
+
+		}
+		 
+		UtilityDB.getInstance().selectLandmark(sql);;
+		selectedLandmarks = UtilityDB.getInstance().getMapLandmark();
+		
+		sql = "where country = '"+((String) comboCountry.getSelectedItem()).replace("'", "''")+
+				"' and admin_name ='"+((String) comboState.getSelectedItem()).replace("'", "''")+"'";
+		
+		UtilityDB.getInstance().selectCity(sql);
+		UtilityDB.getInstance().getCities();
+		
+    	UtilityDB.getInstance().selectAirport(sql.replace("admin_name", "state"));
+    	UtilityDB.getInstance().getAirports();
+    	
+    	UtilityDB.getInstance().selectMountain("where country = '"+((String) comboCountry.getSelectedItem()).replace("'", "''")+"' ");
+    	UtilityDB.getInstance().getMountains();
+
+		searchLandmarkNeighbor();
+		
+		result.setSelectedLandmarks(selectedLandmarks);
+		result.setSelectedMapAirports(selectedAirports);
+	    result.setMapAirport(selectedAirports);
+		result.setSelectedCities(selectedCities);
+		result.setSelectedMountains(selectedMountains);
+		
+		saveKMLFileLandmark(Utility.getInstance().getFlightPlanName(Info.kmlLandmarkMountainCityAirportName),dist);
+
+	}
 	/**
 	 * 
 	 * @param manageXMLFile
@@ -889,6 +1007,86 @@ public class ReadData implements Info{
     	
     }
     
+    public  void saveKMLFileLandmark(String kmlRelative, Distance dist){
+		
+ 		Writer writer = null;
+ 						
+  		try {
+ 		    writer = new BufferedWriter(new OutputStreamWriter(
+ 		          new FileOutputStream(kmlRelative), "utf-8"));
+		    writer.write(CreateKML.createHeader(
+		    		(selectedAirports != null ?selectedAirports.size():0)+
+		    		(UtilityDB.getInstance().getLandmarks() != null?UtilityDB.getInstance().getLandmarks().size():0)+
+		    		(selectedCities != null?selectedCities.size():0)+
+		    		(selectedMountains != null?selectedMountains.size():0)
+		    		));
+		    
+ 		    writer.write("<Folder><name>Landmarks found ("+UtilityDB.getInstance().getLandmarks().size()+") </name>");
+ 		    for(Landmark landmark:UtilityDB.getInstance().getLandmarks()){
+		    	writer.write(createKML.buildLandmarkPlaceMark(landmark));
+ 		    }
+
+ 		    writer.write("</Folder>"); 
+
+ 		    if (dist.isAirport()){
+	 		    writer.write("<Folder><name> Airports found ("+selectedAirports.size()+") </name>");
+	 		    for(Airport airport:selectedAirports.values()){
+			    	writer.write(createKML.buildAirportPlaceMark(airport));
+	
+	 		    }
+				 writer.write("</Folder>"); 
+ 		    }
+ 		    
+ 		    if (dist.isCity()){
+ 			    writer.write("<Folder><name> Cities found ("+selectedCities.size()+") </name>");
+ 			    
+ 			    for(City city: selectedCities.values()){
+ 			    	writer.write(createKML.buildCityPlaceMark(city));
+ 			    }
+ 			    writer.write("</Folder>"); 
+ 		    }
+ 		    
+ 		    if (dist.isMountain()){
+ 			    writer.write("<Folder><name> Mountains found ("+selectedMountains.size()+") </name>");
+ 			    for(Mountain mountain: selectedMountains.values()){
+ 			    	writer.write(createKML.buildMountainPlaceMark(mountain));
+ 			    }
+ 		    	
+ 			    writer.write("</Folder>"); 
+ 		    }
+ 		    
+		    if (dist.isLine()){
+		    	for (String key: dataline.getMapData().keySet()) {
+			    	writer.write("<Folder><name>"+key+" distance </name>"
+			    			+ "<Placemark> "
+			    			+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+			    			+ " <Style>" + 
+			    			"  <LineStyle> " + 
+			    			"   <color>"+dataline.getColor(key)+"</color>"
+			    			+ "<width>2</width> " + 
+			    			"  </LineStyle>" + 
+			    			" </Style>"
+			    			+ "<LineString><extrude>1</extrude>"
+			    			+ "<tessellate>1</tessellate>"
+			    			+ "<altitudeMode>relativeToGround</altitudeMode>"
+			    			+ "<coordinates>\r\n");
+			    	writer.write(dataline.getMapData().get(key));
+			    	writer.write("</coordinates></LineString></Placemark></Folder>");
+		    		
+		    	}
+		    	
+		    }
+
+ 		    writer.write("</Folder></Document></kml>");
+ 	   
+ 		} catch (IOException ex) {
+ 		  System.err.println(ex.getMessage());
+ 		} finally {
+ 		   try {writer.close();} catch (Exception ex) {}
+ 		}			
+     	
+     }
+
 
     public  void saveKMLFileICAO(Map<String, Airport> mapAirports, String kmlRelative, Distance dist){
  		Writer writer = null;

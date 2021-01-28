@@ -15,11 +15,10 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 
 import com.cfg.common.Info;
-import com.db.UtilityDB;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
-import com.model.CityWeather;
+import com.model.Landmark;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Weather;
@@ -35,11 +34,32 @@ public class UtilityWeather implements Info {
 		return instance;
 	}
 
-	public void searchCityWeather(City city) {
+	public void searchCityWeather(Object object) {
+		double lat = 0;
+		double lon = 0;
+		String name = "";
+		String location = "";
+		if (object instanceof City) {
+			lon = ((City)object).getLonx();
+			lat = ((City)object).getLaty();
+			name = ((City)object).getCityAscii(); 
+			location = ((City)object).getIso2(); 
+		} else if (object instanceof Landmark) {
+			lon = ((Landmark)object).getLonx();
+			lat = ((Landmark)object).getLaty();
+			name = ((Landmark)object).getGeoName(); 
+			location = ((City)object).getAdminName(); 
+		} 
+		
 		 try {
-			callOpenweatherName(city.getCityAscii(), city.getIso2());
+			callOpenweatherName(name, location);
 		} catch (Exception e) {
-			callOpenweathermapObject(city);
+			try {
+				callOpenweathermapObject(object);
+			} catch (NullPointerException e1) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+			}
 		}
 	}
 
@@ -96,7 +116,7 @@ public class UtilityWeather implements Info {
 		
 	}
 	
-	public void callOpenweathermapObject(Object object) {
+	public void callOpenweathermapObject(Object object) throws NullPointerException {
 		double lat = 0;
 		double lon = 0;
 		String name = "";
@@ -124,6 +144,11 @@ public class UtilityWeather implements Info {
 			name = ((LegPoint)object).getIcaoIdent(); 
 			message = "Weather Station found at ";
 
+		}  else if (object instanceof Landmark) {
+			lon = ((Landmark)object).getLonx();
+			lat = ((Landmark)object).getLaty();
+			name = ((Landmark)object).getGeoName(); 
+			message = "No weather station at "+name+" but found it at ";
 		} 
 		
         String currStr = null;
@@ -141,6 +166,7 @@ public class UtilityWeather implements Info {
          try {
 			code = data.getInt("cod");
 		} catch (Exception e) {
+			System.out.println(data);
 			code = Integer.parseInt(data.getString("cod"));
 		}
         

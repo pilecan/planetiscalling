@@ -38,6 +38,7 @@ public interface Info {
 	String kmlAirportCityName = "airport_city.kml";
 	String kmlCityAirportMountainName = "city_airport_mountain.kml";
 	String kmlMountainCityAirportName = "mountain_city_airport.kml";
+	String kmlLandmarkMountainCityAirportName = "landmark_mountain_city_airport.kml";
 
     String imageLogo = "/images/hello_here.jpg";
     String datadir  = "/data/";

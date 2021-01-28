@@ -11,13 +11,37 @@ public class Landmark {
 	private Double laty;
 	private String decisionDate;
 	private String source;
+	private String location;
+	private String language;
+	private String syllabic;
+	private String toponomic;
+	private String revelance;
 	
 	public Landmark() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 
+	public Landmark(String cgnId, String geoName, String geoTerm, String category, String code, String admin,
+			Double lonx, Double laty, String decisionDate, String source, String location, String language,
+			String syllabic, String toponomic, String revelance) {
+		super();
+		this.cgnId = cgnId;
+		this.geoName = geoName;
+		this.geoTerm = geoTerm;
+		this.category = category;
+		this.code = code;
+		this.admin = admin;
+		this.lonx = lonx;
+		this.laty = laty;
+		this.decisionDate = decisionDate;
+		this.source = source;
+		this.location = location;
+		this.language = language;
+		this.syllabic = syllabic;
+		this.toponomic = toponomic;
+		this.revelance = revelance;
+	}
 
 	public Landmark(String cgnId, String geoName, String geoTerm, String category, String code, String admin,
 			Double lonx, Double laty, String decisionDate, String source) {
@@ -33,6 +57,7 @@ public class Landmark {
 		this.decisionDate = decisionDate;
 		this.source = source;
 	}
+		
 
 
 
@@ -48,9 +73,18 @@ public class Landmark {
 		this.laty = landmark.getLaty();
 		this.decisionDate = landmark.getDecisionDate();
 		this.source = landmark.getSource();
+		this.location = landmark.getLocation();
+		this.toponomic = landmark.getToponomic();
+		this.language = landmark.getLanguage();
+		this.syllabic = landmark.getSyllabic();
+		this.revelance = landmark.getRevelance();
 
 	}
-	
+
+	public String getCoordinates() {
+		return ""+lonx+","+laty+","+"0";
+	}
+
 	public String getGeoName() {
 		return geoName;
 	}
@@ -95,8 +129,10 @@ public class Landmark {
 	}
 	@Override
 	public String toString() {
-		return "Landmark [geoName=" + geoName + ", geoTerm=" + geoTerm + ", category=" + category + ", code=" + code
-				+ ", admin=" + admin + ", lonx=" + lonx + ", laty=" + laty + "]";
+		return "Landmark [cgnId=" + cgnId + ", geoName=" + geoName + ", geoTerm=" + geoTerm + ", category=" + category
+				+ ", code=" + code + ", admin=" + admin + ", lonx=" + lonx + ", laty=" + laty + ", decisionDate="
+				+ decisionDate + ", source=" + source + ", location=" + location + ", language=" + language
+				+ ", syllabic=" + syllabic + ", toponomic=" + toponomic + ", revelance=" + revelance + "]";
 	}
 
 	public String getCgnId() {
@@ -125,6 +161,66 @@ public class Landmark {
 
 	public void setDecisionDate(String decisionDate) {
 		this.decisionDate = decisionDate;
+	}
+
+
+
+	public String getLanguage() {
+		return language;
+	}
+
+
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+
+
+	public String getSyllabic() {
+		return syllabic;
+	}
+
+
+
+	public void setSyllabic(String syllabic) {
+		this.syllabic = syllabic;
+	}
+
+
+
+	public String getToponomic() {
+		return toponomic;
+	}
+
+
+
+	public void setToponomic(String toponomic) {
+		this.toponomic = toponomic;
+	}
+
+
+
+	public String getLocation() {
+		return location;
+	}
+
+
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+
+
+	public String getRevelance() {
+		return revelance;
+	}
+
+
+
+	public void setRevelance(String revelance) {
+		this.revelance = revelance;
 	}
 
 }

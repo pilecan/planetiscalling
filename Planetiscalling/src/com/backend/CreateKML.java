@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream.GetField;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collections;
@@ -12,10 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Airport;
 import com.model.City;
+import com.model.Landmark;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
@@ -36,6 +35,7 @@ public class CreateKML {
         Map<String, String> aMap = new HashMap<>();
         aMap.put("Canyon", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
         aMap.put("Cap", "http://maps.google.com/mapfiles/kml/shapes/trail.png" ); 
+        aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/campground.png" ); 
         aMap.put("Chalet", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("Cove", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
         aMap.put("Historic", "http://maps.google.com/mapfiles/kml/shapes/info_circle.png" ); 
@@ -47,23 +47,73 @@ public class CreateKML {
         aMap.put("Port", "http://maps.google.com/mapfiles/kml/shapes/ferry.png" ); 
         aMap.put("Pourvoirie", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
         aMap.put("Reserve", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("PARK", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
         aMap.put("Waterfall", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("BCH", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("CHAN", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("FALL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("ISL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("RAP", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("LAKE", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("FOR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("RIV", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("HYDR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("SITE", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("RIVF", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
         aMap.put("Wreck", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
         aMap.put("River", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("SEA", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("SEAF", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("BAY", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("SEAU", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("SPRG", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("VEGL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("SHL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("Castle", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
+        aMap.put("GEOG", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
         aMap.put("Village", "http://maps.google.com/mapfiles/kml/shapes/square.png" ); 
         aMap.put("Church", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("Abbey", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
-        aMap.put(null, "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put("VILG", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put("CITY", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put(null, "http://maps.google.com/mapfiles/kml/paddle/wht-pushpin.png" ); 
         aMap.put("minor", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" ); 
+        aMap.put("TER", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" ); 
         aMap.put("admin", "http://maps.google.com/mapfiles/kml/paddle/pink-stars.png" ); 
         aMap.put("primary", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
         aMap.put("volcano", "http://maps.google.com/mapfiles/kml/shapes/volcano.png" ); 
         aMap.put("vor", "http://maps.google.com/mapfiles/kml/shapes/polygon.png" ); 
         aMap.put("ndb", "http://maps.google.com/mapfiles/kml/shapes/triangle.png" ); 
         aMap.put("airport", "http://maps.google.com/mapfiles/kml/shapes/airports.png" ); 
+        aMap.put("AIR", "http://maps.google.com/mapfiles/kml/shapes/airports.png" ); 
         aMap.put("mountain", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
+        aMap.put("MTN", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
+        aMap.put("CLF", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
+        aMap.put("CRAT", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
+        aMap.put("VALL", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
+        aMap.put("CAVE", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
+        aMap.put("RES", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
+        aMap.put("GLAC", "http://maps.google.com/mapfiles/kml/shapes/snowflake_simple.png" ); 
+        aMap.put("CAPE", "http://maps.google.com/mapfiles/kml/shapes/camera.png" ); 
+        aMap.put("PLN", "http://maps.google.com/mapfiles/kml/shapes/camera.png" ); 
+        aMap.put("HAM", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("HAM", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("TOWN", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
+        aMap.put("IR", "http://maps.google.com/mapfiles/kml/shapes/star.png" ); 
+        aMap.put("MAR", "http://maps.google.com/mapfiles/kml/shapes/ferry.png" ); 
+        aMap.put("MISC", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
+        aMap.put("MIL", "http://maps.google.com/mapfiles/kml/shapes/police.png" ); 
+        aMap.put("MUN1", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
+        aMap.put("MUN2", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
+        aMap.put("PROV", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
+        aMap.put("RAIL", "http://maps.google.com/mapfiles/kml/shapes/tram.png" );
+        aMap.put("RECR", "http://maps.google.com/mapfiles/kml/shapes/play.png" );
+        aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
+        aMap.put("UNP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
+        aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/truck.png" );
+        
+        
         ICON_MAP = Collections.unmodifiableMap(aMap);
     }
 
@@ -132,12 +182,12 @@ public class CreateKML {
 
 			} else if (object instanceof City) {
 				writer.write(buildCityPlaceMark((City)object));
-
 			} else if (object instanceof Ndb) {
 				writer.write(buildNdbPlaceMark((Ndb)object));
-
 			} else if (object instanceof Mountain) {
 				writer.write(buildMountainPlaceMark((Mountain)object));
+			} else if (object instanceof Landmark) {
+				writer.write(buildLandmarkPlaceMark((Landmark)object));
 			}
 
 			writer.write("</Folder></Document></kml>");
@@ -150,8 +200,8 @@ public class CreateKML {
 			} catch (Exception ex) {
 			}
 		}
-     	
-        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(title+".kml")));
+
+       Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(title+".kml")));
 
 	
 	}
@@ -245,7 +295,58 @@ public class CreateKML {
 		
 		}
 	
+	static public String buildLandmarkDescriptionPlane(Landmark landmark){
+		
+		String description = "";
+
+		//Util.createHref(landmark.getGeoName(),landmark.getGeoName()+" "+landmark.getAdmin()+" Canada wikipedia", 0)
+		
+		description += "<div>Name: "+Util.createHref(landmark.getGeoName(),landmark.getGeoName()+" "+landmark.getAdmin()+" Canada wikipedia", 0)+ "</div>";
+		description += "<div>Category: "+landmark.getCategory()+"</div>";
+		description += "<div>Description: "+landmark.getGeoTerm()+"</div>";
 	
+		if (!"".equals(landmark.getLanguage())) {
+			description += "<div>Language: "+landmark.getLanguage()+"</div>";
+		}
+		if (!"".equals(landmark.getSyllabic())) {
+			description += "<div>Syllabic: "+landmark.getSyllabic()+"</div>";
+		}
+		if (!"".equals(landmark.getLocation())) {
+			description += "<div>Location: "+landmark.getLocation()+"</div>";
+		}
+		description += "<div>Province/Territory: "+landmark.getAdmin()+"</div>";
+		
+		if (!"".equals(landmark.getDecisionDate())) {
+			description += "<div>Decision Date: "+landmark.getDecisionDate()+"</div>";
+		}
+		if (!"".equals(landmark.getSource())) {
+			description += "<div>Source: "+landmark.getSource()+"</div>";
+		}
+
+		description += "<div>GPS: "+Util.formatGPS(landmark.getLaty()+" , "+landmark.getLonx())+"</div>";
+		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
+
+		return description;
+		
+		}
+	
+	
+	static public String buildLandmarkPlaceMark(Landmark landmark){
+
+		String description =  buildLandmarkDescriptionPlane(landmark);
+		String icone = "";
+
+		String coordinates = landmark.getLonx()+","+landmark.getLaty()+","+"0";
+		
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(landmark.getCode())+"</href></Icon></IconStyle></Style>";
+
+
+		return "<Placemark><name>"+landmark.getGeoName()+"</name>\n"
+				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ icone
+				+ "<Point><coordinates>"+coordinates+"</coordinates></Point>\n"
+				+ "</Placemark>\n";
+	}
 
 	
 	
