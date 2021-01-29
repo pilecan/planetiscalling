@@ -289,9 +289,6 @@ public class PanelFlightplan {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(result.getCurrentView());
-				System.out.println(result.getCurrentSelection());
-				
 				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
 				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
@@ -318,14 +315,7 @@ public class PanelFlightplan {
 					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
 				
-				
-			//	if (!"waypoint".equals(currentView)){
-			//        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
-					
-		//		}
-
-
-			}
+				}
 		});		
 
 		askMeBt = new JButton("Ask Me");

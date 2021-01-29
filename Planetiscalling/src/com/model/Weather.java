@@ -47,6 +47,8 @@ public class Weather implements Info{
 	
 	private String message;
 	
+	
+	private boolean isSamePlace;
 	public Weather() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -160,26 +162,29 @@ public class Weather implements Info{
 		} else {
 			message = "";
 		}
-		
-		String html = "<br>"
-				+"<div style=' border: 1px solid black; display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> "
-				+ "Weather for "+name+" is "+temp+"°C ("+ Util.celciusToFarenheit(temp)+") "
-				+ "<br>"+dateHourMin
-				+ "<br>"+message 
-				+"</div>"
-				+lines +
-				"  </div>\r\n" + 
-				"  <div style='display: block; clear: left; color: gray; font-size: x-small;'>\r\n" + 
-				"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>More..</a>\r\n" + 
-				"  </div>\r\n" + 
-				"<!--"+icon+"-->";
+		String html = "";
+		if (temp != null) {
+			 html = "<br>"
+					+"<div style=' border: 1px solid black; display: block; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> "
+					+ "Weather for "+name+" is "+temp+"°C ("+ Util.celciusToFarenheit(temp)+") "
+					+ "<br>"+dateHourMin
+					+ "<br>"+message 
+					+"</div>"
+					+lines +
+					"  </div>\r\n" + 
+					"  <div style='display: block; clear: left; color: gray; font-size: x-small;'>\r\n" + 
+					"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>More..</a>\r\n" + 
+					"  </div>\r\n" + 
+					"<!--"+icon+"-->";		
+		}
+
 		return html;
 	}
 	
 
-
-	
-
+	public String getCoordinates() {
+		return ""+lonx+","+laty+",0";
+	}
 	public Double getLonx() {
 		return lonx;
 	}
@@ -279,6 +284,14 @@ public class Weather implements Info{
 				+ pressure + ", weatherMain=" + weatherMain + ", windDirection=" + windDirection + ", windSpeed="
 				+ windSpeed + ", visibility=" + visibility + ", clouds=" + clouds + ", rain=" + rain + ", lonx=" + lonx
 				+ ", laty=" + laty + ", station=" + station + ", icon=" + icon + ", message=" + message + "]";
+	}
+
+	public boolean isSamePlace() {
+		return isSamePlace;
+	}
+
+	public void setSamePlace(boolean isSamePlace) {
+		this.isSamePlace = isSamePlace;
 	}
 	
 	

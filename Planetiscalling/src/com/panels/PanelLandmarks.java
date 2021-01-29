@@ -514,8 +514,6 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(result.getCurrentView());
-				System.out.println(result.getCurrentSelection());
 				
 				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
@@ -533,7 +531,6 @@ public class PanelLandmarks implements Info {
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
-		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
 
 			}
 		});		
@@ -794,9 +791,7 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(result.getCurrentView());
-				System.out.println(result.getCurrentSelection());
-				
+			
 				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
 				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
@@ -813,9 +808,6 @@ public class PanelLandmarks implements Info {
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
-				
-				
-		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
 
 
 			}
@@ -999,8 +991,6 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(result.getCurrentView());
-				System.out.println(result.getCurrentSelection());
 				
 				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
@@ -1018,10 +1008,6 @@ public class PanelLandmarks implements Info {
 				 }else if ("mountain".equals(result.getCurrentView())){
 					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
-				
-				
-		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
-
 
 			}
 		});		

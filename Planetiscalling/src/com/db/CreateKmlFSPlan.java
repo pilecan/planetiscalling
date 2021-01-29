@@ -105,6 +105,9 @@ public class CreateKmlFSPlan{
 	
 		fsxPlan = new ReadFsxPlan(flightPlanFile);
 		
+		long startTime = System.currentTimeMillis();
+		
+		
 		this.flightplan = fsxPlan.getFlightplan();
 		
 		legPoints = fsxPlan.getLegPoints();
@@ -126,7 +129,9 @@ public class CreateKmlFSPlan{
 			throw  new NoPoints("Your Flight Plan don't return any Waypoints...");
 		}
 		
-		
+		long stopTime = System.currentTimeMillis();
+		System.out.println(" stopTime - startTime = "+(stopTime - startTime));
+
 		
 	}
 	

@@ -712,8 +712,11 @@ public class Result implements Info {
 				if ("Airport".equals(legPoints.get(i).getType())) {
 					htmlString = panelAirport(legPoints.get(i).getIcaoIdent());
 				} else {
-					UtilityWeather.getInstance().callOpenweathermapObject(legPoints.get(i));
-					htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+					try {
+						UtilityWeather.getInstance().callOpenweathermapObject(legPoints.get(i));
+						htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+					} catch (Exception e) {
+					}
 				} 
 
 				break;
@@ -749,7 +752,7 @@ public class Result implements Info {
 				UtilityWeather.getInstance().callOpenweathermapObject(airport);
 				varStr += UtilityWeather.getInstance().getWeather().htmlData();
 			}
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 		}
 		return varStr;
 
@@ -807,8 +810,13 @@ public class Result implements Info {
 		for (Mountain mountain : selectedMountains.values()) {
 			if (mountain.getName().equals(line)) {
 				htmlString = CreateKML.buildMountainDescriptionNoWeather(mountain).replaceAll("12px", "10px").replaceAll("\\|","<br>");
-				UtilityWeather.getInstance().callOpenweathermapObject(mountain);
-				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+				try {
+					UtilityWeather.getInstance().callOpenweathermapObject(mountain);
+					htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
 
 			}
 		}
@@ -824,8 +832,11 @@ public class Result implements Info {
 		for (Landmark landmark: selectedLandmarks.values()) {
 			if (landmark.getGeoName().equals(line)) {
 				htmlString = CreateKML.buildLandmarkDescriptionPlane(landmark).replaceAll("12px", "10px").replaceAll("\\|","<br>");
-				UtilityWeather.getInstance().callOpenweathermapObject(landmark);
-				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+				try {
+					UtilityWeather.getInstance().callOpenweathermapObject(landmark);
+					htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+				} catch (Exception e) {
+				}
 
 			}
 		}

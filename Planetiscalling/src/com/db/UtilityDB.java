@@ -6,18 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import com.cfg.common.Info;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
 import com.model.CityWeather;
+import com.model.Landcoord;
 import com.model.Landmark;
 import com.model.Mountain;
 import com.model.Runway;
@@ -36,6 +34,7 @@ public class UtilityDB extends Thread implements Info {
 	private List<Airport> airports;
 	private List<CityWeather> cityWeathers;
 	private List<Landmark> landmarks;
+	private List<Landcoord> landcoords;
 	private List <City> cities;
 	private Map<String, Landmark> mapLandmark;
 	private Map <String,City> mapCities;
@@ -51,10 +50,9 @@ public class UtilityDB extends Thread implements Info {
 	}
 	private Connection connect() {
 		// SQLite connection string
-		String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection(url);
+			conn = DriverManager.getConnection(dbPath);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
@@ -84,6 +82,37 @@ public class UtilityDB extends Thread implements Info {
 							rs.getString("location"), rs.getString("language"), rs.getString("syllabic"), rs.getString("toponomic"), rs.getString("revelance"));
 					landmarks.add(landmark);
 					mapLandmark.put(rs.getString("geo_name"), landmark);
+				}
+
+			}
+			
+					
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			//e1.printStackTrace();
+		}
+		
+
+	}
+	public void selectLandcoord(String search) {
+		landcoords = new ArrayList<>();
+		Landcoord landcoord;
+		
+		
+		String sql = "SELECT cgn_id, admin, laty, lonx " + 
+				"FROM cgn_all_canada ";
+		
+		if (!"".equals(search)) {
+			sql += search;
+		}
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					landcoord = new Landcoord( rs.getString("cgn_id"),rs.getString("admin"), rs.getDouble("lonx"),  rs.getDouble("laty"));
+					landcoords.add(landcoord);
 				}
 
 			}
@@ -422,6 +451,9 @@ public class UtilityDB extends Thread implements Info {
 	}
 	public List<City> getCities() {
 		return cities;
+	}
+	public List<Landcoord> getLandcoords() {
+		return landcoords;
 	}
 	
 }

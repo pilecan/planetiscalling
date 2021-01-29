@@ -293,10 +293,6 @@ public class PanelCity implements Info {
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
 				 }
-				
-				
-		        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
-
 
 			}
 		});		

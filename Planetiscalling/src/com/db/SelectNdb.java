@@ -90,10 +90,9 @@ public class SelectNdb implements Info{
    }
 
 	private Connection connect() {
-		String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection(url);
+			conn = DriverManager.getConnection(dbPath);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}

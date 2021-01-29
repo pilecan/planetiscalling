@@ -324,7 +324,7 @@ public class PaneIcaolAiport extends JFrame {
 			 }
 			
 			
-	        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
+	   //     Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
 
 
 		}
@@ -380,9 +380,9 @@ public class PaneIcaolAiport extends JFrame {
   	//askMePanel.setBounds(x, 210, 340, 150);	
   	askMePanel.setBounds(x, 10, 340, 190);	
 
-	delMeBt.setBounds(x, y, 78, 23);
-	askMeBt.setBounds(x+130, y, 77, 23);
-	landMeBt.setBounds(x+258, y, 82, 23);
+  	landMeBt.setBounds(x, y, 82, 23);
+	askMeBt.setBounds(x+130, y, 88, 23);
+	delMeBt.setBounds(x+258, y, 82, 23);
   	
 	distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
 	inputIcaoPanel.setBounds(10, 200, 310, 120);

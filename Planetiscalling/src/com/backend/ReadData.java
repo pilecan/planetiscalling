@@ -159,7 +159,15 @@ public class ReadData implements Info{
 					selectNdb.getNdbs());
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
-
+			
+		   
+	
+			System.out.println("begin");
+			UtilityDB.getInstance().selectLandcoord("");
+			
+			System.out.println("getLandcoords = "+UtilityDB.getInstance().getLandcoords().size());
+			
+		   
 			setResult();
 			result.setLegPoints(createKmlFSPlan.getLegPoints());
 

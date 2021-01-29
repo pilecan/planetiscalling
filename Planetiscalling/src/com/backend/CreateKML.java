@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cfg.common.Dataline;
+import com.geo.util.Geoinfo;
 import com.main.form.Result;
 import com.model.Airport;
 import com.model.City;
@@ -22,13 +24,17 @@ import com.model.Vor;
 import com.util.Util;
 import com.util.Utility;
 
+import net.weather.UtilityWeather;
+
 public class CreateKML {
 	private static String CASTEL_ICON ="http://maps.google.com/mapfiles/kml/shapes/ranger_station.png";
 	private static String BUILDING_ICON ="http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png";
 	private static String LOOKTOWER_ICON ="http://maps.google.com/mapfiles/kml/shapes/target.png";
 	private static String SILO_ICON ="http://maps.google.com/mapfiles/kml/shapes/donut.png";
 	private static String AIRPORT_ICON ="http://maps.google.com/mapfiles/kml/shapes/airports.png";
-	
+
+	private static Dataline dataline;
+
 	
     private static final Map<String, String> ICON_MAP;
     static {
@@ -56,10 +62,10 @@ public class CreateKML {
         aMap.put("RAP", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("LAKE", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("FOR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
-        aMap.put("RIV", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
-        aMap.put("HYDR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("RIV", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("HYDR", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SITE", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
-        aMap.put("RIVF", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("RIVF", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("Wreck", "http://maps.google.com/mapfiles/kml/shapes/poi.png" ); 
         aMap.put("River", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SEA", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
@@ -107,12 +113,39 @@ public class CreateKML {
         aMap.put("MUN1", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
         aMap.put("MUN2", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
         aMap.put("PROV", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
-        aMap.put("RAIL", "http://maps.google.com/mapfiles/kml/shapes/tram.png" );
+        aMap.put("RAIL", "http://maps.google.com/mapfiles/kml/shapes/rail.png" );
         aMap.put("RECR", "http://maps.google.com/mapfiles/kml/shapes/play.png" );
         aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
         aMap.put("UNP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
         aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/truck.png" );
         
+        aMap.put("01d", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
+        aMap.put("01n", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
+     
+        aMap.put("02d", "http://maps.google.com/mapfiles/kml/shapes/partly_cloudy.png" );
+        aMap.put("02n", "http://maps.google.com/mapfiles/kml/shapes/partly_cloudy.png" );
+
+        aMap.put("04d", "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png" );
+        aMap.put("04n", "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png" );
+        
+        aMap.put("09d", "http://maps.google.com/mapfiles/kml/shapes/partly_cloudy.png" );
+        aMap.put("09n", "http://maps.google.com/mapfiles/kml/shapes/partly_cloudy.png" );
+
+        aMap.put("03d", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+        aMap.put("03n", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+         
+        aMap.put("10d", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+        aMap.put("10n", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+         
+        aMap.put("11d", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+        aMap.put("11n", "http://maps.google.com/mapfiles/kml/shapes/rainy.png" );
+
+        aMap.put("13d", "http://maps.google.com/mapfiles/kml/shapes/snowflake_simple.png" );
+        aMap.put("13n", "http://maps.google.com/mapfiles/kml/shapes/snowflake_simple.png" );
+        
+        aMap.put("50d", "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png" );
+        aMap.put("50n", "http://maps.google.com/mapfiles/kml/shapes/shaded_dot.png" );
+         
         
         ICON_MAP = Collections.unmodifiableMap(aMap);
     }
@@ -176,18 +209,25 @@ public class CreateKML {
 
 			 else if (object instanceof Airport) {
 				writer.write(buildAirportPlaceMark((Airport)object));
-
+				writer.write(buildWeatherPlaceMark(((Airport)object).getCoordinates()));
+				makeLine("airport",writer,((Airport)object).getCoordinates());
 			} else if (object instanceof Vor) {
 				writer.write(buildVorPlaceMark((Vor)object));
 
 			} else if (object instanceof City) {
 				writer.write(buildCityPlaceMark((City)object));
+				writer.write(buildWeatherPlaceMark(((City)object).getCoordinates()));
+				makeLine("city",writer,((City)object).getCoordinates());
 			} else if (object instanceof Ndb) {
 				writer.write(buildNdbPlaceMark((Ndb)object));
 			} else if (object instanceof Mountain) {
 				writer.write(buildMountainPlaceMark((Mountain)object));
+				writer.write(buildWeatherPlaceMark(((Mountain)object).getCoordinates()));
+				makeLine("mountain",writer,((Mountain)object).getCoordinates());
 			} else if (object instanceof Landmark) {
 				writer.write(buildLandmarkPlaceMark((Landmark)object));
+				writer.write(buildWeatherPlaceMark(((Landmark)object).getCoordinates()));
+				makeLine("mountain",writer,((Landmark)object).getCoordinates());
 			}
 
 			writer.write("</Folder></Document></kml>");
@@ -204,6 +244,46 @@ public class CreateKML {
        Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(title+".kml")));
 
 	
+	}
+	
+	private static void makeLine(String topic, Writer writer, String fromCoordinats) {
+		if (!"".equals(UtilityWeather.getInstance().getWeather().htmlData())) {
+			dataline = new Dataline();
+			Double[] dd2 = null;
+			Double[] dd1 = Geoinfo.convertDoubleLongLat(fromCoordinats);
+			if (UtilityWeather.getInstance().getWeather().isSamePlace()) {
+				dd2 = Geoinfo.convertDoubleLongLat(fromCoordinats);
+			} else {
+				dd2 = Geoinfo.convertDoubleLongLat(UtilityWeather.getInstance().getWeather().getCoordinates());
+			}
+			dataline.setData(topic,dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+
+	    	for (String key: dataline.getMapData().keySet()) {
+		    	try {
+					writer.write("<Folder><name>"+key+" distance </name>"
+							+ "<Placemark> "
+							+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+							+ " <Style>" + 
+							"  <LineStyle> " + 
+							"   <color>"+dataline.getColor(key)+"</color>"
+							+ "<width>2</width> " + 
+							"  </LineStyle>" + 
+							" </Style>"
+							+ "<LineString><extrude>1</extrude>"
+							+ "<tessellate>1</tessellate>"
+							+ "<altitudeMode>clampToGround</altitudeMode>"
+							+ "<coordinates>\r\n");
+			    	writer.write(dataline.getMapData().get(key));
+			    	writer.write("</coordinates></LineString></Placemark></Folder>");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		
+	    	}
+			
+		}
+		
 	}
 	
 	private static String createKMLHeader(int total, String title) {
@@ -338,7 +418,7 @@ public class CreateKML {
 
 		String coordinates = landmark.getLonx()+","+landmark.getLaty()+","+"0";
 		
-		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(landmark.getCode())+"</href></Icon></IconStyle></Style>";
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get((landmark.toString().contains("Railway")?"RAIL":landmark.getCode()))+"</href></Icon></IconStyle></Style>";
 
 
 		return "<Placemark><name>"+landmark.getGeoName()+"</name>\n"
@@ -346,6 +426,34 @@ public class CreateKML {
 				+ icone
 				+ "<Point><coordinates>"+coordinates+"</coordinates></Point>\n"
 				+ "</Placemark>\n";
+	}
+
+	static public String buildWeatherPlaceMark(String fromCoordinates){
+		String placemark = "";
+
+		if (UtilityWeather.getInstance().getWeather() != null) {
+			String description = UtilityWeather.getInstance().getWeather().htmlData();
+			String icone = "";
+
+			String coordinates = "";
+
+			if (UtilityWeather.getInstance().getWeather().isSamePlace()) {
+				coordinates = fromCoordinates;
+			} else {
+				coordinates = UtilityWeather.getInstance().getWeather().getCoordinates();
+			}
+			System.out.println("Icon = "+UtilityWeather.getInstance().getWeather().getIcon());
+
+			icone = "<Style id=\"silo\"><IconStyle><Icon><href>"
+					+ ICON_MAP.get(UtilityWeather.getInstance().getWeather().getIcon())
+					+ "</href></Icon></IconStyle></Style>";
+
+			placemark = "<Placemark><name>" + UtilityWeather.getInstance().getWeather().getName() + " Weather</name>\n"
+					+ "<description><![CDATA[" + description + "]]></description>\n" + icone + "<Point><coordinates>"
+					+ coordinates + "</coordinates></Point>\n" + "</Placemark>\n";
+		}
+		
+		return placemark;
 	}
 
 	

@@ -56,7 +56,7 @@ public class UtilityWeather implements Info {
 		} catch (Exception e) {
 			try {
 				callOpenweathermapObject(object);
-			} catch (NullPointerException e1) {
+			} catch (Exception e1) {
 				// TODO Auto-generated catch block
 				//e1.printStackTrace();
 			}
@@ -66,6 +66,7 @@ public class UtilityWeather implements Info {
 	public void callOpenweathermapId(long id) {
         String currStr = null;
         weather = new Weather();
+		weather.setSamePlace(false);
 		try {
 			currStr = getData("http://api.openweathermap.org/data/2.5/weather?id=" + id + "&APPID=3506dfa8bbebf7709e6fba904a68559a");
 		} catch (MalformedURLException e) {
@@ -93,8 +94,10 @@ public class UtilityWeather implements Info {
 	public void callOpenweatherName(String cityName, String country) throws NullPointerException {
         String currStr = null;
         weather = new Weather();
+
 		try {
 			currStr = getData("http://api.openweathermap.org/data/2.5/weather?q=" + cityName+","+country +"&APPID=3506dfa8bbebf7709e6fba904a68559a");
+			weather.setSamePlace(true);
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
 		}
@@ -116,52 +119,59 @@ public class UtilityWeather implements Info {
 		
 	}
 	
-	public void callOpenweathermapObject(Object object) throws NullPointerException {
+	public void callOpenweathermapObject(Object object) throws Exception {
 		double lat = 0;
 		double lon = 0;
 		String name = "";
 		String message = "";
+        weather = new Weather();
+
 		if (object instanceof City) {
 			lon = ((City)object).getLonx();
 			lat = ((City)object).getLaty();
 			name = ((City)object).getCityAscii(); 
 			message = "No weather station at "+name+" but found it at ";
+			weather.setSamePlace(false);
 		} else if (object instanceof Airport) {
 			lon = ((Airport)object).getLonx();
 			lat = ((Airport)object).getLaty();
 			name = ((Airport)object).getName(); 
 			message = "No METAR at "+name+" Airport but Weather Station found at ";
+			weather.setSamePlace(false);
 
 		} else if (object instanceof Mountain) {
 			lon = ((Mountain)object).getLonx();
 			lat = ((Mountain)object).getLaty();
 			name = ((Mountain)object).getName(); 
 			message = "Weather Station found at ";
+			weather.setSamePlace(false);
 
 		}  else if (object instanceof LegPoint) {
 			lon = ((LegPoint)object).getLonx();
 			lat = ((LegPoint)object).getLaty();
 			name = ((LegPoint)object).getIcaoIdent(); 
 			message = "Weather Station found at ";
+			weather.setSamePlace(false);
 
 		}  else if (object instanceof Landmark) {
 			lon = ((Landmark)object).getLonx();
 			lat = ((Landmark)object).getLaty();
 			name = ((Landmark)object).getGeoName(); 
 			message = "No weather station at "+name+" but found it at ";
+			weather.setSamePlace(false);
 		} 
 		
         String currStr = null;
-        weather = new Weather();
+        JsonObject data = null;
+        JsonReader reader = null;
         
 		try {
 			currStr = getData("http://api.openweathermap.org/data/2.5/find?lat="+lat+"&lon="+lon+"&cnt=1&APPID=3506dfa8bbebf7709e6fba904a68559a");
-		} catch (MalformedURLException e) {
-		} catch (IOException e) {
+		     reader = Json.createReader(new StringReader(currStr));
+		     data = reader.readObject();
+		} catch (Exception e) {
 		}
-        JsonReader reader = Json.createReader(new StringReader(currStr));
-        JsonObject data = reader.readObject();
-        
+         
         int code = 0;
          try {
 			code = data.getInt("cod");

@@ -50,11 +50,9 @@ public class SelectDB implements Info{
 	 * @return the Connection object
 	 */
 	private Connection connect() {
-		// SQLite connection string
-		String url = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
 		Connection conn = null;
 		try {
-			conn = DriverManager.getConnection(url);
+			conn = DriverManager.getConnection(dbPath);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
