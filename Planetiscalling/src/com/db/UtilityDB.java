@@ -59,6 +59,8 @@ public class UtilityDB extends Thread implements Info {
 	}
 
 /*	
+INSERT INTO airport_runway.airport_test 
+
 select b.* 
 FROM airport_runway.airport a left join navdata.airport b on a.ident = b.ident
 where b.ident is null and b.ident is not null
@@ -66,6 +68,7 @@ union all
 select  b.* 
 from  navdata.airport b left join airport_runway.airport a on a.ident = b.ident
 where a.ident is null and b.ident is not null
+
 */	
 	public void selectLandmark(String search) {
 		landmarks = new ArrayList<>();
