@@ -796,6 +796,13 @@ public class Result implements Info {
 				htmlString += CreateKML.buildCityDescriptionPlane(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
 				UtilityWeather.getInstance().searchCityWeather(city);
 				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
+/*				try {
+					UtilityWeather.getInstance().callOpenStreetmapObject(city);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				}
+*/				
 			}
 		}
 

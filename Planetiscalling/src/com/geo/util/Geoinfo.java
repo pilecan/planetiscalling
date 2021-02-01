@@ -1,8 +1,12 @@
 package com.geo.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
+import com.model.Airport;
 import com.model.Flightplan;
+import com.model.Landcoord;
+import com.model.Landmark;
 import com.model.LegPoint;
 
 public class Geoinfo {
@@ -32,7 +36,7 @@ public class Geoinfo {
 	/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
 	/*::  This function converts radians to decimal degrees             :*/
 	/*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
-	private static double rad2deg(double rad) {
+	public static double rad2deg(double rad) {
 	  return (rad * 180 / Math.PI);
 	}
 
@@ -79,6 +83,64 @@ public class Geoinfo {
 	    
 	}	
 	
+	public static boolean isInside(Landcoord coorMid, ArrayList <Landcoord> landcoords) {
+			
+/*		 if (coorMid.getLaty() > landcoords.get(0).getLaty()) {
+			 System.out.println();
+		 } 
+		 if (coorMid.getLaty() <landcoords.get(1).getLaty()) {
+			 System.out.println();
+		 } 
+		 if (Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())) {
+			 System.out.println();
+		 }
+		
+		 if (Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())) {
+			 System.out.println();
+		 }
+*/	     return (coorMid.getLaty() > landcoords.get(0).getLaty()
+	    		 && coorMid.getLaty() < landcoords.get(1).getLaty()
+	    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())
+	    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())
+	    		 
+	    		 );
+	     }
+	
+	public static Landcoord searchPoint(double latitude, double longitude, double distanceInNm, double bearing) {
+	    double brngRad = deg2rad(bearing);
+	    double latRad = deg2rad(latitude);
+	    double lonRad = deg2rad(longitude);
+	    int earthRadiusInMetres = 3440;
+	    double distFrac = distanceInNm / earthRadiusInMetres;
+
+	    double latitudeResult = Math.asin(Math.sin(latRad) * Math.cos(distFrac) + Math.cos(latRad) * Math.sin(distFrac) * Math.cos(brngRad));
+	    double a = Math.atan2(Math.sin(brngRad) * Math.sin(distFrac) * Math.cos(latRad), Math.cos(distFrac) - Math.sin(latRad) * Math.sin(latitudeResult));
+	    double longitudeResult = (lonRad + a + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+	    
+	    System.out.println(rad2deg(latitudeResult)+","+rad2deg(longitudeResult));
+        return new Landcoord(rad2deg(latitudeResult), rad2deg(longitudeResult));
+
+	}
+	
+	String sql = "select ai.id, ai.icao,  ((ACOS(SIN(ai.Latitude * PI() / 180) * SIN(geo.Latitude * PI() / 180) + "
+			+ "COS(ai.Latitude * PI() / 180) * COS(geo.Latitude * PI() / 180)"
+			+ " * COS((ai.Longitude - geo.Longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance "
+			+ "from airport ai, geonames geo " 
+			+ "where ai.iso = geo.country_code " +
+				"and ai.admin1 = geo.admin1_code "+
+				"and geo.geonameid = ? "+
+				"HAVING distance <= 20 "+
+				"order by icao";
+	
+	
+	public static boolean isNearEnough(Airport ai, Landcoord lm) {
+		
+		return ((Math.acos((Math.sin(ai.getLaty()*Math.PI/180) * Math.sin(lm.getLaty()*Math.PI/180) 
+				+ Math.cos(ai.getLaty() * Math.PI / 180) * Math.cos(lm.getLaty() * Math.PI / 180)
+				* Math.cos((ai.getLonx() - lm.getLonx()) * Math.PI / 180)) * 180 / Math.PI)) * 60 * 1.1515) < 30 ;
+	}
+	
+	
 	public static Double[] convertDoubleLongLat(String value){
 		Double[] dd = new Double[3];
 		String[] coords = value.split(",");
@@ -98,6 +160,44 @@ public class Geoinfo {
 
         return angle;
     }
+    
+    public static double calculateAngle2(double y1, double x1, double y2, double x2)
+    {
+        double angle = Math.toDegrees(Math.atan2(x2 - x1, y2 - y1));
+        // Keep angle between 0 and 360
+        angle = angle + Math.ceil( -angle / 360 ) * 360;
+
+        return angle;
+    }
+    
+    public static double getAngleOfLineBetweenTwoPoints(double y1, double x1, double y2, double x2)
+    {
+        double xDiff = x1 -x2;
+        double yDiff = y1 -y2;
+        return Math.toDegrees(Math.atan2(yDiff, xDiff));
+    }    
+  
+    public static  double angleFromCoordinate(double lat1, double long1, double lat2, double long2) {
+
+        double dLon = (long2 - long1);
+
+        double y = Math.sin(dLon) * Math.cos(lat2);
+        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
+                * Math.cos(lat2) * Math.cos(dLon);
+
+        double brng = Math.atan2(y, x);
+
+        brng = Math.toDegrees(brng);
+        brng = (brng + 360) % 360;
+        //brng = 360 - brng; // count degrees counter-clockwise - remove to make clockwise
+        
+        
+        float dy = (float) (lat2 - lat1);
+        float dx = (float) (Math.cos(Math.PI/180*lat1)*(long2 - long1));
+        float angle = (float) Math.atan2(dy, dx);
+
+        return angle;
+    }   
     
     public static String calculateTocTod(double altitude, char direction, double lon1,double lat1,double lon2,double lat2) {
     	altitude = altitude*3.2804;

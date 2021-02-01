@@ -14,6 +14,8 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 
+import org.json.simple.JSONObject;
+
 import com.cfg.common.Info;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
@@ -23,6 +25,8 @@ import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Weather;
 import com.util.Util;
+
+import test.OpenStreetMapUtils;
 
 public class UtilityWeather implements Info {
 	private static UtilityWeather instance = new UtilityWeather();
@@ -176,7 +180,6 @@ public class UtilityWeather implements Info {
          try {
 			code = data.getInt("cod");
 		} catch (Exception e) {
-			System.out.println(data);
 			code = Integer.parseInt(data.getString("cod"));
 		}
         
@@ -187,6 +190,60 @@ public class UtilityWeather implements Info {
 	        				+Util.formatAngle(Geoinfo.calculateAngle(lon, lat, weather.getLonx(), weather.getLaty())) +" degrees.");
         }
         reader.close();
+		
+	}
+	public void callOpenStreetmapObject(Object object) throws Exception {
+		double lat = 0;
+		double lon = 0;
+		String name = "";
+		String message = "";
+
+		if (object instanceof City) {
+			lon = ((City)object).getLonx();
+			lat = ((City)object).getLaty();
+			name = ((City)object).getCityAscii(); 
+			message = "No weather station at "+name+" but found it at ";
+		} else if (object instanceof Airport) {
+			lon = ((Airport)object).getLonx();
+			lat = ((Airport)object).getLaty();
+			name = ((Airport)object).getName(); 
+			message = "No METAR at "+name+" Airport but Weather Station found at ";
+
+		} else if (object instanceof Mountain) {
+			lon = ((Mountain)object).getLonx();
+			lat = ((Mountain)object).getLaty();
+			name = ((Mountain)object).getName(); 
+			message = "Weather Station found at ";
+
+		}  else if (object instanceof LegPoint) {
+			lon = ((LegPoint)object).getLonx();
+			lat = ((LegPoint)object).getLaty();
+			name = ((LegPoint)object).getIcaoIdent(); 
+			message = "Weather Station found at ";
+
+		}  else if (object instanceof Landmark) {
+			lon = ((Landmark)object).getLonx();
+			lat = ((Landmark)object).getLaty();
+			name = ((Landmark)object).getGeoName(); 
+			message = "No weather station at "+name+" but found it at ";
+		} 
+		
+        String currStr = null;
+        JsonObject data = null;
+        JsonReader reader = null;
+        
+		try {
+			currStr ="https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
+		     OpenStreetMapUtils.getInstance().getRequest(currStr);
+		     
+		    // jsonObject.
+		    
+		} catch (Exception e) {
+		}
+         
+		System.out.println("openmap = "+data);
+		System.out.println("https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon);
+         reader.close();
 		
 	}
 	

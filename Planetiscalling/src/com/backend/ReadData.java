@@ -159,14 +159,6 @@ public class ReadData implements Info{
 					selectNdb.getNdbs());
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
-			
-		   
-	
-			System.out.println("begin");
-			UtilityDB.getInstance().selectLandcoord("");
-			
-			System.out.println("getLandcoords = "+UtilityDB.getInstance().getLandcoords().size());
-			
 		   
 			setResult();
 			result.setLegPoints(createKmlFSPlan.getLegPoints());
@@ -1031,7 +1023,7 @@ public class ReadData implements Info{
 		    
  		    writer.write("<Folder><name>Landmarks found ("+UtilityDB.getInstance().getLandmarks().size()+") </name>");
  		    for(Landmark landmark:UtilityDB.getInstance().getLandmarks()){
-		    	writer.write(createKML.buildLandmarkPlaceMark(landmark));
+		    	writer.write(createKML.buildLandmarkPlaceMark(landmark,"1"));
  		    }
 
  		    writer.write("</Folder>"); 

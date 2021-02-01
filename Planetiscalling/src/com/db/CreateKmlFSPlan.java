@@ -20,9 +20,11 @@ import com.backend.ReadFsxPlan;
 import com.cfg.common.Dataline;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
+import com.model.Boundingbox;
 import com.model.City;
 import com.model.Distance;
 import com.model.Flightplan;
+import com.model.Landmark;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Ndb;
@@ -201,6 +203,26 @@ public class CreateKmlFSPlan{
 		
 		// search Neighbor
 		searchFlightPlanNeighbor(selectAirport);
+		
+		
+		UtilityDB.getInstance().selectAirport("where ident = '"+legPoints.get(0).getIcaoIdent()+"'"); 
+		Airport airportDep =  UtilityDB.getInstance().getAirport();
+		UtilityDB.getInstance().selectAirport("where ident = '"+legPoints.get(legPoints.size()-1).getIcaoIdent()+"'"); 
+		Airport airportArr =  UtilityDB.getInstance().getAirport();
+
+		if ("Canada".equals(airportDep.getCountry()) || "Canada".equals(airportArr.getCountry())){
+			
+			Boundingbox boundingbox = new Boundingbox(legPoints.get(0).getLaty(), legPoints.get(0).getLonx(), 
+					legPoints.get(legPoints.size()-1).getLaty(), legPoints.get(legPoints.size()-1).getLonx()); 
+			
+			UtilityDB.getInstance().selectLandmarkProximity(boundingbox, "where admin = '"+airportDep.getState()+"' "
+					+ "or admin = '"+airportArr.getState()+"' ", airportArr);
+			System.out.println("landmark found = "+ UtilityDB.getInstance().getGroupLandmark().size());
+			
+			
+
+		}
+		
 		
 		if (distanceBetween < 1000) {
 			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
@@ -446,6 +468,29 @@ public class CreateKmlFSPlan{
 			    }
 		    	
 			    writer.write("</Folder>"); 
+		    }
+		    
+		    if (UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){
+			    writer.write("<Folder><name>Landmark groups found ("+UtilityDB.getInstance().getGroupLandmark().size()+") </name>");
+
+					for (Map.Entry<String, List<Landmark>> entry :UtilityDB.getInstance().getGroupLandmark().entrySet()) {
+					    writer.write("<Folder><name>"+ entry.getKey()+" found ("+entry.getValue().size()+")\r\n" + 
+					    		" </name>");
+					    	for (Landmark landmark :entry.getValue()) {
+						    	writer.write(createKML.buildLandmarkPlaceMark(landmark,"0"));
+	
+					    	}
+						 writer.write("</Folder>"); 
+	
+					}
+
+				 writer.write("</Folder>"); 
+
+/*			    
+			    for(Landmark landmark: UtilityDB.getInstance().getMapLandmark().values()){
+			    	writer.write(createKML.buildLandmarkPlaceMark(landmark));
+			    }
+*/		    	
 		    }
 		    
 		    if (dist.isLine()){

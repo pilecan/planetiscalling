@@ -57,9 +57,9 @@ public Airport(Airport airport) {
 	this.dst = airport.getDst();
 	this.altitude = airport.getAltitude();
 	this.magVar = airport.getMagVar();
-	this.hourZone = airport.getHourZone();
+/*	this.hourZone = airport.getHourZone();
 	this.timeZone = airport.getTimeZone();
-	this.lonx = airport.getLonx();
+*/	this.lonx = airport.getLonx();
 	this.laty = airport.getLaty();
 	PlaceMarkName = airport.getPlaceMarkName();
 	this.description = airport.getDescription();
@@ -121,7 +121,11 @@ public void setCity(String city) {
 
 public String getCountry() {
 	if (country == null) {
-		country = Util.REGION_MAP.get(ident.substring(0, 2));
+		try {
+			country = Util.REGION_MAP.get(ident.substring(0, 2));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}
 	}
 	return country;
 }
@@ -232,7 +236,7 @@ public String getPlaceMarkName() {
 					+ "|City: "+Util.createHref(city ,city+" City "+(state!=null?state:"")+" "+(country!=null?country:""), 0)+" ("+Util.createHref("Weather",city+" "+(state!=null?state:"")+" "+(country!=null?country:"")+" weather", 0)+ ")"
 					+ (state!=null?"|State: "+state:"")
 					+ (country!=null?"|Country: "+country:"")
-					+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
+				//	+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
 					+ "|Magnetic Variation: "+Util.formatMagvar(magVar)
 					+ (atisFrequency!=null && atisFrequency > 0?"|ATIS: "+Util.formatFrequency(atisFrequency):"")
@@ -257,7 +261,7 @@ public String getPlaceMarkName() {
 					+ "|City: "+Util.createHref(city ,city+" City "+(state!=null?state:"")+" "+(country!=null?country:""), 0)
 					+ (state!=null?"|State: "+state:"")
 					+ (country!=null?"|Country: "+country:"")
-					+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
+	//				+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
 					+ "|Magnetic Variation: "+Util.formatMagvar(magVar)
 					+ (atisFrequency!=null && atisFrequency > 0?"|ATIS: "+Util.formatFrequency(atisFrequency):"")
@@ -280,17 +284,18 @@ private String makeRunways(){
 	String runstr="";
 	if (runways != null){
 		for(Runway runway:runways){
-			runstr +=  "|Runway: "+runway.getRunwayName()+ " Course: "+Util.formatHeading(runway.getRunwayHeading(),runway.getMagVar(),false);
+			runstr += "<hr>";
+			runstr +=  "Runway: "+runway.getRunwayName()+ " Course: "+Util.formatHeading(runway.getRunwayHeading(),runway.getMagVar(),false);
 			runstr +=  "|Length: "+Util.formatLenght(runway.getLength(),runway.getWidth(),runway.getSurface());
 			if (runway.getIlsIdent() != null){
 				runstr +=  "|"+runway.getIlsName()+"("+runway.getIlsIdent()+") "+Util.formatFrequency(runway.getIlsFrequency());
 			}
-			//runstr += "|";
+
 		}
 	
 	}
 	
-	return runstr +"|";
+	return runstr+="<hr>";
 }
 
 
@@ -329,7 +334,7 @@ public String toString() {
 	return "Airport [airportId=" + airportId + ", ident=" + ident + ", name=" + name + ", iata=" + iata + ", state="
 			+ state + ", city=" + city + ", country=" + country + ", region=" + region + ", atisFrequency="
 			+ atisFrequency + ", towerFrequency=" + towerFrequency + ", dst=" + dst + ", altitude=" + altitude
-			+ ", magVar=" + magVar + ", hourZone=" + hourZone + ", timeZone=" + timeZone + ", lonx=" + lonx + ", laty="
+			+ ", magVar=" + magVar + ", lonx=" + lonx + ", laty="
 			+ laty + ", PlaceMarkName=" + PlaceMarkName + ", description=" + description + ", styleUrl=" + styleUrl
 			+ ", point=" + point + ", coordinates=" + coordinates + "]";
 }

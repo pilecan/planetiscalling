@@ -33,17 +33,17 @@ public class OpenStreetMapUtils {
         return instance;
     }
 
-    private String getRequest(String url) throws Exception {
+    public String getRequest(String url) throws Exception {
 
         final URL obj = new URL(url);
         final HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-        con.setRequestMethod("GET");
+  /*      con.setRequestMethod("GET");
 
         if (con.getResponseCode() != 200) {
             return null;
         }
-
+*/
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();

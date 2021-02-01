@@ -39,8 +39,8 @@ public interface Info {
 	String kmlMountainCityAirportName = "mountain_city_airport.kml";
 	String kmlLandmarkMountainCityAirportName = "landmark_mountain_city_airport.kml";
 	
-	//String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
-	String dbPath = "jdbc:sqlite:data/airport_runway.db";
+	String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
+	//String dbPath = "jdbc:sqlite:data/airport_runway.db";
 
 
     String imageLogo = "/images/hello_here.jpg";

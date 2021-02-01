@@ -58,7 +58,10 @@ public class CreateKML {
         aMap.put("BCH", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("CHAN", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("FALL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("TRUCK", "http://maps.google.com/mapfiles/kml/shapes/truck.png" ); 
+        aMap.put("BRIDG", "http://maps.google.com/mapfiles/kml/shapes/square.png" ); 
         aMap.put("ISL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("ANCH", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
         aMap.put("RAP", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("LAKE", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("FOR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
@@ -117,7 +120,7 @@ public class CreateKML {
         aMap.put("RECR", "http://maps.google.com/mapfiles/kml/shapes/play.png" );
         aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
         aMap.put("UNP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
-        aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/truck.png" );
+        aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/trail.png" );
         
         aMap.put("01d", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
         aMap.put("01n", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
@@ -225,7 +228,7 @@ public class CreateKML {
 				writer.write(buildWeatherPlaceMark(((Mountain)object).getCoordinates()));
 				makeLine("mountain",writer,((Mountain)object).getCoordinates());
 			} else if (object instanceof Landmark) {
-				writer.write(buildLandmarkPlaceMark((Landmark)object));
+				writer.write(buildLandmarkPlaceMark((Landmark)object,"1"));
 				writer.write(buildWeatherPlaceMark(((Landmark)object).getCoordinates()));
 				makeLine("mountain",writer,((Landmark)object).getCoordinates());
 			}
@@ -402,6 +405,8 @@ public class CreateKML {
 		if (!"".equals(landmark.getSource())) {
 			description += "<div>Source: "+landmark.getSource()+"</div>";
 		}
+		description += "<div>Code: "+landmark.getCode()+"</div>";
+
 
 		description += "<div>GPS: "+Util.formatGPS(landmark.getLaty()+" , "+landmark.getLonx())+"</div>";
 		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
@@ -411,18 +416,22 @@ public class CreateKML {
 		}
 	
 	
-	static public String buildLandmarkPlaceMark(Landmark landmark){
+	static public String buildLandmarkPlaceMark(Landmark landmark, String visibitlity){
 
 		String description =  buildLandmarkDescriptionPlane(landmark);
 		String icone = "";
 
 		String coordinates = landmark.getLonx()+","+landmark.getLaty()+","+"0";
+		icone = (landmark.toString().contains("Railway")?"RAIL":landmark.getCode());
+		icone = (landmark.toString().contains("Bridge")?"BRIDG":landmark.getCode());
+		icone = (landmark.toString().contains("Anchorage")?"ANCH":landmark.getCode());
 		
-		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get((landmark.toString().contains("Railway")?"RAIL":landmark.getCode()))+"</href></Icon></IconStyle></Style>";
+		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(icone)+
+				"</href></Icon></IconStyle></Style>";
 
 
 		return "<Placemark><name>"+landmark.getGeoName()+"</name>\n"
-				+ "<description><![CDATA["+description+"]]></description>\n"
+				+ "<description><![CDATA["+description+"]]></description><visibility>"+visibitlity+"</visibility>\n"
 				+ icone
 				+ "<Point><coordinates>"+coordinates+"</coordinates></Point>\n"
 				+ "</Placemark>\n";

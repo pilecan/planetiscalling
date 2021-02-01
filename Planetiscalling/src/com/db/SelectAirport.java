@@ -50,7 +50,7 @@ public class SelectAirport implements Info{
 		mapAirport = new TreeMap<String, Airport>();
 		
 		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
-				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name, hour_zone, time_zone  "
+				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name  "
 				+ "FROM v_airport_runway ";
 		if (!"".equals(search)) {
 			sql += search;
@@ -87,9 +87,7 @@ public class SelectAirport implements Info{
 						airport.setLonx(rs.getDouble("lonx"));
 						airport.setLaty(rs.getDouble("laty"));
 						airport.setMagVar(rs.getDouble("mag_var"));
-						airport.setHourZone(rs.getDouble("hour_zone"));
-						airport.setTimeZone(rs.getString("time_zone"));
-
+			
 
 						runway = new Runway();
 						runway.setRunwayName(rs.getString("runway_name"));
