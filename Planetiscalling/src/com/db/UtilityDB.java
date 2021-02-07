@@ -6,25 +6,34 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.cfg.common.Info;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.Boundingbox;
+import com.model.BoundingboxOld;
 import com.model.City;
 import com.model.CityWeather;
 import com.model.Landcoord;
 import com.model.Landmark;
+import com.model.LegPoint;
 import com.model.Mountain;
+import com.model.Ndb;
 import com.model.Runway;
+import com.model.Vor;
 
 public class UtilityDB extends Thread implements Info {
 
 	private static UtilityDB instance = new UtilityDB();
-
 	private Airport airport;
 	private CityWeather cityWeather;
 	private Runway runway;
@@ -39,6 +48,8 @@ public class UtilityDB extends Thread implements Info {
 	private Map<String, List<Landmark>> groupLandmark;
 	private Map<String, City> mapCities;
 
+	private String province;
+	
 	private Mountain mountain;
 	private List<Mountain> mountains;
 	private Map<String, Mountain> mapMountains;
@@ -70,6 +81,75 @@ from  navdata.airport b left join airport_runway.airport a on a.ident = b.ident
 where a.ident is null and b.ident is not null
 
 */	
+	
+	public void updateAirportState() {
+		groupLandmark = new TreeMap<>();
+		Landmark landmark;
+
+		selectAirport("");
+		selectCity("");
+		Map <String, Airport> mapAirFound = new HashMap<>();
+		double distance = 0;
+
+		int cptState = 0;
+		int cptCountry = 0;
+		int cptCityfound = 0;
+		int cptCityNotfound = 0;
+		boolean foundState = false;
+		boolean foundCountry = false;
+		
+		String state = "";
+		String country = "";
+
+		for (Airport airport: airports) {
+			
+			if (airport.getState() == null) {
+			//	System.out.println(airport.toString());
+				cptState++;
+				 try {
+					City city2 = selectOneCity("where city_ascii ='"+airport.getCity()+"' and country = '"+airport.getCountry()+"'" );
+					if (city2.getAdminName() != null ) {
+						cptCityfound++;
+						update(airport.getIdent(), city2.getAdminName(), airport.getCountry());
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					cptCityNotfound++;
+				}
+			}
+			
+
+		}
+		
+		System.out.println("cptCityfound = "+cptCityfound);
+		System.out.println("cptCityNotfound = "+cptCityNotfound);
+		System.out.println("cptState = "+cptState);
+		System.out.println("cptCountry = "+cptCountry);
+		System.out.println("mapAirFound = "+mapAirFound.size());
+
+	}
+	
+	
+	 private void update(String ident, String state, String country) {
+	        String sql = "UPDATE airport SET state = ? , "
+	                + "country = ? "
+	                + "WHERE ident = ?";
+
+	        try (Connection conn = this.connect();
+	                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+	            // set the corresponding param
+	            pstmt.setString(1, state);
+	            pstmt.setString(2, country);
+	            pstmt.setString(3, ident);
+	            // update 
+	            pstmt.executeUpdate();
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	        }
+	    }
+
+	
 	public void selectLandmark(String search) {
 		landmarks = new ArrayList<>();
 		mapLandmark = new TreeMap<>();
@@ -104,10 +184,11 @@ where a.ident is null and b.ident is not null
 		}
 
 	}
-
-	public void selectLandmarkProximity(Boundingbox boundingbox, String search, Airport ai) {
-		groupLandmark = new TreeMap<>();
+	
+	public void selectProvinceLandmark(String search) {
+		this.mapLandmark = new TreeMap<String, Landmark>();
 		Landmark landmark;
+
 
 		String sql = "SELECT cgn_id, geo_name, geo_term, category,code, laty, lonx, admin, decision_date, source,"
 				+ "location, language, syllabic, toponomic, revelance " + "FROM cgn_all_canada ";
@@ -119,34 +200,19 @@ where a.ident is null and b.ident is not null
 			final PreparedStatement statement = this.connect().prepareStatement(sql);
 
 			try (ResultSet rs = statement.executeQuery()) {
-				int cpt = 0;
-				while (rs.next()) {
-					if (Geoinfo.distance(ai.getLaty(), rs.getDouble("laty"), ai.getLonx(), rs.getDouble("lonx")) < 20){
-					//	System.out.println("geo_term "+rs.getString("geo_term"));
-						cpt++;
-						
-					}
-					if (boundingbox.isInside(new Landcoord(rs.getDouble("laty"), rs.getDouble("lonx")))) {
-						landmark = new Landmark(rs.getString("cgn_id"), rs.getString("geo_name"),
-								rs.getString("geo_term"), rs.getString("category"), rs.getString("code"),
-								rs.getString("admin"), rs.getDouble("lonx"), rs.getDouble("laty"),
-								rs.getString("decision_date"), rs.getString("source"), rs.getString("location"),
-								rs.getString("language"), rs.getString("syllabic"), rs.getString("toponomic"),
-								rs.getString("revelance"));
-						if (groupLandmark.get(rs.getString("geo_term")) == null){
-							landmarks = new ArrayList<Landmark>();
-						} else {
-							landmarks = groupLandmark.get(rs.getString("geo_term"));
-						}
-						landmarks.add(landmark);
-						groupLandmark.put(rs.getString("geo_term"),landmarks);
-					} else {
 
+				while (rs.next()) {
+					landmark = new Landmark(rs.getString("cgn_id"), rs.getString("geo_name"), rs.getString("geo_term"),
+							rs.getString("category"), rs.getString("code"), rs.getString("admin"), rs.getDouble("lonx"),
+							rs.getDouble("laty"), rs.getString("decision_date"), rs.getString("source"),
+							rs.getString("location"), rs.getString("language"), rs.getString("syllabic"),
+							rs.getString("toponomic"), rs.getString("revelance"));
+					
+					 if (Boundingbox.getInstance().isInside(rs.getDouble("laty"),rs.getDouble("lonx"))){
+						 mapLandmark.put(rs.getString("geo_name"), landmark);
+					 }
 					}
 				}
-				System.err.println(cpt);
-
-			}
 
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
@@ -154,6 +220,40 @@ where a.ident is null and b.ident is not null
 		}
 
 	}
+	public String selectNearestLandmark(Double laty, Double lonx) {
+		groupLandmark = new TreeMap<>();
+		Landmark landmark;
+
+		String sql = "SELECT laty, lonx, admin FROM cgn_all_canada ";
+
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				int cpt = 0;
+				double distance = 0;
+				while (rs.next()) {
+				        distance = Geoinfo.distance(laty, rs.getDouble("laty"), lonx, rs.getDouble("lonx"));
+					
+				        if (distance < 10) {
+				        	//System.out.println( rs.getString("admin"));
+				        	return rs.getString("admin");
+				        }
+					
+				}
+
+			}
+
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			// e1.printStackTrace();
+		}
+		
+		return null;
+
+	}
+	
 
 	public List<String> selectComboLandmark(String sql) {
 		List<String> list = new ArrayList<>();
@@ -184,7 +284,7 @@ where a.ident is null and b.ident is not null
 		airport = new Airport();
 		mapAirport = new TreeMap<String, Airport>();
 
-		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
+		String sql = "SELECT airport_id, ident, iata, region, REPLACE(name,'&','and'), atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
 				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name "
 				+ "FROM v_airport_runway ";
 		if (!"".equals(search)) {
@@ -207,11 +307,14 @@ where a.ident is null and b.ident is not null
 						}
 						airport = new Airport();
 						listRunways = new ArrayList<>();
-
+						
+	
 						airport.setAirportId(rs.getInt("airport_id"));
 						airport.setIdent(rs.getString("ident"));
 						airport.setIata(rs.getString("iata"));
-						airport.setName(rs.getString("name"));
+						try {
+							airport.setName(rs.getString("name").replace("&", "and"));
+						} catch (Exception e) {}
 						airport.setCity(rs.getString("city"));
 						airport.setState(rs.getString("state"));
 						airport.setCountry(rs.getString("country"));
@@ -305,6 +408,39 @@ where a.ident is null and b.ident is not null
 		}
 
 		return cities;
+	}
+	
+	public City selectOneCity(String search) {
+		City city = new City();
+
+		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region "
+				+ "FROM world_city_new ";
+		if (!"".equals(sql)) {
+			sql += search;
+		}
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				String lastAirport = "";
+
+				while (rs.next()) {
+					city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"),
+							rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"),
+							rs.getString("iso3"), rs.getString("region"), rs.getString("admin_name"),
+							rs.getString("capital").trim(), rs.getLong("population"));
+				}
+
+			}
+
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+
+		}
+
+		return city;
 	}
 
 	public void selectMountain(String search) {
@@ -491,6 +627,18 @@ where a.ident is null and b.ident is not null
 
 	public Map<String, List<Landmark>> getGroupLandmark() {
 		return groupLandmark;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public void setGroupLandmark(Map<String, List<Landmark>> groupLandmark) {
+		this.groupLandmark = groupLandmark;
 	}
 
 }

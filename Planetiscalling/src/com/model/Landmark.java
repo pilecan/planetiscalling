@@ -27,9 +27,9 @@ public class Landmark {
 			String syllabic, String toponomic, String revelance) {
 		super();
 		this.cgnId = cgnId;
-		this.geoName = geoName;
-		this.geoTerm = geoTerm;
-		this.category = category;
+		this.geoName = geoName.replace("&", "");
+		this.geoTerm = geoTerm.replace("&", "");
+		this.category = category.replace("&", "");
 		this.code = code;
 		this.admin = admin;
 		this.lonx = lonx;

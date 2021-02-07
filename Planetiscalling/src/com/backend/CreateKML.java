@@ -41,6 +41,7 @@ public class CreateKML {
         Map<String, String> aMap = new HashMap<>();
         aMap.put("Canyon", "http://maps.google.com/mapfiles/kml/shapes/hiker.png" ); 
         aMap.put("Cap", "http://maps.google.com/mapfiles/kml/shapes/trail.png" ); 
+        aMap.put("TRAIL", "http://maps.google.com/mapfiles/kml/shapes/trail.png" ); 
         aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/campground.png" ); 
         aMap.put("Chalet", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("Cove", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
@@ -54,8 +55,10 @@ public class CreateKML {
         aMap.put("Pourvoirie", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" ); 
         aMap.put("Reserve", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
         aMap.put("PARK", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
+        aMap.put("PPARK", "http://maps.google.com/mapfiles/kml/shapes/picnic.png" ); 
+        aMap.put("SKI", "http://maps.google.com/mapfiles/kml/shapes/ski.png" ); 
         aMap.put("Waterfall", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
-        aMap.put("BCH", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("BCH", "http://maps.google.com/mapfiles/kml/shapes/swimming.png" ); 
         aMap.put("CHAN", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("FALL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("TRUCK", "http://maps.google.com/mapfiles/kml/shapes/truck.png" ); 
@@ -63,9 +66,9 @@ public class CreateKML {
         aMap.put("ISL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("ANCH", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
         aMap.put("RAP", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
-        aMap.put("LAKE", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("LAKE", "http://maps.google.com/mapfiles/kml/shapes/sailing.png" ); 
         aMap.put("FOR", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
-        aMap.put("RIV", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("RIV", "http://maps.google.com/mapfiles/kml/shapes/fishing.png" ); 
         aMap.put("HYDR", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SITE", "http://maps.google.com/mapfiles/kml/shapes/parks.png" ); 
         aMap.put("RIVF", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
@@ -73,7 +76,7 @@ public class CreateKML {
         aMap.put("River", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SEA", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SEAF", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
-        aMap.put("BAY", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
+        aMap.put("BAY", "http://maps.google.com/mapfiles/kml/shapes/marina.png" ); 
         aMap.put("SEAU", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("SPRG", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
         aMap.put("VEGL", "http://maps.google.com/mapfiles/kml/shapes/water.png" ); 
@@ -109,7 +112,7 @@ public class CreateKML {
         aMap.put("HAM", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("HAM", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("TOWN", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
-        aMap.put("IR", "http://maps.google.com/mapfiles/kml/shapes/star.png" ); 
+        aMap.put("IR", "http://maps.google.com/mapfiles/kml/shapes/target.png" ); 
         aMap.put("MAR", "http://maps.google.com/mapfiles/kml/shapes/ferry.png" ); 
         aMap.put("MISC", "http://maps.google.com/mapfiles/kml/pushpin/wht-pushpin.png" ); 
         aMap.put("MIL", "http://maps.google.com/mapfiles/kml/shapes/police.png" ); 
@@ -118,9 +121,8 @@ public class CreateKML {
         aMap.put("PROV", "http://maps.google.com/mapfiles/kml/paddle/ylw-stars.png" ); 
         aMap.put("RAIL", "http://maps.google.com/mapfiles/kml/shapes/rail.png" );
         aMap.put("RECR", "http://maps.google.com/mapfiles/kml/shapes/play.png" );
-        aMap.put("CAMP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
         aMap.put("UNP", "http://maps.google.com/mapfiles/kml/shapes/ranger_station.png" );
-        aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/trail.png" );
+        aMap.put("ROAD", "http://maps.google.com/mapfiles/kml/shapes/truck.png" );
         
         aMap.put("01d", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
         aMap.put("01n", "http://maps.google.com/mapfiles/kml/shapes/sunny.png" );
@@ -204,7 +206,9 @@ public class CreateKML {
 					///System.out.println(legPoint.getType()+" - "+legPoint.getIcaoIdent());
 						if (title.split("-")[1].equals(legPoint.getIcaoIdent())){
 							writer.write(legPoint.buildPoint());
-							break;
+							//writer.write(buildWeatherPlaceMark(((LegPoint)object).getCoordinates()));
+						//	makeLine("waypoint",writer,((LegPoint)object).getCoordinates());
+					break;
 						}
 					}
 				}
@@ -422,9 +426,14 @@ public class CreateKML {
 		String icone = "";
 
 		String coordinates = landmark.getLonx()+","+landmark.getLaty()+","+"0";
-		icone = (landmark.toString().contains("Railway")?"RAIL":landmark.getCode());
+		icone = (landmark.toString().contains("Rail")?"RAIL":landmark.getCode());
 		icone = (landmark.toString().contains("Bridge")?"BRIDG":landmark.getCode());
 		icone = (landmark.toString().contains("Anchorage")?"ANCH":landmark.getCode());
+		icone = (landmark.toString().contains("Public Park")?"PPARK":landmark.getCode());
+		icone = (landmark.toString().contains("Ski")?"SKI":landmark.getCode());
+		icone = (landmark.toString().contains("Trail")?"TRAIL":landmark.getCode());
+		icone = (landmark.toString().contains("Portage")?"TRAIL":landmark.getCode());
+		icone = (landmark.toString().contains("Camp")?"CAMP":landmark.getCode());
 		
 		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(icone)+
 				"</href></Icon></IconStyle></Style>";

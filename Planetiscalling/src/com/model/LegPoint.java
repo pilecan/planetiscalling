@@ -18,6 +18,12 @@ public class LegPoint {
     private static DecimalFormat df = new DecimalFormat("0.00");
 
 
+	public LegPoint(double lonx, double laty) {
+		super();
+		this.lonx = lonx;
+		this.laty = laty;
+	}
+
 	public LegPoint(String id, String type, String position, String visible) {
 		super();
 		this.id = id;
@@ -124,7 +130,10 @@ public class LegPoint {
 	            + "";
 	}
 
-	
+	public String getCoordinates() {
+		return ""+lonx+","+laty+","+altitude;
+	}
+
 	
 	public String getVisible() {
 		return visible;

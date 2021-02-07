@@ -78,8 +78,6 @@ public class SelectNdb implements Info{
 				
 
 		}
-			System.out.println(ndbs.size());
-			System.out.println(mapNdb.size());
 			} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

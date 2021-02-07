@@ -116,13 +116,14 @@ public class Weather implements Info{
 	public String htmlData() {
 		
 		//System.out.println(weather.getName() +" weather at " +Util.formatDistance(Geoinfo.distance(city.getLaty(), weather.getLaty(), city.getLonx(),weather.getLonx()))+" miles from "+city.getCityAscii());
+		String meteoline = "<div style='display: block; clear: left; font-size: medium;'>#value</div>\n\r";
 
 		
 		String url1 = UtilityWeather.getInstance().getCanonicalFile(icon+"@2x.png").toString();
 		//url1 = "http://openweathermap.org/imgxx/w/04d.png";
 		String url2 = UtilityWeather.getInstance().getCanonicalFile("transparent.png").toString();
 		//url2 = "./image/weather/transparent.png";
-		String detailLine = Info.meteoline;
+		String detailLine = meteoline;
 		String lines = "";
 		if (weatherDescription != null) {
 			lines += detailLine.replace("#value", "Summary: "+weatherDescription);
@@ -172,8 +173,8 @@ public class Weather implements Info{
 					+"</div>"
 					+lines +
 					"  </div>\r\n" + 
-					"  <div style='display: block; clear: left; color: gray; font-size: x-small;'>\r\n" + 
-					"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>More..</a>\r\n" + 
+					"  <div style='display: block; clear: left; color: gray; font-size: small;'>\r\n" + 
+					"    <a href='http://openweathermap.org/city/"+id+"?utm_source=openweathermap&amp;utm_medium=widget&amp;utm_campaign=html_old' target='_blank'>Forecast..</a>\r\n" + 
 					"  </div>\r\n" + 
 					"<!--"+icon+"-->";		
 		}

@@ -7,6 +7,7 @@ public class Distance {
 	private int cityDist;
 	private int airportDist;
 	private int vorNdbDist;
+	private int landmarkDist;
 	private boolean line;
 	private double altitude;
 
@@ -28,12 +29,13 @@ public class Distance {
  * @param line
  * @param altitude
  */
-	public Distance(int cityDist, int mountainDist,  int airportDist, int vorNdbDist, boolean line,double altitude) {
+	public Distance(int cityDist, int mountainDist,  int airportDist, int vorNdbDist, int landmarkDist, boolean line,double altitude) {
 		super();
 		this.mountainDist = mountainDist;
 		this.cityDist = cityDist;
 		this.airportDist = airportDist;
 		this.vorNdbDist = vorNdbDist;
+		this.landmarkDist = landmarkDist;
 		this.line = line;
 		this.altitude = altitude;
 	}
@@ -57,6 +59,10 @@ public class Distance {
 
 	public boolean isVorNdb() {
 		return vorNdbDist > 0;
+	}
+	
+	public boolean isLandmark() {
+		return landmarkDist > 0;
 	}
 	
 	public boolean isAirport() {
@@ -107,6 +113,11 @@ public class Distance {
 
 	public double getAltitude() {
 		return altitude;
+	}
+
+
+	public int getLandmarkDist() {
+		return landmarkDist;
 	}
 
 	

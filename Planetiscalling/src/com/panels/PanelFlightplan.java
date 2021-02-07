@@ -86,6 +86,7 @@ public class PanelFlightplan {
 	public JPanel createPanel() {
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
 		
@@ -109,7 +110,7 @@ public class PanelFlightplan {
 		panelResult.setBorder(new TitledBorder("Searh Result"));
 		
 		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder(""));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 	     Border border = outputPanel.getBorder();
 		 Border margin = new EmptyBorder(5,5,5,5);
 		 outputPanel.setBorder(new CompoundBorder(border, margin));
@@ -142,6 +143,7 @@ public class PanelFlightplan {
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 (int)distanceSpin.getAirportSpinner().getValue(),
 		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 		        				 distanceSpin.getCheckTocTod().isSelected(),
 		        				 0.0));
     	  
@@ -154,6 +156,8 @@ public class PanelFlightplan {
 		  		 panelResult.removeAll();	
 				 panelResult.add(result.getFlightPlanFormPanel());
 				 panelResult.validate();
+				 
+				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 				 
 			  	 result.getWaypointListModel();
 
@@ -191,12 +195,15 @@ public class PanelFlightplan {
 					    			 (int)distanceSpin.getMountainSpinner().getValue(), 
 					    			 (int)distanceSpin.getAirportSpinner().getValue(),
 					    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 					    			 distanceSpin.getCheckTocTod().isSelected(),
 					    			 (double)result.getAltitudeModel().getValue())); 
 					    	 
 						  	 panelResult.removeAll();	
 						  	 
 							 result.getWaypointListModel();
+							 
+							 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 							  
 							 resetBt.setEnabled(true);
 
@@ -246,6 +253,7 @@ public class PanelFlightplan {
 				distanceSpin.getAirportSpinner().setValue(0);
 				distanceSpin.getVorNdbSpinner().setValue(0);
 				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getLandkmarkSpinner().setValue(0);
 				distanceSpin.getCheckTocTod().setSelected(false);
 
 				readData.resetFlightPlanResult();
@@ -254,7 +262,7 @@ public class PanelFlightplan {
 				result.getWaypointListModel();
 
 				panelResult.add(result.getFlightPlanFormPanel());
-
+				
 				resetBt.setEnabled(false);
 
 				panelResult.validate();
@@ -267,10 +275,15 @@ public class PanelFlightplan {
 		googleBt.setEnabled(false);
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				//UtilityDB.getInstance().updateAirportState();
+				
 				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
 						(int) distanceSpin.getMountainSpinner().getValue(),
 						(int) distanceSpin.getAirportSpinner().getValue(),
-						(int) distanceSpin.getVorNdbSpinner().getValue(), distanceSpin.getCheckTocTod().isSelected(),
+						(int) distanceSpin.getVorNdbSpinner().getValue(), 
+       				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+						distanceSpin.getCheckTocTod().isSelected(),
 						(double) result.getAltitudeModel().getValue()));
 				panelResult.removeAll();
 
@@ -313,6 +326,8 @@ public class PanelFlightplan {
 					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
 				 }else if ("mountain".equals(result.getCurrentView())){
 					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+				 }else if ("landmark".equals(result.getCurrentView())){
+						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
 				 }
 				
 				}
@@ -320,52 +335,47 @@ public class PanelFlightplan {
 
 		askMeBt = new JButton("Ask Me");
 		askMeBt.setEnabled(false);
-/*		askMeBt.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if ("Ask Me".equals(askMeBt.getText())) {
-					result.showAskMeAnswer();
-				} else {
-				  askMeBt.setText("Ask Me");
-				  askMePanel.setVisible(false);
-				}
-
-			}
-		});	
-*/			
+			
 		askMePanel.setVisible(false);
 
 		result.setButtons(landMeBt, askMeBt);
-
-		buttonLeftPanel.add(refreshBt);
-		buttonLeftPanel.add(resetBt);
-		buttonLeftPanel.add(googleBt);
 		
+		refreshBt.setBounds(30, 310, 125, 23);
+		resetBt.setBounds(180, 310, 125, 23);
+		googleBt.setBounds(90, 350, 180, 23);
+	
 		buttonRightPanel.add(askMeBt);
 		buttonRightPanel.add(landMeBt);
 		
 
-		flightPlanBt.setBounds(70, 220, 200, 23);
-		distanceSpin.getSpinnerPanel().setBounds(10, 10,  310, 190);
+		distanceSpin.getSpinnerPanel().setBounds(10, 10,  310, 220);
+		flightPlanBt.setBounds(45, 260, 240, 23);
 
-		buttonLeftPanel.setBounds(70, 260, 200, 100);
+		buttonLeftPanel.setBounds(60, 280, 200, 100);
 	
 		buttonRightPanel.setBounds(290, 380, 300, 23);
 
 		int x = 330;
 		
-	  	panelResult.setBounds(x, 10, 340, 240);	
-		outputPanel.setBounds(x, 260, 340, 130);	
-		  //	askMePanel.setBounds(x, 260, 340, 130);	
-		askMePanel.setBounds(x, 10, 340, 240);	
+	  	panelResult.setBounds(x, 10, 340, 270);	
+		outputPanel.setBounds(x, 282, 340, 130);	
+		askMePanel.setBounds(x, 10, 340, 270);	
 
 	  	x += 0;
-		landMeBt.setBounds(x, 400, 94, 23);
-		askMeBt.setBounds(x+248, 400, 94, 23);
+		landMeBt.setBounds(x, 419, 94, 23);
+		askMeBt.setBounds(x+243, 420, 94, 23);
 
      	panelFlightplan.add(flightPlanBt);
 		panelFlightplan.add(panelResult);
 		panelFlightplan.add(outputPanel);
 		panelFlightplan.add(askMePanel);
+		
+		panelFlightplan.add(refreshBt);
+		panelFlightplan.add(resetBt);
+		panelFlightplan.add(landMeBt);
+		panelFlightplan.add(googleBt);
+
+
 		
 		panelFlightplan.add(askMeBt);
 		panelFlightplan.add(landMeBt);
@@ -373,7 +383,7 @@ public class PanelFlightplan {
 		//panelFlightplan.add(buttonRightPanel);
 
 		panelFlightplan.add(distanceSpin.getSpinnerPanel());
-     	panelFlightplan.add(buttonLeftPanel);
+     //	panelFlightplan.add(buttonLeftPanel);
   
 		return panelFlightplan;					
 	}

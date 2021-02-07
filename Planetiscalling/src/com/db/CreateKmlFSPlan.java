@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.backend.CreateKML;
 import com.backend.ReadFsxPlan;
@@ -30,6 +31,7 @@ import com.model.Mountain;
 import com.model.Ndb;
 import com.model.Vor;
 import com.util.Utility;
+import com.util.UtilityMap;
 
 
 public class CreateKmlFSPlan{
@@ -38,6 +40,8 @@ public class CreateKmlFSPlan{
 	private String flightPlanFile;// = "C:\\Users\\Pierre\\AppData\\Local\\Packages\\Microsoft.FlightSimulator_8wekyb3d8bbwe\\LocalState\\PHNGPHJR.pln";
 
 	private Map<String, Airport> selectedAirports ;
+	private Map<String, Landmark> selectedLandmarks ;
+
 	private Map<String, City> selectedCities ;
 	private Map<String, Mountain> selectedMountains ;
 	private Map<Integer, Vor> selectedVors;
@@ -91,6 +95,7 @@ public class CreateKmlFSPlan{
 		this.flightPlanFile = flightPlanFile;
 		this.dist = dist;
 		this.selectedAirports = new HashMap<>();
+		this.selectedLandmarks = new TreeMap<>();
 		this.selectedCities = new HashMap<>();
 		this.selectedMountains = new HashMap<>();
 		this.selectedNdbs = new HashMap<>();
@@ -199,31 +204,14 @@ public class CreateKmlFSPlan{
 			distanceBetween += Geoinfo.distance(Double.parseDouble(begin[1]), Double.parseDouble(begin[0]), Double.parseDouble(end[1]), Double.parseDouble(end[0]), 'N');
 
 		}
-		
-		
-		// search Neighbor
+
 		searchFlightPlanNeighbor(selectAirport);
 		
+		Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
 		
-		UtilityDB.getInstance().selectAirport("where ident = '"+legPoints.get(0).getIcaoIdent()+"'"); 
-		Airport airportDep =  UtilityDB.getInstance().getAirport();
-		UtilityDB.getInstance().selectAirport("where ident = '"+legPoints.get(legPoints.size()-1).getIcaoIdent()+"'"); 
-		Airport airportArr =  UtilityDB.getInstance().getAirport();
+		System.out.println("selectedLandmarks "+selectedLandmarks.size());
+		
 
-		if ("Canada".equals(airportDep.getCountry()) || "Canada".equals(airportArr.getCountry())){
-			
-			Boundingbox boundingbox = new Boundingbox(legPoints.get(0).getLaty(), legPoints.get(0).getLonx(), 
-					legPoints.get(legPoints.size()-1).getLaty(), legPoints.get(legPoints.size()-1).getLonx()); 
-			
-			UtilityDB.getInstance().selectLandmarkProximity(boundingbox, "where admin = '"+airportDep.getState()+"' "
-					+ "or admin = '"+airportArr.getState()+"' ", airportArr);
-			System.out.println("landmark found = "+ UtilityDB.getInstance().getGroupLandmark().size());
-			
-			
-
-		}
-		
-		
 		if (distanceBetween < 1000) {
 			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 		}
@@ -362,9 +350,54 @@ public class CreateKmlFSPlan{
 			}
 		}
 		
+/*		if (dist.isLandmark() && UtilityDB.getInstance().getLandmarks() != null && UtilityDB.getInstance().getLandmarks().size() > 0) {
+			
+			for(Landmark landmark : UtilityDB.getInstance().getLandmarks() ){
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
+				current++;
+				
+				for(LegPoint point : legPoints){
+					Boundingbox.getInstance().checkProvince(point.getLaty(), point.getLonx());
+					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
+					
+					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getLandmarkDist()){
+						selectedLandmarks.put(landmark.getGeoName(),new Landmark(landmark));
+						if (dist.isLine()) {
+							//dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+						}
+						
+					}
+				}
+			}
+		}
+*/
 		
-		
-		
+		if (dist.isLandmark()) {
+			
+			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
+			for (int i = 0; i < legPoints.size()-1; i++) {
+				try {
+					String provinces =  UtilityMap.getInstance().check2Provinces(legPoints.get(i).getLaty(),legPoints.get(i).getLonx(),
+																				legPoints.get(i+1).getLaty(),legPoints.get(i+1).getLonx());
+					
+					Boundingbox.getInstance().createBox(legPoints.get(i).getLaty(),legPoints.get(i).getLonx(),
+														legPoints.get(i+1).getLaty(),legPoints.get(i+1).getLonx(), 
+														dist.getLandmarkDist());
+					
+					UtilityDB.getInstance().selectProvinceLandmark("where admin in ("+provinces+")");
+					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
+					System.out.println(provinces);
+				} catch (Exception e) {
+				}
+				
+			}
+
+
+				
+			
+
+		}
+
 	}
 	
 	public  synchronized void createAndsaveFlightPlan(){
@@ -391,7 +424,7 @@ public class CreateKmlFSPlan{
 		    
 		    for (LegPoint legPoint : legPoints){
 
-				if ("1".equals(legPoint.getVisible()) || distanceBetween > 1000) {
+				if ("1".equals(legPoint.getVisible())) {
 				//	System.out.println(selectedAirports.get(legPoint.getIcaoIdent()));
 					
 			    	writer.write(legPoint.buildPoint());
@@ -470,12 +503,25 @@ public class CreateKmlFSPlan{
 			    writer.write("</Folder>"); 
 		    }
 		    
-		    if (UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){
+		    
+
+			
+		    
+/*		    if (selectedLandmarks != null && selectedLandmarks.size() > 0){
+			    writer.write("<Folder><name> landwarks found ("+selectedLandmarks.size()+") </name>");
+			    for(Landmark landmark: selectedLandmarks.values()){
+			    	writer.write(createKML.buildLandmarkPlaceMark(landmark, "1"));
+			    }
+			    writer.write("</Folder>"); 
+	        }
+*/		    
+
+		    
+		    if (dist.isLandmark() && UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){
 			    writer.write("<Folder><name>Landmark groups found ("+UtilityDB.getInstance().getGroupLandmark().size()+") </name>");
 
 					for (Map.Entry<String, List<Landmark>> entry :UtilityDB.getInstance().getGroupLandmark().entrySet()) {
-					    writer.write("<Folder><name>"+ entry.getKey()+" found ("+entry.getValue().size()+")\r\n" + 
-					    		" </name>");
+					    writer.write("<Folder><name>"+ entry.getKey()+" ("+entry.getValue().size()+")</name>");
 					    	for (Landmark landmark :entry.getValue()) {
 						    	writer.write(createKML.buildLandmarkPlaceMark(landmark,"0"));
 	
@@ -485,13 +531,10 @@ public class CreateKmlFSPlan{
 					}
 
 				 writer.write("</Folder>"); 
-
-/*			    
-			    for(Landmark landmark: UtilityDB.getInstance().getMapLandmark().values()){
-			    	writer.write(createKML.buildLandmarkPlaceMark(landmark));
-			    }
-*/		    	
 		    }
+
+	    	
+		    
 		    
 		    if (dist.isLine()){
 		    	for (String key: dataline.getMapData().keySet()) {
@@ -517,7 +560,7 @@ public class CreateKmlFSPlan{
 		    
 		    
 		    writer.write("</Document></kml>");
-	   
+		
 		} catch (IOException ex) {
 		  System.err.println(ex.getMessage());
 		} finally {
@@ -552,6 +595,7 @@ public class CreateKmlFSPlan{
 				;	
 		}	
 
+	
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void main(String[] args) throws FileNotFoundException, NullPointerException, NoPoints, IOException {
@@ -715,6 +759,16 @@ public class CreateKmlFSPlan{
 
 	public void setAltitude(double altitude) {
 		this.altitude = altitude;
+	}
+
+
+	public Map<String, Landmark> getSelectedLandmarks() {
+		return selectedLandmarks;
+	}
+
+
+	public void setSelectedLandmarks(Map<String, Landmark> selectedLandmarks) {
+		this.selectedLandmarks = selectedLandmarks;
 	}
 
 

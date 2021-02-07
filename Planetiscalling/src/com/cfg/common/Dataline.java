@@ -13,6 +13,7 @@ public class Dataline {
         aMap.put("city", "#ffff00ff");
         aMap.put("airport", "#ffff0000");
         aMap.put("mountain", "#ff00ff00");
+        aMap.put("landmark", "#ff00ff00");
         mapColor = Collections.unmodifiableMap(aMap);
     }
     

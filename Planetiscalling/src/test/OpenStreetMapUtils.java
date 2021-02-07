@@ -38,12 +38,12 @@ public class OpenStreetMapUtils {
         final URL obj = new URL(url);
         final HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-  /*      con.setRequestMethod("GET");
+        con.setRequestMethod("GET");
 
         if (con.getResponseCode() != 200) {
-            return null;
+         //   return null;
         }
-*/
+
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String inputLine;
         StringBuffer response = new StringBuffer();

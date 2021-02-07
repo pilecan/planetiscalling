@@ -33,6 +33,7 @@ import com.db.SelectDB;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
@@ -85,6 +86,7 @@ public class PanelCity implements Info {
 	public JPanel getPanel(final SelectCity selectCity ,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("city");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		selectAirport = new SelectAirport();
 		
@@ -103,7 +105,7 @@ public class PanelCity implements Info {
    	    askMePanel.add(askmeScrollPan);
 
 		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("List"));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 
 		result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -192,6 +194,7 @@ public class PanelCity implements Info {
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -201,7 +204,8 @@ public class PanelCity implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
-					 
+					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
+
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
 					 
@@ -220,6 +224,7 @@ public class PanelCity implements Info {
 				distanceSpin.getAirportSpinner().setValue(0);
 				distanceSpin.getVorNdbSpinner().setValue(0);
 				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getLandkmarkSpinner().setValue(0);
 				distanceSpin.getCheckLinedist().setSelected(false);
 
 				readData.resetCityResult(result);
@@ -247,6 +252,7 @@ public class PanelCity implements Info {
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -306,7 +312,8 @@ public class PanelCity implements Info {
 	    result.setButtons(landMeBt, askMeBt);
 		
 		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
-		panelCombo.setBounds(10, 200, 240, 90);
+		panelCombo.setBounds(10, 210, 310, 90);
+
 		
 		int x = 330;
 		
@@ -318,19 +325,19 @@ public class PanelCity implements Info {
 		landMeBt.setBounds(x, 370, 94, 23);
 		askMeBt.setBounds(x+244, 370, 94, 23);
 
-		resetBt.setBounds(120, 300, 90, 23);
-  	    searchBt.setBounds(10, 300, 90, 23);
-		googleBt.setBounds(10, 330, 200, 23);
+		searchBt.setBounds(30, 350, 125, 23);
+		resetBt.setBounds(180, 350, 125, 23);
+		googleBt.setBounds(90, 390, 180, 23);
 
 		
 		panelLandMark.add(panelCombo);
 		panelLandMark.add(distanceSpin.getSpinnerPanel());
 		panelLandMark.add(searchBt);
 		panelLandMark.add(resetBt);
+		panelLandMark.add(landMeBt);
 		panelLandMark.add(panelResult);
 		panelLandMark.add(outputPanel);
 		panelLandMark.add(askMePanel);
-		panelLandMark.add(landMeBt);
 		panelLandMark.add(askMeBt);
   	    panelLandMark.add(googleBt);
 		

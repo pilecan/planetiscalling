@@ -176,7 +176,7 @@ public class SelectDB implements Info{
 		
 		countryState = new TreeSet<String>();
 		listState.add(" All");
-		String sql = "SELECT country, state from airport order by country, state";
+		String sql = "SELECT country, state from v_airport_runway order by country, state";
 				
 		try {
 			final PreparedStatement statement = this.connect().prepareStatement(sql);
@@ -185,9 +185,14 @@ public class SelectDB implements Info{
 				int cpt = 0;
 				String lastCountry = "";
 				while (rs.next()) {
+
+
 					
 					if (rs.getString("country") != null ) {
 						if (!lastCountry.equals(rs.getString("country"))) {
+							if ("France".equals(rs.getString("country"))) {
+							//	System.out.println(rs.getString("state"));
+							}
 							if (!"".equals(lastCountry)) {
 								mapCountryAirport.put(lastCountry, countryState);
 							}

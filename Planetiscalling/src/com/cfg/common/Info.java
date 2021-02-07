@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.swing.plaf.ColorUIResource;
 
 public interface Info {
-	Color[] colorBackground = {new ColorUIResource(26,108,26), new ColorUIResource(12,133,222),new ColorUIResource(153,59,21),new ColorUIResource(38,30,18),new ColorUIResource(229,228,200)};
+	Color[] colorBackground = {new ColorUIResource(26,108,26), new ColorUIResource(12,133,222),new ColorUIResource(153,59,21),new ColorUIResource(12,7,92),new ColorUIResource(229,228,200)};
 	Color[] colorForground = {new Color(255,196,52),new ColorUIResource(222,231,239),new ColorUIResource(255,253,195),new ColorUIResource(222,231,239),Color.lightGray,new ColorUIResource(22,105,23)};
 	Color[] colorForgroundBtn = {Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY,Color.DARK_GRAY};
 	Color[] colorBack = {new Color(165,181,214),new Color(165,181,214),new Color(165,181,214)};
@@ -24,8 +24,8 @@ public interface Info {
     Font fontList 	= new Font("arial", Font.BOLD, 12);
     Font fontTitle 	= new Font("arial", Font.BOLD, 13);
     
-	String imagesPath = "/images/";
-	//String path = "C:/projects/fsx/readconfig/data/";
+	//String imagesPath = "/images/";
+	String path = "C:/projects/fsx/readconfig/data/";
 
 	String SCENERY_ROOT_LM = "C:\\ProgramData\\Lockheed Martin\\";
 	String SCENERY_ROOT_FSX = "C:\\ProgramData\\Microsoft/FSX\\";
@@ -39,7 +39,7 @@ public interface Info {
 	String kmlMountainCityAirportName = "mountain_city_airport.kml";
 	String kmlLandmarkMountainCityAirportName = "landmark_mountain_city_airport.kml";
 	
-	String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway.db";
+	String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway-2.db";
 	//String dbPath = "jdbc:sqlite:data/airport_runway.db";
 
 
@@ -47,7 +47,6 @@ public interface Info {
     String datadir  = "/data/";
     String metarFileName = "data/metar/metar.txt";
     String weatherPath = "image/weather/";
-	String meteoline = "<div style='display: block; clear: left; font-size: small;'>#value</div>\n\r";
 
  	
 

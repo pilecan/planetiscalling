@@ -133,7 +133,11 @@ public class UtilityTimer extends Thread implements Info {
 	                Thread.currentThread().sleep(sequence);
 	                mc.setTitle("The Planet Is Calling 0.910"
 	               +"                                                               "+ timeUTC+ " UTC    "
-	               +timeLocal+" "+localAbbreviation+"                "+timer);
+	               +timeLocal+" "+localAbbreviation+"             "+timer);
+/*	        	    Utility.getInstance().initLookAndFeel((PlanetIsCalling) planetIsCalling, Util.DAY_PERIOD.get(Util.getPeriod()) );
+	        		Utility.getInstance().getPrefs().put("day.period", Util.getPeriod());
+	            	Utility.getInstance().savePrefProperties();
+*/
 	                } catch (InterruptedException e) {
 	                    // TODO Auto-generated catch block
 	                    e.printStackTrace();

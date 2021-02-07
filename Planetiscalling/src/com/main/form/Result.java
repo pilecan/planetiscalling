@@ -45,6 +45,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import com.backend.CreateKML;
 import com.cfg.common.Info;
 import com.db.SelectAirport;
+import com.db.UtilityDB;
 import com.geo.util.Geoinfo;
 import com.model.Airport;
 import com.model.City;
@@ -217,7 +218,7 @@ public class Result implements Info {
 
 		
 		altitudeModel = new SpinnerNumberModel(altitude, 500, // min
-				100000, // max
+				50000, // max
 				500);
 
 		altitudeSpinner = new JSpinner(altitudeModel);
@@ -252,6 +253,7 @@ public class Result implements Info {
 		ndbBtn = new JRadioButton("");
 		cityBtn = new JRadioButton("");
 		mountainBtn = new JRadioButton("");
+		landmarkBtn = new JRadioButton("");
 
 		bgroup.add(waypointBtn);
 		bgroup.add(airportBtn);
@@ -259,6 +261,7 @@ public class Result implements Info {
 		bgroup.add(ndbBtn);
 		bgroup.add(cityBtn);
 		bgroup.add(mountainBtn);
+		bgroup.add(landmarkBtn);
 
 		RadioListener myListener = new RadioListener();
 		waypointBtn.addActionListener(myListener);
@@ -267,6 +270,7 @@ public class Result implements Info {
 		ndbBtn.addActionListener(myListener);
 		cityBtn.addActionListener(myListener);
 		mountainBtn.addActionListener(myListener);
+		landmarkBtn.addActionListener(myListener);
 		
 		setformLine(resultPanel, "Waypoints:", this.legPoints.size(), waypointBtn);
 		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
@@ -274,6 +278,9 @@ public class Result implements Info {
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+		if (!"".equals(UtilityDB.getInstance().getProvince())) {
+			setformLine(resultPanel, "Landmark:", this.selectedLandmarks.size(), landmarkBtn);
+		}
 
 		resultPanel.validate();
 
@@ -753,6 +760,12 @@ public class Result implements Info {
 				varStr += UtilityWeather.getInstance().getWeather().htmlData();
 			}
 		} catch (Exception e) {
+			varStr = "<b>"+icao+" airport is not in database</b>";
+			if (isMetarVadid) {
+				varStr += " but METAR is avaliable !" +metar;	
+			}
+
+			
 		}
 		return varStr;
 
@@ -796,13 +809,13 @@ public class Result implements Info {
 				htmlString += CreateKML.buildCityDescriptionPlane(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
 				UtilityWeather.getInstance().searchCityWeather(city);
 				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
-/*				try {
+				try {
 					UtilityWeather.getInstance().callOpenStreetmapObject(city);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					//e.printStackTrace();
 				}
-*/				
+				
 			}
 		}
 

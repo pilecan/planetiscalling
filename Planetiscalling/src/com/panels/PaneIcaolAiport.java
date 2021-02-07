@@ -37,6 +37,7 @@ import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
+import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Util;
@@ -98,6 +99,7 @@ public class PaneIcaolAiport extends JFrame {
 		
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("icao");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 
 		
         jEditorPane = new JEditorPane();
@@ -139,7 +141,7 @@ public class PaneIcaolAiport extends JFrame {
 	icaoPanel.setLayout(null);
 
 	outputPanel = new JPanel(new BorderLayout());
-	outputPanel.setBorder(new TitledBorder(""));
+	outputPanel.setBorder(new TitledBorder("List Result"));
 	result.setOutputPanel(outputPanel);
 
 	panelResult = new JPanel(new BorderLayout());
@@ -158,6 +160,7 @@ public class PaneIcaolAiport extends JFrame {
 	        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 	        				 0,
 	        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+         				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 	        				 distanceSpin.getCheckLinedist().isSelected(),
 	        				 0.0)
 							 ); 
@@ -170,33 +173,7 @@ public class PaneIcaolAiport extends JFrame {
 
 	final JTextArea textArea = new JTextArea();
 	//textArea.setFont(textArea.getFont().deriveFont(14f));
-	textArea.setText("RORK \r\n" + 
-			"ROMD \r\n" + 
-			"RKTU \r\n" + 
-			"RKTN \r\n" + 
-			"RKSS \r\n" + 
-			"RKSM \r\n" + 
-			"RKPK \r\n" + 
-			"RKPC \r\n" + 
-			"RKNY \r\n" + 
-			"RKJB \r\n" + 
-			"RJSM \r\n" + 
-			"RJOS \r\n" + 
-			"RJOH \r\n" + 
-			"RJNK \r\n" + 
-			"RJKI \r\n" + 
-			"RJFR \r\n" + 
-			"RJAW \r\n" + 
-			"RJAH \r\n" + 
-			"RCNN \r\n" + 
-			"RCMQ \r\n" + 
-			"PLCH \r\n" + 
-			"OTHH \r\n" + 
-			"OSLK \r\n" + 
-			"OSKL \r\n" + 
-			"OSAP \r\n" + 
-			"ORNI \r\n" + 
-			"ORMM ");
+	textArea.setText("");
 	setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	textArea.setColumns(100);
 	textArea.setLineWrap(true);
@@ -245,6 +222,7 @@ public class PaneIcaolAiport extends JFrame {
 			distanceSpin.getCitySpinner().setValue(0);
 			distanceSpin.getVorNdbSpinner().setValue(0);
 			distanceSpin.getMountainSpinner().setValue(0);
+			distanceSpin.getLandkmarkSpinner().setValue(0);
 			distanceSpin.getCheckLinedist().setSelected(false);
 
 			if (readData != null) {
@@ -280,10 +258,12 @@ public class PaneIcaolAiport extends JFrame {
         				 (int)distanceSpin.getMountainSpinner().getValue(), 
         				 0,
         				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+       				     (int)distanceSpin.getLandkmarkSpinner().getValue(), 
         				 distanceSpin.getCheckLinedist().isSelected(),
         				 0.0));
 	    	  
 			  result.getAirportListModel();
+		      distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 
 	    	  
 	    	//  setIcaoResult();

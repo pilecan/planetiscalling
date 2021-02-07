@@ -1,75 +1,117 @@
 package com.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.geo.util.Geoinfo;
+import com.util.UtilityMap;
 
-public class Boundingbox {
-	private double beginLaty;
-	private double beginLonx;
-	private double endLaty;
-	private double endLonx;
-	private ArrayList<Landcoord> landcoords;
+public class Boundingbox{
+	private double lat1;
+	private double lon1;
+	private double lat2;
+	private double lon2;
+	private int distance;
+	private List<Landcoord> landcoords;
+	private Landcoord landcoord;
+	private List<CoordinatesDTO> coords;
+	private double flpAngle;
 	
-	public Boundingbox(double beginLaty, double beginLonx, double endLaty, double endLonx) {
+	private static Boundingbox instance = new Boundingbox();
+	public static Boundingbox getInstance() {
+		return instance;
+	}
+	
+	public Boundingbox() {
 		super();
-		this.beginLaty = beginLaty;
-		this.beginLonx = beginLonx;
-		this.endLaty = endLaty;
-		this.endLonx = endLonx;
-		createBox();
+		// TODO Auto-generated constructor stub
 	}
-	
-	private void createBox() {
-	     double angle = Geoinfo.calculateAngle(beginLonx,beginLaty,endLonx, endLaty);
-	     System.out.println("angle = "+angle);
-	     Landcoord landcoord = null;
+
+
+	public void createBox(double lat1, double lon1, double lat2, double lon2, int distance) {
+		this.lat1 = lat1;
+		this.lon1 = lon1;
+		this.lat2 = lat2;
+		this.lon2 = lon2;
+		this.distance = distance;
+
+		landcoords = new ArrayList<Landcoord>();
+
+	    double angleForward = Geoinfo.calculateAngle(lon1,lat1,lon2, lat2);
+	    double angleBackward = Geoinfo.calculateAngle(lon2, lat2,lon1,lat1);
 	     
-	     landcoords = new ArrayList<>();
-	     int orientation = 0;
-	     if (angle > 0 && angle < 90) {
-	    	 orientation = 90;
-	    	landcoord= Geoinfo.searchPoint(beginLaty,beginLonx, 50, angle+180);
-	        beginLaty = landcoord.getLaty();
-	        beginLonx = landcoord.getLonx();
-	        landcoords.add(Geoinfo.searchPoint(beginLaty,beginLonx, 50, angle+orientation));
+	    Landcoord coordBack = Geoinfo.searchPoint(lat1,lon1, distance, angleBackward); 
+	    Landcoord coordFoward = Geoinfo.searchPoint(lat2,lon2, distance, angleForward);
+	     
+	    landcoords.add(Geoinfo.searchPoint(coordBack.getLaty(),coordBack.getLonx(), distance, Geoinfo.correctAngle(angleForward-90)));
+	    landcoords.add(Geoinfo.searchPoint(coordBack.getLaty(),coordBack.getLonx(), distance, Geoinfo.correctAngle(angleForward+90)));
+	    landcoords.add(Geoinfo.searchPoint(coordFoward.getLaty(),coordFoward.getLonx(), distance, Geoinfo.correctAngle(angleForward+90)));
+	    landcoords.add(Geoinfo.searchPoint(coordFoward.getLaty(),coordFoward.getLonx(), distance, Geoinfo.correctAngle(angleForward-90)));
+	     
+		coords = new ArrayList<CoordinatesDTO>();
+	    coords.add(new CoordinatesDTO(landcoords.get(0).getLaty(), landcoords.get(0).getLonx()));
+	    coords.add(new CoordinatesDTO(landcoords.get(1).getLaty(), landcoords.get(1).getLonx()));
+	    coords.add(new CoordinatesDTO(landcoords.get(2).getLaty(), landcoords.get(2).getLonx()));
+	    coords.add(new CoordinatesDTO(landcoords.get(3).getLaty(), landcoords.get(3).getLonx()));
 
-	     }
+	}
 
-	  //   landcoords.add(Geoinfo.searchPoint(beginLaty,beginLonx, 20, angle+orientation));
-	     landcoords.add(Geoinfo.searchPoint(endLaty,endLonx, 20, Geoinfo.calculateAngle( endLaty, endLonx,beginLaty, beginLonx)+orientation));
-/*	     landcoords.add(Geoinfo.searchPoint(endLaty,endLonx, 20, Geoinfo.calculateAngle( endLaty, endLonx,beginLaty, beginLonx)+orientation));
-	     landcoords.add(Geoinfo.searchPoint(endLaty,endLonx, 20, Geoinfo.calculateAngle( endLaty, endLonx,beginLaty, beginLonx)-orientation));
-*/	}
+
 	
-	
-	public boolean isInside(Landcoord landcoord ) {
-		return Geoinfo.isInside(landcoord, landcoords);
+	public boolean isInside(double laty, double lonx ) {
+		return UtilityMap.getInstance().isLocationInsideTheFencing(new CoordinatesDTO(laty, lonx), coords);
 	}
 	
-	public double getBeginLaty() {
-		return beginLaty;
+
+
+	public double getLat1() {
+		return lat1;
 	}
-	public void setBeginLaty(double beginLaty) {
-		this.beginLaty = beginLaty;
+
+
+	public void setLat1(double lat1) {
+		this.lat1 = lat1;
 	}
-	public double getBeginLonx() {
-		return beginLonx;
+
+
+	public double getLon1() {
+		return lon1;
 	}
-	public void setBeginLonx(double beginLonx) {
-		this.beginLonx = beginLonx;
+
+
+	public void setLon1(double lon1) {
+		this.lon1 = lon1;
 	}
-	public double getEndLaty() {
-		return endLaty;
+
+
+	public double getLat2() {
+		return lat2;
 	}
-	public void setEndLaty(double endLaty) {
-		this.endLaty = endLaty;
+
+
+	public void setLat2(double lat2) {
+		this.lat2 = lat2;
 	}
-	public double getEndLonx() {
-		return endLonx;
+
+
+	public double getLon2() {
+		return lon2;
 	}
-	public void setEndLonx(double endLonx) {
-		this.endLonx = endLonx;
+
+
+	public void setLon2(double lon2) {
+		this.lon2 = lon2;
 	}
+
+
+	public int getDistance() {
+		return distance;
+	}
+
+
+	public void setDistance(int distance) {
+		this.distance = distance;
+	}
+	
 
 }

@@ -1,9 +1,10 @@
 package com.util;
 
 import java.awt.Color;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,9 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +52,11 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import com.cfg.common.Info;
 import com.db.SelectAirport;
+import com.db.UtilityDB;
 import com.main.PlanetIsCalling;
-import com.metar.decoder.Decoder;
-import com.metar.download.Download;
 import com.model.Airport;
+import com.model.CoordinatesDTO;
+import com.model.Landmark;
 
 public class Utility implements Info {
 	private static Utility instance = new Utility();
@@ -69,7 +71,6 @@ public class Utility implements Info {
 	private String googleEarthExec = "C:/Program Files/Google/Google Earth Pro/client/googleearth.exe";
 
 	public static Utility getInstance() {
-
 		return instance;
 	}
 
@@ -597,5 +598,49 @@ public class Utility implements Info {
 		return panel;
 
 	}
+	
+	public void createLandmarkByGroup(Map<String, Landmark> selectedLandmarks) {
+		List <Landmark >tempLandmark = new ArrayList<Landmark>();
+		UtilityDB.getInstance().setGroupLandmark(new HashMap<String, List<Landmark>>());
+		for (Landmark landmark: selectedLandmarks.values()) {
+			if (UtilityDB.getInstance().getGroupLandmark().get(landmark.getGeoTerm()) == null){
+				tempLandmark = new ArrayList<Landmark>();
+			} else {
+				tempLandmark = UtilityDB.getInstance().getGroupLandmark().get(landmark.getGeoTerm());
+			}
+			UtilityDB.getInstance().getGroupLandmark().put(landmark.getGeoTerm(),tempLandmark);
+			tempLandmark.add(landmark);
+			
+		}
+		
+	}
+	
+	public static boolean isLocationInsideTheFencing(CoordinatesDTO location, List<CoordinatesDTO> fencingCoordinates) { //this is important method for Checking the point exist inside the fence or not.
+	    boolean blnIsinside = false;
+
+	    List<CoordinatesDTO> lstCoordinatesDTO = fencingCoordinates;
+
+	    Path2D myPolygon = new Path2D.Double();
+	    myPolygon.moveTo(lstCoordinatesDTO.get(0).getLatitude(), lstCoordinatesDTO.get(0).getLongnitude()); // first
+	                                                                                                        // point
+	    for (int i = 1; i < lstCoordinatesDTO.size(); i++) {
+	        myPolygon.lineTo(lstCoordinatesDTO.get(i).getLatitude(), lstCoordinatesDTO.get(i).getLongnitude()); // draw
+	                                                                                                            // lines
+	    }
+	    myPolygon.closePath(); // draw last line
+
+	    // myPolygon.contains(p);
+	    Point2D P2D2 = new Point2D.Double();
+	    P2D2.setLocation(location.getLatitude(), location.getLongnitude());
+
+	    if (myPolygon.contains(P2D2)) {
+	        blnIsinside = true;
+	    } else {
+	        blnIsinside = false;
+	    }
+
+	    return blnIsinside;
+	}
+	
 
 }

@@ -76,7 +76,9 @@ public class SelectAirport implements Info{
 						airport.setAirportId(rs.getInt("airport_id"));
 						airport.setIdent(rs.getString("ident"));
 						airport.setIata(rs.getString("iata"));
-						airport.setName(rs.getString("name"));
+						try {
+							airport.setName(rs.getString("name").replace("&", "and"));
+						} catch (Exception e) {}
 						airport.setCity(rs.getString("city"));
 						airport.setState(rs.getString("state"));
 						airport.setCountry(rs.getString("country"));

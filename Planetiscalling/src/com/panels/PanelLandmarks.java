@@ -124,7 +124,7 @@ public class PanelLandmarks implements Info {
 
     	
     	outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("List"));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 
     	result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -154,7 +154,7 @@ public class PanelLandmarks implements Info {
 
      //   selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 
-        int widht = 300;
+        int widht = 240;
 		comboCountry.setPreferredSize(new Dimension(widht,25));
         comboState.setPreferredSize(new Dimension(widht,25));
         comboGeoterm.setPreferredSize(new Dimension(widht,25));
@@ -229,6 +229,7 @@ public class PanelLandmarks implements Info {
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 		        				 0, 
+		        				 0,
 		        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
 		         
@@ -284,6 +285,7 @@ public class PanelLandmarks implements Info {
         				 (int)distanceSpin.getMountainSpinner().getValue(), 
         				 (int)distanceSpin.getAirportSpinner().getValue(), 
         				 0, 
+        				 0, 
         				 distanceSpin.getCheckLinedist().isSelected(),
         				 0.0));
          
@@ -291,6 +293,8 @@ public class PanelLandmarks implements Info {
          panelResult.removeAll();	
 		 panelResult.add(result.getLandmarkFormPanel());
 		 panelResult.validate();
+		 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
+
 		 
 		 googleBt.setEnabled(true);
 		 resetBt.setEnabled(true);
@@ -337,6 +341,7 @@ public class PanelLandmarks implements Info {
 	public JPanel getAirportPanel(final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("airport");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 
 		this.selectAirport = new SelectAirport();
 		
@@ -360,7 +365,7 @@ public class PanelLandmarks implements Info {
 
     	
     	outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("List"));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 
     	result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -384,7 +389,7 @@ public class PanelLandmarks implements Info {
 		comboCity = new JComboBox<>();
 		comboCity.addItem(" All");
 
-        selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+        selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 
 		comboCountry.setPreferredSize(new Dimension(240,25));
         comboState.setPreferredSize(new Dimension(240,25));
@@ -401,7 +406,7 @@ public class PanelLandmarks implements Info {
 
 				int totalCity = 0;
 				if (comboState.getSelectedItem() != null && comboState.getItemCount() ==1 ) {
-			        totalCity = selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+			        totalCity = selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 				}
 				
 				//setResult(labelHeader,totalCity);
@@ -416,7 +421,7 @@ public class PanelLandmarks implements Info {
 
 		        int totalCity = 0;
 				if (comboState.getSelectedItem() != null && !" All".equals(comboState.getSelectedItem() )) {
-					totalCity =  selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getMaximumRowCount());
+					totalCity =  selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getMaximumRowCount());
 				}
 				
 				//setResult(labelHeader,totalCity);
@@ -440,6 +445,7 @@ public class PanelLandmarks implements Info {
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 0, 
 		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+		        				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 		        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
 		         
@@ -447,7 +453,8 @@ public class PanelLandmarks implements Info {
 		         panelResult.removeAll();	
 				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
-				 
+				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
+
 				 googleBt.setEnabled(true);
 				 resetBt.setEnabled(true);
 
@@ -469,7 +476,8 @@ public class PanelLandmarks implements Info {
 				distanceSpin.getCitySpinner().setValue(0);
 				distanceSpin.getVorNdbSpinner().setValue(0);
 				distanceSpin.getMountainSpinner().setValue(0);
-				distanceSpin.getCheckLinedist().setSelected(false);
+				distanceSpin.getLandkmarkSpinner().setValue(0);
+		     	distanceSpin.getCheckLinedist().setSelected(false);
 
 				readData.resetAirportResult();
 				panelResult.removeAll();
@@ -494,11 +502,14 @@ public class PanelLandmarks implements Info {
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 0, 
 		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-		        				 distanceSpin.getCheckLinedist().isSelected(),
+		        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+	        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
 		         panelResult.removeAll();	
 				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
+				 
+				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 				 
 			  	result.getAirportListModel();
 			  	panelLandMark.validate();
@@ -551,7 +562,7 @@ public class PanelLandmarks implements Info {
 
 		
 		distanceSpin.getSpinnerPanel().setBounds(10, 10, 310, 190);
-		panelCombo.setBounds(10, 200, 310, 120);
+		panelCombo.setBounds(10, 210, 310, 120);
 		
 		int x = 330;
 		
@@ -563,9 +574,9 @@ public class PanelLandmarks implements Info {
 		landMeBt.setBounds(x, 370, 94, 23);
 		askMeBt.setBounds(x+244, 370, 94, 23);
 
-		resetBt.setBounds(120, 360, 90, 23);
-  	    searchBt.setBounds(10, 360, 90, 23);
-		googleBt.setBounds(10, 380, 200, 23);
+		searchBt.setBounds(30, 350, 125, 23);
+		resetBt.setBounds(180, 350, 125, 23);
+		googleBt.setBounds(90, 390, 180, 23);
 
 		
 		panelLandMark.add(panelCombo);
@@ -594,6 +605,7 @@ public class PanelLandmarks implements Info {
 	public JPanel getCityPanel(final SelectCity selectCity ,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("city");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		selectAirport = new SelectAirport();
 		
@@ -619,7 +631,7 @@ public class PanelLandmarks implements Info {
     	askMePanel.add(askmeScrollPan);
 
 		outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("List"));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 
 		result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -709,7 +721,8 @@ public class PanelLandmarks implements Info {
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-			        				 distanceSpin.getCheckLinedist().isSelected(),
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+		        				     distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
 		        		  
@@ -718,6 +731,8 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
+					 
+					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
@@ -737,6 +752,7 @@ public class PanelLandmarks implements Info {
 				distanceSpin.getAirportSpinner().setValue(0);
 				distanceSpin.getVorNdbSpinner().setValue(0);
 				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getLandkmarkSpinner().setValue(0);
 				distanceSpin.getCheckLinedist().setSelected(false);
 
 				readData.resetCityResult(result);
@@ -764,6 +780,7 @@ public class PanelLandmarks implements Info {
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -773,6 +790,8 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
+					 
+					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
@@ -828,6 +847,7 @@ public class PanelLandmarks implements Info {
 		
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");
+		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		selectAirport = new SelectAirport();
 		readData = new ReadData();
@@ -853,7 +873,7 @@ public class PanelLandmarks implements Info {
     	askMePanel.add(askmeScrollPan);
 
     	outputPanel = new JPanel(new BorderLayout());
-		outputPanel.setBorder(new TitledBorder("List"));
+		outputPanel.setBorder(new TitledBorder("List Result"));
 
         result = new Result();
 	    result.setjEditorPane(jEditorPane);
@@ -883,7 +903,7 @@ public class PanelLandmarks implements Info {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				comboMountain.removeAllItems();
-				comboMountain.addItem(" All");
+				//comboMountain.addItem(" All");
 
 				for (String state : selectDB.getMountain((String) comboCountry.getSelectedItem())) {
 					comboMountain.addItem(state);
@@ -910,6 +930,7 @@ public class PanelLandmarks implements Info {
 			        				 0, 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -919,6 +940,8 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getMountainFormPanel());
 					 panelResult.validate();
+					 
+					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
@@ -938,6 +961,7 @@ public class PanelLandmarks implements Info {
 				distanceSpin.getAirportSpinner().setValue(0);
 				distanceSpin.getVorNdbSpinner().setValue(0);
 				distanceSpin.getMountainSpinner().setValue(0);
+				distanceSpin.getLandkmarkSpinner().setValue(0);
 				distanceSpin.getCheckLinedist().setSelected(false);
 
 				readData.resetCityResult(result);
@@ -964,6 +988,7 @@ public class PanelLandmarks implements Info {
 			        				 0, 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+			        				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -973,6 +998,8 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getMountainFormPanel());
 					 panelResult.validate();
+					 
+					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);

@@ -80,8 +80,6 @@ public class SelectVor implements Info{
 				
 
 		}
-			System.out.println(vors.size());
-			System.out.println(mapVors.size());
 			} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

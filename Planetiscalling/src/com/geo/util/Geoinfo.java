@@ -1,13 +1,18 @@
 package com.geo.util;
 
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.model.Airport;
+import com.model.CoordinatesDTO;
 import com.model.Flightplan;
 import com.model.Landcoord;
-import com.model.Landmark;
 import com.model.LegPoint;
+
+
 
 public class Geoinfo {
 	public static double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
@@ -83,28 +88,47 @@ public class Geoinfo {
 	    
 	}	
 	
-	public static boolean isInside(Landcoord coorMid, ArrayList <Landcoord> landcoords) {
-			
-/*		 if (coorMid.getLaty() > landcoords.get(0).getLaty()) {
-			 System.out.println();
-		 } 
-		 if (coorMid.getLaty() <landcoords.get(1).getLaty()) {
-			 System.out.println();
-		 } 
-		 if (Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())) {
-			 System.out.println();
-		 }
-		
-		 if (Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())) {
-			 System.out.println();
-		 }
-*/	     return (coorMid.getLaty() > landcoords.get(0).getLaty()
-	    		 && coorMid.getLaty() < landcoords.get(1).getLaty()
-	    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())
-	    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())
-	    		 
-	    		 );
+	public static boolean isInside(Landcoord coorMid, ArrayList <Landcoord> landcoords, double angle) {
+		 boolean isfoundInAngle = false;
+
+	     if (angle > 0 && angle < 90) {
+	    	 isfoundInAngle =  (coorMid.getLaty() > landcoords.get(0).getLaty()
+		    		 && coorMid.getLaty() < landcoords.get(1).getLaty()
+		    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())
+		    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())
+		    		 
+		    		 );
+		    	 
+		 } else if (angle >= 90  && angle <= 180) {
+			 isfoundInAngle = (coorMid.getLaty() < landcoords.get(0).getLaty()
+		    		 && coorMid.getLaty() > landcoords.get(1).getLaty()
+		    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(0).getLonx())
+		    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(1).getLonx())
+		    		 
+		    		 );
+	     	 
+	     } else if (angle >= 180  && angle <= 275) {
+			 isfoundInAngle = (coorMid.getLaty() < landcoords.get(0).getLaty()
+		    		 && coorMid.getLaty() > landcoords.get(1).getLaty()
+		    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(0).getLonx())
+		    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(1).getLonx())
+		    		 
+		    		 );
+	     	 
+	     } else if (angle >= 275  && angle <= 360) {
+			 isfoundInAngle = (coorMid.getLaty() > landcoords.get(0).getLaty()
+		    		 && coorMid.getLaty() < landcoords.get(1).getLaty()
+		    		 && Math.abs(coorMid.getLonx()) > Math.abs(landcoords.get(0).getLonx())
+		    		 && Math.abs(coorMid.getLonx()) < Math.abs(landcoords.get(1).getLonx())
+		    		 
+		    		 );
+	     	 
 	     }
+
+	     return isfoundInAngle;
+	
+	
+	}
 	
 	public static Landcoord searchPoint(double latitude, double longitude, double distanceInNm, double bearing) {
 	    double brngRad = deg2rad(bearing);
@@ -151,6 +175,12 @@ public class Geoinfo {
 		
 		return dd;
 	}
+
+    public static double correctAngle(double angle)    {
+        return angle + Math.ceil( -angle / 360 ) * 360;
+    }
+
+	
 	
     public static double calculateAngle(double x1, double y1, double x2, double y2)
     {
@@ -235,15 +265,14 @@ public class Geoinfo {
     
 	public static LinkedList<LegPoint> removeInvisiblePointAndInitialiseDist( LinkedList<LegPoint> legPoints) {
 		//remove intermediate point
+		LinkedList<LegPoint> newLegs = new LinkedList<LegPoint>();
 		for (int i = 0; i < legPoints.size(); i++) {
-			if ("0".equals(legPoints.get(i).getVisible())) {
-				legPoints.remove(i);
-			} else {
-				legPoints.get(i).setDistFrom(0);
+			if ("1".equals(legPoints.get(i).getVisible())) {
+				newLegs.add(legPoints.get(i));
 			}
 		}
 		
-		return legPoints;
+		return newLegs;
 		
 	}
 	
@@ -344,16 +373,21 @@ public class Geoinfo {
 		double currentDist = 0;
 		while (!isfound && index >= 0) {
 			
-			currentDist = distance(legPoints.get(index).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index-1).getLaty(), legPoints.get(index-1).getLonx(),'N');
-			distCumulate += currentDist;
-			legPoints.get(index).setDistFrom(distCumulate+legPoints.get(index).getDistFrom());
-		
-			if (distForAltitude < distCumulate) {
-				isfound = true;
-				legPoints.get(index).setDistFrom(legPoints.get(index).getDistFrom()-currentDist);
+			try {
+				currentDist = distance(legPoints.get(index).getLaty(), legPoints.get(index).getLonx(), legPoints.get(index-1).getLaty(), legPoints.get(index-1).getLonx(),'N');
+				distCumulate += currentDist;
+				legPoints.get(index).setDistFrom(distCumulate+legPoints.get(index).getDistFrom());
+
+				if (distForAltitude < distCumulate) {
+					isfound = true;
+					legPoints.get(index).setDistFrom(legPoints.get(index).getDistFrom()-currentDist);
+				}
+				
+				index--;
+			} catch (Exception e) {
+				index = 1;
+				// TODO Auto-generated catch block
 			}
-			
-			index--;
 
 		}
 		
@@ -500,6 +534,68 @@ public class Geoinfo {
 		// calculate the result
 		return (c * r) * 0.539957;
 	}	
+	
+	public static boolean isLocationInsideTheFencing(CoordinatesDTO location, List<CoordinatesDTO> fencingCoordinates) { //this is important method for Checking the point exist inside the fence or not.
+	    boolean blnIsinside = false;
+
+	    List<CoordinatesDTO> lstCoordinatesDTO = fencingCoordinates;
+
+	    Path2D myPolygon = new Path2D.Double();
+	    myPolygon.moveTo(lstCoordinatesDTO.get(0).getLatitude(), lstCoordinatesDTO.get(0).getLongnitude()); // first
+	                                                                                                        // point
+	    for (int i = 1; i < lstCoordinatesDTO.size(); i++) {
+	        myPolygon.lineTo(lstCoordinatesDTO.get(i).getLatitude(), lstCoordinatesDTO.get(i).getLongnitude()); // draw
+	                                                                                                            // lines
+	    }
+	    myPolygon.closePath(); // draw last line
+
+	    // myPolygon.contains(p);
+	    Point2D P2D2 = new Point2D.Double();
+	    P2D2.setLocation(location.getLatitude(), location.getLongnitude());
+
+	    if (myPolygon.contains(P2D2)) {
+	        blnIsinside = true;
+	    } else {
+	        blnIsinside = false;
+	    }
+
+	    return blnIsinside;
+	}
+	
+	public static List<CoordinatesDTO> manitobaCoords() {
+		List<CoordinatesDTO> list = new ArrayList<CoordinatesDTO>();
+
+		list.add(new CoordinatesDTO(49.16325310958394, -101.3635401998698));
+		list.add(new CoordinatesDTO(60.08081648306394, -101.92107583743366));
+		list.add(new CoordinatesDTO(60.013943847065285, -94.87101999169981));
+		list.add(new CoordinatesDTO(56.89059589041594, -88.9756991586904));
+		list.add(new CoordinatesDTO(52.84630155492344, -95.21099903581343));
+		list.add(new CoordinatesDTO(49.11247432299795, -95.16223805466778));
+
+		return list;
+	}
+	public static List<CoordinatesDTO> ontarioCoords() {
+		List<CoordinatesDTO> list = new ArrayList<CoordinatesDTO>();
+		list.add(new CoordinatesDTO(56.891703794970624, -89.11251036790122));
+		list.add(new CoordinatesDTO(52.81380563156915, -95.08320068156674));
+		list.add(new CoordinatesDTO(49.152092749861964, -95.10895288847276));
+		list.add(new CoordinatesDTO(46.406725952167115, -84.2481575503475));
+		list.add(new CoordinatesDTO(43.020021661883106, -82.2966919809097));
+		list.add(new CoordinatesDTO(41.86656689790429, -83.19584546369572));
+		list.add(new CoordinatesDTO(42.77833570900693, -79.09115236399617));
+		list.add(new CoordinatesDTO(43.48612176119141, -79.22562812924087));
+		list.add(new CoordinatesDTO(43.688971943610895, -76.84666901288871));
+		list.add(new CoordinatesDTO(45.16520240789509, -74.38187517183053));
+		list.add(new CoordinatesDTO(45.58697884610369, -74.43019370827935));
+		list.add(new CoordinatesDTO(45.62222749320456, -75.12753632848944));
+		list.add(new CoordinatesDTO(45.474447316097006, -75.69706994279473));
+		list.add(new CoordinatesDTO(47.01462396202919, -79.3706725744501));
+		list.add(new CoordinatesDTO(51.81360703880206, -79.60756511374221));
+		list.add(new CoordinatesDTO(53.09841154301055, -82.28576726441892));
+		list.add(new CoordinatesDTO(55.21565806661516, -82.12800845032245));
+		list.add(new CoordinatesDTO(56.92037839423947, -88.85298440649987));
+		return list;
+	}
 	
 	
 }

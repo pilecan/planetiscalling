@@ -233,7 +233,7 @@ public class UtilityWeather implements Info {
         JsonReader reader = null;
         
 		try {
-			currStr ="https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
+			currStr ="http://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon;
 		     OpenStreetMapUtils.getInstance().getRequest(currStr);
 		     
 		    // jsonObject.
