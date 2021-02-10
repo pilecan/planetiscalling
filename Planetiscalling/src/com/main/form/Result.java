@@ -337,7 +337,7 @@ public class Result implements Info {
 	public JPanel getIcaoFormPanel() {
 		resultPanel = setBorderPanel(resultPanel);
 
-		formUtility = new FormUtility();
+		formUtility = new FormUtility();	
 
 		ButtonGroup bgroup = new ButtonGroup();
 
@@ -346,12 +346,14 @@ public class Result implements Info {
 		ndbBtn = new JRadioButton("");
 		cityBtn = new JRadioButton("");
 		mountainBtn = new JRadioButton("");
+		landmarkBtn = new JRadioButton("");
 
 		bgroup.add(airportBtn);
 		bgroup.add(vorBtn);
 		bgroup.add(ndbBtn);
 		bgroup.add(cityBtn);
 		bgroup.add(mountainBtn);
+		bgroup.add(landmarkBtn);
 
 		RadioListener myListener = new RadioListener();
 		airportBtn.addActionListener(myListener);
@@ -359,12 +361,14 @@ public class Result implements Info {
 		ndbBtn.addActionListener(myListener);
 		cityBtn.addActionListener(myListener);
 		mountainBtn.addActionListener(myListener);
-
+		landmarkBtn.addActionListener(myListener);
+		
 		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
 		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+		setformLine(resultPanel, "Landmarks:", this.selectedLandmarks.size(), landmarkBtn);
 
 		resultPanel.validate();
 		return resultPanel;
@@ -382,12 +386,14 @@ public class Result implements Info {
 		ndbBtn = new JRadioButton("");
 		cityBtn = new JRadioButton("");
 		mountainBtn = new JRadioButton("");
+		landmarkBtn = new JRadioButton("");
 
 		bgroup.add(airportBtn);
 		bgroup.add(vorBtn);
 		bgroup.add(ndbBtn);
 		bgroup.add(cityBtn);
 		bgroup.add(mountainBtn);
+		bgroup.add(landmarkBtn);
 
 		RadioListener myListener = new RadioListener();
 		airportBtn.addActionListener(myListener);
@@ -395,12 +401,14 @@ public class Result implements Info {
 		ndbBtn.addActionListener(myListener);
 		cityBtn.addActionListener(myListener);
 		mountainBtn.addActionListener(myListener);
+		landmarkBtn.addActionListener(myListener);
 
 		setformLine(resultPanel, "Airports:", this.mapAirport.size(), airportBtn);
 		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+		setformLine(resultPanel, "Landmarks:", this.selectedLandmarks.size(), landmarkBtn);
 
 		resultPanel.validate();
 		return resultPanel;
@@ -418,12 +426,14 @@ public class Result implements Info {
 		vorBtn = new JRadioButton();
 		ndbBtn = new JRadioButton("");
 		mountainBtn = new JRadioButton("");
+		landmarkBtn = new JRadioButton("");
 
 		bgroup.add(airportBtn);
 		bgroup.add(vorBtn);
 		bgroup.add(ndbBtn);
 		bgroup.add(mountainBtn);
 		bgroup.add(cityBtn);
+		bgroup.add(landmarkBtn);
 
 		RadioListener myListener = new RadioListener();
 		vorBtn.addActionListener(myListener);
@@ -431,12 +441,14 @@ public class Result implements Info {
 		airportBtn.addActionListener(myListener);
 		cityBtn.addActionListener(myListener);
 		mountainBtn.addActionListener(myListener);
+		landmarkBtn.addActionListener(myListener);
 
 		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
 	    setformLine(resultPanel, "Airports:", this.selectedMapAirports.size(), airportBtn);
 		setformLine(resultPanel, "VORs:", this.selectedVors.size(), vorBtn);
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
+		setformLine(resultPanel, "Landmarks:", this.selectedLandmarks.size(), landmarkBtn);
 
 		resultPanel.validate();
 		return resultPanel;

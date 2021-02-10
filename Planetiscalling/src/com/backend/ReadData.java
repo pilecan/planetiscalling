@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -32,6 +33,7 @@ import com.db.UtilityDB;
 import com.geo.util.Geoinfo;
 import com.main.form.Result;
 import com.model.Airport;
+import com.model.Boundingbox;
 import com.model.City;
 import com.model.Distance;
 import com.model.Landmark;
@@ -40,6 +42,7 @@ import com.model.Ndb;
 import com.model.Vor;
 import com.util.SwingUtils;
 import com.util.Utility;
+import com.util.UtilityMap;
 
 public class ReadData implements Info{
 	private SelectAirport selectAiport;
@@ -222,6 +225,7 @@ public class ReadData implements Info{
 		result.setSelectedMountains(new HashMap<String, Mountain>());
 		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
 		result.setSelectedVors(new HashMap<Integer, Vor>());
+		result.setSelectedLandmarks(new HashMap<String, Landmark>());
 	}
 	
 	public void resetLandmarkResult() {
@@ -239,6 +243,7 @@ public class ReadData implements Info{
 		result.setSelectedMountains(new HashMap<String, Mountain>());
 		result.setSelectedNdbs(new HashMap<Integer, Ndb>());
 		result.setSelectedVors(new HashMap<Integer, Vor>());
+		result.setSelectedLandmarks(new HashMap<String, Landmark>());
 		//setResult();
 	}
 	
@@ -247,6 +252,7 @@ public class ReadData implements Info{
     	this.dist = dist;
 		createKML = new CreateKML();
 		selectedMountains = new HashMap<>();
+		selectedLandmarks = new HashMap<>();
 		selectedCities = new HashMap<>();
 		selectedNdbs = new HashMap<>();
 		selectedVors = new HashMap<>();
@@ -264,6 +270,11 @@ public class ReadData implements Info{
 			
 			searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 			searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor, selectNdb);
+			
+			if (dist.isLandmark()) {
+				Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
+			}
+
 				
 			result.setMapAirport(selectAirport.getMapAirport());
 			
@@ -272,6 +283,7 @@ public class ReadData implements Info{
 			result.setSelectedMountains(selectedMountains);
 			result.setSelectedNdbs(selectedNdbs);
 			result.setSelectedVors(selectedVors);
+			result.setSelectedLandmarks(selectedLandmarks);
 
 			
 			saveKMLFileICAO(selectAirport.getMapAirport(),Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName),dist);
@@ -469,24 +481,27 @@ public class ReadData implements Info{
 				}
 			}
 		}
+	
+		if (dist.isLandmark()) {
 
-		if (dist.isLandmark() && UtilityDB.getInstance().getLandmarks() != null && UtilityDB.getInstance().getLandmarks().size() > 0) {
-			for(Landmark landmark : UtilityDB.getInstance().getLandmarks() ){
-				Double[] dd1 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
-				
- 				for(Airport airport : airports){
-					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
+			
+			for (int i = 0; i < airports.size(); i++) {
+				try {
+					String province =  UtilityMap.getInstance().checkProvince(airports.get(i).getLaty(),airports.get(i).getLonx());
 					
-					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getLandmarkDist()){
-						selectedLandmarks.put(landmark.getGeoName(),new Landmark(landmark));
-						if (dist.isLine()) {
-							dataline.setData("landmark",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
-						}
-						
-					}
+					Boundingbox.getInstance().createBox(airports.get(i).getLaty(),airports.get(i).getLonx(),
+							airports.get(i).getLaty(),airports.get(i).getLonx(), 
+														dist.getLandmarkDist());
+					
+					UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
+					System.out.println(province);
+				} catch (Exception e) {
 				}
+				
 			}
 		}
+		
 		
      }	
     /**
@@ -532,6 +547,29 @@ public class ReadData implements Info{
 				}
 			}
 		}
+
+		if (dist.isLandmark()) {
+			
+			for (City city : selectCity.getCities()) {
+				try {
+					String province =  UtilityMap.getInstance().checkProvince(city.getLaty(),city.getLonx());
+					
+					Boundingbox.getInstance().createBox(city.getLaty(),city.getLonx(),
+							city.getLaty(),city.getLonx(), dist.getLandmarkDist());
+					
+					UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
+					System.out.println(province);
+				} catch (Exception e) {
+				}
+				
+			}
+			
+			Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
+
+		}
+		
+
 
 	}
 	/**
@@ -748,6 +786,7 @@ public class ReadData implements Info{
 		this.dataline = new Dataline();
 		this.dist = dist;
 		this.result = result;
+		selectedLandmarks = new HashMap<>();
 
 		String sql = "";	
 		String strQuote = "";
@@ -795,7 +834,7 @@ public class ReadData implements Info{
 
 		searchCityNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 		searchCityVorNdb(selectVor,selectNdb);
-		
+
 		selectedCities = selectCity.getMapCities();
 		
 		if (selectedAirports.size() == 0) {
@@ -808,6 +847,7 @@ public class ReadData implements Info{
 		result.setSelectedMountains(selectedMountains);
 		result.setSelectedNdbs(selectedNdbs);
 		result.setSelectedVors(selectedVors);
+		result.setSelectedLandmarks(selectedLandmarks);
 		
 		saveKMLFile(new ArrayList<Airport>(selectAirport.getMapAirport().values()),Utility.getInstance().getFlightPlanName(Info.kmlCityAirportMountainName),dist);
 
@@ -880,6 +920,7 @@ public class ReadData implements Info{
 		String sql = "";	
 		String strQuote = "";
 		this.result = result;
+		selectedLandmarks = new HashMap<>();
 	
 		this.dist = dist;
 
@@ -918,9 +959,14 @@ public class ReadData implements Info{
 		
 		searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 		searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor,selectNdb);
+
+		if (dist.isLandmark()) {
+			Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
+		}
 		
 		result.setMapAirport(selectAirport.getMapAirport());
 		result.setSelectedCities(selectedCities);
+		result.setSelectedLandmarks(selectedLandmarks);
 		result.setSelectedMountains(selectedMountains);
 		result.setSelectedNdbs(selectedNdbs);
 		result.setSelectedVors(selectedVors);
@@ -987,6 +1033,25 @@ public class ReadData implements Info{
 	    	
 		    writer.write("</Folder>"); 
 
+
+		    if (dist.isLandmark() && UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){
+			    writer.write("<Folder><name>Landmark groups found ("+UtilityDB.getInstance().getGroupLandmark().size()+") </name>");
+
+					for (Map.Entry<String, List<Landmark>> entry :UtilityDB.getInstance().getGroupLandmark().entrySet()) {
+					    writer.write("<Folder><name>"+ entry.getKey()+" ("+entry.getValue().size()+")</name>");
+					    	for (Landmark landmark :entry.getValue()) {
+						    	writer.write(createKML.buildLandmarkPlaceMark(landmark,"0"));
+	
+					    	}
+						 writer.write("</Folder>"); 
+	
+					}
+
+				 writer.write("</Folder>"); 
+		    }
+	    	
+		    
+		    
 		    if (dist.isLine()){
 		    	for (String key: dataline.getMapData().keySet()) {
 			    	writer.write("<Folder><name>"+key+" distance </name>"
@@ -1159,6 +1224,22 @@ public class ReadData implements Info{
 			    }
 		    	
 			    writer.write("</Folder>"); 
+		    }
+		    
+		    if (dist.isLandmark() && UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){
+			    writer.write("<Folder><name>Landmark groups found ("+UtilityDB.getInstance().getGroupLandmark().size()+") </name>");
+
+					for (Map.Entry<String, List<Landmark>> entry :UtilityDB.getInstance().getGroupLandmark().entrySet()) {
+					    writer.write("<Folder><name>"+ entry.getKey()+" ("+entry.getValue().size()+")</name>");
+					    	for (Landmark landmark :entry.getValue()) {
+						    	writer.write(createKML.buildLandmarkPlaceMark(landmark,"0"));
+	
+					    	}
+						 writer.write("</Folder>"); 
+	
+					}
+
+				 writer.write("</Folder>"); 
 		    }
 		    
 		    if (dist.isLine()){

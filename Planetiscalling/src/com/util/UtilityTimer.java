@@ -25,6 +25,7 @@ public class UtilityTimer extends Thread implements Info {
 	private Thread t1;
 	private long sequence = 1000;
 	private String timerSartAt = "";
+	private int currentPeriod;
 	
 	private static UtilityTimer instance = new UtilityTimer();
 	public static UtilityTimer getInstance(){
@@ -111,40 +112,37 @@ public class UtilityTimer extends Thread implements Info {
 		        this.planetIsCalling = planetIsCalling;
 		  }
 
-		@Override
-		public void run() {
-			   
-		       Object o =  planetIsCalling;
-		       PlanetIsCalling mc = null;
-		        if(o != null && o instanceof PlanetIsCalling)
-		        	mc = (PlanetIsCalling) o;
-		        mc.setTitle("Good "+Util.getPeriod()+" World!");
-		        Util.pause(2000);
-	  
-	        while(true) 
-	        {
-	        	
-	        	millis += 1000;
-	        	timer = getTimer(millis);
-	            timeUTC = getTime("UTC",false);
-	            timeLocal = getTime("local",false);
-	            //delay the loop for 1 sec
-	            try {
-	                Thread.currentThread().sleep(sequence);
-	                mc.setTitle("The Planet Is Calling 0.910"
-	               +"                                                               "+ timeUTC+ " UTC    "
-	               +timeLocal+" "+localAbbreviation+"             "+timer);
-/*	        	    Utility.getInstance().initLookAndFeel((PlanetIsCalling) planetIsCalling, Util.DAY_PERIOD.get(Util.getPeriod()) );
-	        		Utility.getInstance().getPrefs().put("day.period", Util.getPeriod());
-	            	Utility.getInstance().savePrefProperties();
-*/
-	                } catch (InterruptedException e) {
-	                    // TODO Auto-generated catch block
-	                    e.printStackTrace();
-	                }
-	        }
-		
-		}
+			@Override
+			public void run() {
+				   
+			       Object o =  planetIsCalling;
+			       PlanetIsCalling mc = null;
+			        if(o != null && o instanceof PlanetIsCalling)
+			        	mc = (PlanetIsCalling) o;
+			        mc.setTitle("Good "+Util.getPeriod()+" World!");
+			        Util.pause(2000);
+		  
+		        while(true) 
+		        {
+		        	
+		        	millis += 1000;
+		        	timer = getTimer(millis);
+		            timeUTC = getTime("UTC",false);
+		            timeLocal = getTime("local",false);
+		            //delay the loop for 1 sec
+		            try {
+		                Thread.currentThread().sleep(sequence);
+		                mc.setTitle("The Planet Is Calling 0.910"
+		               +"                                                             "+ timeUTC+ " UTC    "
+		               +timeLocal+" "+localAbbreviation+"             "+timer);
+
+		                } catch (InterruptedException e) {
+		                    // TODO Auto-generated catch block
+		                    e.printStackTrace();
+		                }
+		        }
+			
+			}
 
 		public long getMillis() {
 			return millis;
@@ -160,6 +158,14 @@ public class UtilityTimer extends Thread implements Info {
 
 		public void setTimerSartAt(String timerSartAt) {
 			this.timerSartAt = timerSartAt;
+		}
+
+		public int getCurrentPeriod() {
+			return currentPeriod;
+		}
+
+		public void setCurrentPeriod(int currentPeriod) {
+			this.currentPeriod = currentPeriod;
 		}
    
 }

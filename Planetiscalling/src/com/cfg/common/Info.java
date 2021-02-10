@@ -44,6 +44,7 @@ public interface Info {
 
 
     String imageLogo = "/images/hello_here.jpg";
+    String imageEarth = "/images/earth.gif";
     String datadir  = "/data/";
     String metarFileName = "data/metar/metar.txt";
     String weatherPath = "image/weather/";

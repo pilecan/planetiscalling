@@ -349,28 +349,7 @@ public class CreateKmlFSPlan{
 				}
 			}
 		}
-		
-/*		if (dist.isLandmark() && UtilityDB.getInstance().getLandmarks() != null && UtilityDB.getInstance().getLandmarks().size() > 0) {
-			
-			for(Landmark landmark : UtilityDB.getInstance().getLandmarks() ){
-				Double[] dd1 = Geoinfo.convertDoubleLongLat(landmark.getCoordinates());
-				current++;
-				
-				for(LegPoint point : legPoints){
-					Boundingbox.getInstance().checkProvince(point.getLaty(), point.getLonx());
-					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
-					
-					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getLandmarkDist()){
-						selectedLandmarks.put(landmark.getGeoName(),new Landmark(landmark));
-						if (dist.isLine()) {
-							//dataline.setData("ndb",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
-						}
-						
-					}
-				}
-			}
-		}
-*/
+
 		
 		if (dist.isLandmark()) {
 			
@@ -391,11 +370,6 @@ public class CreateKmlFSPlan{
 				}
 				
 			}
-
-
-				
-			
-
 		}
 
 	}
@@ -504,17 +478,6 @@ public class CreateKmlFSPlan{
 		    }
 		    
 		    
-
-			
-		    
-/*		    if (selectedLandmarks != null && selectedLandmarks.size() > 0){
-			    writer.write("<Folder><name> landwarks found ("+selectedLandmarks.size()+") </name>");
-			    for(Landmark landmark: selectedLandmarks.values()){
-			    	writer.write(createKML.buildLandmarkPlaceMark(landmark, "1"));
-			    }
-			    writer.write("</Folder>"); 
-	        }
-*/		    
 
 		    
 		    if (dist.isLandmark() && UtilityDB.getInstance().getGroupLandmark() != null && UtilityDB.getInstance().getGroupLandmark().size() > 0){

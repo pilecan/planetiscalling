@@ -608,11 +608,11 @@ public class Util implements Info {
 */		  
 		  if (hour >= 6 && hour < 12 ) {
 			  dayPeriod = "Morning";
-		  } else if (hour >= 12 && hour < 17 ) {
+		  } else if (hour >= 12 && hour < 20 ) {
 			  dayPeriod = "Afternoon";
-		  }else if (hour >= 17 && hour < 20 ) {
+		  }else if (hour >= 20 && hour < 21 ) {
 			  dayPeriod = "Evening";
-		  }else if (hour >= 20 || hour >= 0) {
+		  }else if (hour >= 21 || hour >= 0) {
 			  dayPeriod = "Night";
 		  }
 		  

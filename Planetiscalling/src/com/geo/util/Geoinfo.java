@@ -141,7 +141,7 @@ public class Geoinfo {
 	    double a = Math.atan2(Math.sin(brngRad) * Math.sin(distFrac) * Math.cos(latRad), Math.cos(distFrac) - Math.sin(latRad) * Math.sin(latitudeResult));
 	    double longitudeResult = (lonRad + a + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
 	    
-	    System.out.println(rad2deg(latitudeResult)+","+rad2deg(longitudeResult));
+	  //  System.out.println(rad2deg(latitudeResult)+","+rad2deg(longitudeResult));
         return new Landcoord(rad2deg(latitudeResult), rad2deg(longitudeResult));
 
 	}

@@ -85,7 +85,7 @@ public class UtilityMap {
 	}
 	
 	public String checkProvince(double lat1, double lon1) {
-		return UtilityMap.getInstance().checkWichProvince(new Landcoord(lat1, lon1));
+		return checkWichProvince(new Landcoord(lat1, lon1));
 	}
 
 	public String check2Provinces(double lat1, double lon1,double lat2, double lon2) throws Exception {

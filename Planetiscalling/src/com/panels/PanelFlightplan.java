@@ -32,6 +32,7 @@ import com.model.Airport;
 import com.model.Distance;
 import com.model.WaitMessage;
 import com.util.Utility;
+import com.util.UtilityEarth;
 
 public class PanelFlightplan {
 
@@ -176,72 +177,32 @@ public class PanelFlightplan {
 		refreshBt = new JButton("Update");
 		refreshBt.setEnabled(false);
 
-		refreshBt.addActionListener(new ActionListener()
-	    {
-	      public void actionPerformed(ActionEvent e)
-	      {
-	  	    final WaitMessage waitMessage = new WaitMessage(null);
-			final JDialog loading = new JDialog();
-	  		SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
-				@Override
+		refreshBt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
-				protected String doInBackground() throws InterruptedException {
-		 
-					
-				    Runnable r = new Runnable() {
-				         public void run() {
-					    	 readData.createFlightplan(
-					    			 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
-					    			 (int)distanceSpin.getMountainSpinner().getValue(), 
-					    			 (int)distanceSpin.getAirportSpinner().getValue(),
-					    			 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-					    			 distanceSpin.getCheckTocTod().isSelected(),
-					    			 (double)result.getAltitudeModel().getValue())); 
-					    	 
-						  	 panelResult.removeAll();	
-						  	 
-							 result.getWaypointListModel();
-							 
-							 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
-							  
-							 resetBt.setEnabled(true);
+				//UtilityEarth.getInstance().terminate();
 
-					    	 panelResult.add(result.getFlightPlanFormPanel());
-							 panelResult.validate();
-							 panelFlightplan.validate();
-				         }
-				     };
+				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
+						(int) distanceSpin.getMountainSpinner().getValue(),
+						(int) distanceSpin.getAirportSpinner().getValue(),
+						(int) distanceSpin.getVorNdbSpinner().getValue(),
+						(int) distanceSpin.getLandkmarkSpinner().getValue(), distanceSpin.getCheckTocTod().isSelected(),
+						(double) result.getAltitudeModel().getValue()));
 
-				     new Thread(r).start();	
-					
-					return null;
-					
+				panelResult.removeAll();
 
-				}
+				result.getWaypointListModel();
 
-				@Override
-				protected void done() {
-				    loading.dispose();
-					waitMessage.setVisible(false);
-				}
-			};
-		   worker.execute();
-		   loading.setVisible(true);
-		   
-		   
-		  try {
-		      worker.get();
-		  } catch (Exception e1) {
-				System.err.println(e1);
-		     // e1.printStackTrace();
-		  } finally {
-	
-		  }
-		  				 
-	      }
-	    });
-		
+				distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
+
+				resetBt.setEnabled(true);
+
+				panelResult.add(result.getFlightPlanFormPanel());
+				panelResult.validate();
+				panelFlightplan.validate();
+
+			}
+		});		
 		
 		
 		
@@ -364,8 +325,7 @@ public class PanelFlightplan {
 	  	x += 0;
 		landMeBt.setBounds(x, 419, 94, 23);
 		askMeBt.setBounds(x+243, 420, 94, 23);
-
-     	panelFlightplan.add(flightPlanBt);
+    	panelFlightplan.add(flightPlanBt);
 		panelFlightplan.add(panelResult);
 		panelFlightplan.add(outputPanel);
 		panelFlightplan.add(askMePanel);
@@ -374,11 +334,18 @@ public class PanelFlightplan {
 		panelFlightplan.add(resetBt);
 		panelFlightplan.add(landMeBt);
 		panelFlightplan.add(googleBt);
-
-
-		
 		panelFlightplan.add(askMeBt);
 		panelFlightplan.add(landMeBt);
+
+
+		UtilityEarth.getInstance().createEarth();
+		
+		UtilityEarth.getInstance().getPanelImage().setBounds(250, 77, 200, 200);
+		panelFlightplan.add(UtilityEarth.getInstance().createEarth());
+
+		
+ 
+		
 		
 		//panelFlightplan.add(buttonRightPanel);
 

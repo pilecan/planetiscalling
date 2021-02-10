@@ -17,6 +17,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -52,6 +53,8 @@ public class PanelManage implements Info, Runnable {
 	private JPanel colorPanel;
 
 	private String timerSartAt = "";
+	
+	PlanetIsCalling frame;
 
 
 	private boolean isFromAdd = false;
@@ -71,6 +74,8 @@ public class PanelManage implements Info, Runnable {
 
 		hashFP = new TreeMap<>();
 		hashKML = new TreeMap<>();
+		
+		this.frame = frame;
 
 		timerSartAt = UtilityTimer.getInstance().getTime("local", true);
 		timerPanel = new JPanel(new BorderLayout());
@@ -433,7 +438,18 @@ public class PanelManage implements Info, Runnable {
              try {
                 Thread.currentThread().sleep(1000);
 		  		labelTimer.setText("Started at "+timerSartAt+"    ["+UtilityTimer.getInstance().getTimer(UtilityTimer.getInstance().getMillis())+"]");
-            } catch (InterruptedException e) {
+/*		  		if (Util.DAY_PERIOD.get(Util.getPeriod()) !=UtilityTimer.getInstance().getCurrentPeriod() ){
+			  		UtilityTimer.getInstance().setCurrentPeriod(Util.DAY_PERIOD.get(Util.getPeriod())) ;
+		  		    Utility.getInstance().initLookAndFeel(frame, Util.DAY_PERIOD.get(Util.getPeriod()) );
+			  		System.out.println("new period of day!");
+		  			Utility.getInstance().getPrefs().put("day.period", Util.getPeriod());
+		  	    	Utility.getInstance().savePrefProperties();
+		  	    	UtilityTimer.getInstance().setCurrentPeriod(Util.DAY_PERIOD.get(Util.getPeriod()));
+			  		System.out.println(Util.DAY_PERIOD.get(Util.getPeriod()));
+			  		System.out.println(UtilityTimer.getInstance().getCurrentPeriod());
+
+		  		}
+*/            } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

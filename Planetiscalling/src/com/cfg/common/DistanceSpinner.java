@@ -118,7 +118,6 @@ public class DistanceSpinner implements Info {
           	airportSpinner = makeSpinner("Airport distances in Nautical Miles", "Airport (nm)", airportSpinner, distanceAirport, panel, formUtility);
          	vorNdbSpinner =  makeSpinner("Vor/NDB distances in Nautical Miles", "Vor/NDB (nm)", vorNdbSpinner, distanceVorNdb, panel, formUtility);
           	citySpinner = makeSpinner("City distances in Nautical Miles", "City (nm)", citySpinner, distanceCity, panel, formUtility);
-        	landkmarkSpinner = makeSpinner("Canada Landmark distances in Nautical Miles", "Landmark (nm)", landkmarkSpinner, distanceLandmark, panel, formUtility);
        	    checkLinedist = makeCheckbox("Check it to see lines between placemarks", "Line Between", checkLinedist, false, panel, formUtility);
 
           }else  if ("landmark".equals(topic)) {

@@ -426,15 +426,28 @@ public class CreateKML {
 		String icone = "";
 
 		String coordinates = landmark.getLonx()+","+landmark.getLaty()+","+"0";
-		icone = (landmark.toString().contains("Rail")?"RAIL":landmark.getCode());
-		icone = (landmark.toString().contains("Bridge")?"BRIDG":landmark.getCode());
-		icone = (landmark.toString().contains("Anchorage")?"ANCH":landmark.getCode());
-		icone = (landmark.toString().contains("Public Park")?"PPARK":landmark.getCode());
-		icone = (landmark.toString().contains("Ski")?"SKI":landmark.getCode());
-		icone = (landmark.toString().contains("Trail")?"TRAIL":landmark.getCode());
-		icone = (landmark.toString().contains("Portage")?"TRAIL":landmark.getCode());
-		icone = (landmark.toString().contains("Camp")?"CAMP":landmark.getCode());
-		
+		if (landmark.toString().contains("Rail")) {
+			icone = "RAIL";
+		} else if (landmark.toString().contains("Bridge")) {
+			icone = "BRIDG";
+		} else if (landmark.toString().contains("Anchorage")) {
+			icone = "ANCH";
+		} else if (landmark.toString().contains("Public Park")) {
+			icone = "PPARK";			
+		} else if (landmark.toString().contains("Ski")) {
+			icone = "SKI";
+		} else if (landmark.toString().contains("Trail")) {
+			icone = "TRAIL";
+		} else if (landmark.toString().contains("Portage")) {
+			icone = "TRAIL";
+		} else if (landmark.toString().contains("Camp")) {
+			icone = "CAMP";
+		} else if (landmark.toString().contains("Harbour")) {
+			icone = "MAR";
+		} else {
+			icone = landmark.getCode();
+		}
+			
 		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(icone)+
 				"</href></Icon></IconStyle></Style>";
 

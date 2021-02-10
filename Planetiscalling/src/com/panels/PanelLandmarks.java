@@ -13,10 +13,14 @@ import java.util.TreeMap;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
 import com.backend.CreateKML;
@@ -33,6 +37,7 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
+import com.util.UtilityEarth;
 
 public class PanelLandmarks implements Info {
 
@@ -338,10 +343,22 @@ public class PanelLandmarks implements Info {
 	   return setLandmarkPanel(distanceSpin);
 	}
 	
-	public JPanel getAirportPanel(final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
+	public JPanel getAirportPanel(JFrame  parent, final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("airport");
 		distanceSpin.getLandkmarkSpinner().setEnabled(false);
+		
+		final JDialog dialog = new JDialog(parent, true); // modal
+		dialog.setUndecorated(true);
+		JProgressBar bar = new JProgressBar();
+		bar.setIndeterminate(true);
+		bar.setStringPainted(true);
+		bar.setString("Scanning the Planet...");
+		dialog.add(bar);
+		dialog.pack();
+		   dialog.setLocationRelativeTo(parent);
+
+
 
 		this.selectAirport = new SelectAirport();
 		
@@ -439,7 +456,14 @@ public class PanelLandmarks implements Info {
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
-		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
+		    	//  dialog.setVisible(true);
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+		    	  
+		    	  readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
 		        		 selectMountain, selectVor,selectNdb,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -449,6 +473,17 @@ public class PanelLandmarks implements Info {
 		        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
 		         
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
 		         searchBt.setText("Update");
 		         panelResult.removeAll();	
 				 panelResult.add(result.getAiportFormPanel());
@@ -461,6 +496,9 @@ public class PanelLandmarks implements Info {
 				 
 			  	result.getAirportListModel();
 			  	panelLandMark.validate();
+			  	
+		    	  UtilityEarth.getInstance().terminate();
+
 
 	         
 		      }
@@ -541,6 +579,8 @@ public class PanelLandmarks implements Info {
 						CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+				 }else if ("landmark".equals(result.getCurrentView())){
+						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
 				 }
 
 			}
@@ -826,8 +866,9 @@ public class PanelLandmarks implements Info {
 						CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
 				 }else if ("mountain".equals(result.getCurrentView())){
 						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+				 } else if ("landmark".equals(result.getCurrentView())){
+						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
 				 }
-
 
 			}
 		});		
@@ -847,7 +888,6 @@ public class PanelLandmarks implements Info {
 		
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");
-		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		selectAirport = new SelectAirport();
 		readData = new ReadData();
@@ -930,7 +970,7 @@ public class PanelLandmarks implements Info {
 			        				 0, 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+			        				 0, 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -940,8 +980,6 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getMountainFormPanel());
 					 panelResult.validate();
-					 
-					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);

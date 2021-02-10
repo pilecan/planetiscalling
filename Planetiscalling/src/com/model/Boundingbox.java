@@ -38,7 +38,8 @@ public class Boundingbox{
 		landcoords = new ArrayList<Landcoord>();
 
 	    double angleForward = Geoinfo.calculateAngle(lon1,lat1,lon2, lat2);
-	    double angleBackward = Geoinfo.calculateAngle(lon2, lat2,lon1,lat1);
+	   // double angleBackward = Geoinfo.calculateAngle(lon2, lat2,lon1,lat1);
+	    double angleBackward = Geoinfo.correctAngle(angleForward-180);
 	     
 	    Landcoord coordBack = Geoinfo.searchPoint(lat1,lon1, distance, angleBackward); 
 	    Landcoord coordFoward = Geoinfo.searchPoint(lat2,lon2, distance, angleForward);

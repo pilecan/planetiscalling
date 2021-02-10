@@ -602,6 +602,7 @@ public class Utility implements Info {
 	public void createLandmarkByGroup(Map<String, Landmark> selectedLandmarks) {
 		List <Landmark >tempLandmark = new ArrayList<Landmark>();
 		UtilityDB.getInstance().setGroupLandmark(new HashMap<String, List<Landmark>>());
+		
 		for (Landmark landmark: selectedLandmarks.values()) {
 			if (UtilityDB.getInstance().getGroupLandmark().get(landmark.getGeoTerm()) == null){
 				tempLandmark = new ArrayList<Landmark>();

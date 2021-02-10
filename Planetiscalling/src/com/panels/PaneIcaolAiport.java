@@ -282,9 +282,7 @@ public class PaneIcaolAiport extends JFrame {
 	landMeBt.setEnabled(false);
 	landMeBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			System.out.println(result.getCurrentView());
-			System.out.println(result.getCurrentSelection());
-			
+
 			String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
 			String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
 			String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
@@ -301,6 +299,8 @@ public class PaneIcaolAiport extends JFrame {
 					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
 			 }else if ("mountain".equals(result.getCurrentView())){
 					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
+			 }else if ("landmark".equals(result.getCurrentView())){
+					CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
 			 }
 			
 			
