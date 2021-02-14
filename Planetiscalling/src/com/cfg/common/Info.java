@@ -39,8 +39,9 @@ public interface Info {
 	String kmlMountainCityAirportName = "mountain_city_airport.kml";
 	String kmlLandmarkMountainCityAirportName = "landmark_mountain_city_airport.kml";
 	
-	String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\airport_runway-2.db";
-	//String dbPath = "jdbc:sqlite:data/airport_runway.db";
+	String dbPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\info.db";
+	String dbNavPath = "jdbc:sqlite:g:\\addons\\777-tools\\Navdatareader\\navdata.db";
+//	String dbPath = "jdbc:sqlite:data/info.db";
 
 
     String imageLogo = "/images/hello_here.jpg";
@@ -48,7 +49,9 @@ public interface Info {
     String datadir  = "/data/";
     String metarFileName = "data/metar/metar.txt";
     String weatherPath = "image/weather/";
-
- 	
+    
+    String soundAbout= "sounds/inflight.mp3";
+    String soundIntro= "sounds/start.mp3";
+    String soundsearch= "sounds/beesearching.mp3";
 
 }

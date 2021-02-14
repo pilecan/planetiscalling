@@ -108,6 +108,8 @@ public class CreateKmlFSPlan{
 		
 		this.dataline = new Dataline();
 		
+		
+		
 		current = 0;
 	
 		fsxPlan = new ReadFsxPlan(flightPlanFile);

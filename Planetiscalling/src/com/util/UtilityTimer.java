@@ -1,5 +1,7 @@
 package com.util;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -10,6 +12,9 @@ import javax.swing.JFrame;
 import com.cfg.common.Info;
 import com.db.SelectDB;
 import com.main.PlanetIsCalling;
+
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.Player;
 
 
 public class UtilityTimer extends Thread implements Info {
@@ -112,6 +117,8 @@ public class UtilityTimer extends Thread implements Info {
 		        this.planetIsCalling = planetIsCalling;
 		  }
 
+			
+		  
 			@Override
 			public void run() {
 				   
@@ -120,7 +127,8 @@ public class UtilityTimer extends Thread implements Info {
 			        if(o != null && o instanceof PlanetIsCalling)
 			        	mc = (PlanetIsCalling) o;
 			        mc.setTitle("Good "+Util.getPeriod()+" World!");
-			        Util.pause(2000);
+			        UtilityEarth.getInstance().playSound(soundIntro);
+			      //  Util.pause(2000);
 		  
 		        while(true) 
 		        {
@@ -133,7 +141,7 @@ public class UtilityTimer extends Thread implements Info {
 		            try {
 		                Thread.currentThread().sleep(sequence);
 		                mc.setTitle("The Planet Is Calling 0.910"
-		               +"                                                             "+ timeUTC+ " UTC    "
+		               +"                                                        "+ timeUTC+ " UTC    "
 		               +timeLocal+" "+localAbbreviation+"             "+timer);
 
 		                } catch (InterruptedException e) {

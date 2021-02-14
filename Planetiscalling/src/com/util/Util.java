@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -608,9 +611,9 @@ public class Util implements Info {
 */		  
 		  if (hour >= 6 && hour < 12 ) {
 			  dayPeriod = "Morning";
-		  } else if (hour >= 12 && hour < 20 ) {
+		  } else if (hour >= 12 && hour < 17 ) {
 			  dayPeriod = "Afternoon";
-		  }else if (hour >= 20 && hour < 21 ) {
+		  }else if (hour >= 17 && hour < 21 ) {
 			  dayPeriod = "Evening";
 		  }else if (hour >= 21 || hour >= 0) {
 			  dayPeriod = "Night";
@@ -1019,6 +1022,11 @@ public class Util implements Info {
 		return result;
 	}
 
+	public static boolean isFileExist(String filePathString){
+		Path path = Paths.get(filePathString);
+		return Files.exists(path);
+		
+	}
 	
 	
 }

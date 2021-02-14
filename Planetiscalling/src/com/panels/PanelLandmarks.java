@@ -69,6 +69,7 @@ public class PanelLandmarks implements Info {
 	private JComboBox<String> comboMountain;
 
 	private ReadData readData;
+	private JDialog dialog;
 	
 
 	private JButton landMeBt;
@@ -272,6 +273,7 @@ public class PanelLandmarks implements Info {
 			panelResult.removeAll();
 			result.getLandmarkFormPanel();
 			result.getLandmarkListModel();
+			result.resetButton();
 			
 			googleBt.setEnabled(false);
 			panelResult.add(result.getLandmarkFormPanel());
@@ -298,7 +300,6 @@ public class PanelLandmarks implements Info {
          panelResult.removeAll();	
 		 panelResult.add(result.getLandmarkFormPanel());
 		 panelResult.validate();
-		 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 
 		 
 		 googleBt.setEnabled(true);
@@ -343,22 +344,10 @@ public class PanelLandmarks implements Info {
 	   return setLandmarkPanel(distanceSpin);
 	}
 	
-	public JPanel getAirportPanel(JFrame  parent, final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
+	public JPanel getAirportPanel(final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("airport");
 		distanceSpin.getLandkmarkSpinner().setEnabled(false);
-		
-		final JDialog dialog = new JDialog(parent, true); // modal
-		dialog.setUndecorated(true);
-		JProgressBar bar = new JProgressBar();
-		bar.setIndeterminate(true);
-		bar.setStringPainted(true);
-		bar.setString("Scanning the Planet...");
-		dialog.add(bar);
-		dialog.pack();
-		   dialog.setLocationRelativeTo(parent);
-
-
 
 		this.selectAirport = new SelectAirport();
 		
@@ -426,6 +415,13 @@ public class PanelLandmarks implements Info {
 			        totalCity = selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
 				}
 				
+				if ("Canada".equals(comboCountry.getSelectedItem())) {
+					distanceSpin.getLandkmarkSpinner().setEnabled(true);
+				} else {
+					distanceSpin.getLandkmarkSpinner().setValue(0);
+					distanceSpin.getLandkmarkSpinner().setEnabled(false);
+				}
+				
 				//setResult(labelHeader,totalCity);
 			}
 	
@@ -452,11 +448,13 @@ public class PanelLandmarks implements Info {
 		panelCombo.add(comboCity);
 
 		searchBt = new JButton("Search");
+		
+		dialog = UtilityEarth.getInstance().panelWait();
+
 		searchBt.addActionListener(new ActionListener()
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
-		    	//  dialog.setVisible(true);
 		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
 		  		{
 		  		    protected Void doInBackground()
@@ -483,24 +481,17 @@ public class PanelLandmarks implements Info {
 	  		    }
 	  		};
 	  		worker.execute();
-	  		dialog.setVisible(true); // will block but with a responsive GUI		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
 		         searchBt.setText("Update");
 		         panelResult.removeAll();	
 				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
-				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
-
 				 googleBt.setEnabled(true);
 				 resetBt.setEnabled(true);
 
 				 
 			  	result.getAirportListModel();
 			  	panelLandMark.validate();
-			  	
-		    	  UtilityEarth.getInstance().terminate();
-
-
-	         
 		      }
 		    });
 
@@ -521,6 +512,7 @@ public class PanelLandmarks implements Info {
 				panelResult.removeAll();
 				result.getAiportFormPanel();
 				result.getAirportListModel();
+				result.resetButton();
 				
 				googleBt.setEnabled(false);
 				panelResult.add(result.getAiportFormPanel());
@@ -534,6 +526,13 @@ public class PanelLandmarks implements Info {
 		googleBt.setEnabled(false);
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+	
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+		    	  
 		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
 		        		 selectMountain, selectVor,selectNdb,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
@@ -543,11 +542,25 @@ public class PanelLandmarks implements Info {
 		        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 	        				 distanceSpin.getCheckLinedist().isSelected(),
 		        				 0.0));
+		         
+		         
+		         
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
+
+				
 		         panelResult.removeAll();	
 				 panelResult.add(result.getAiportFormPanel());
 				 panelResult.validate();
-				 
-				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 				 
 			  	result.getAirportListModel();
 			  	panelLandMark.validate();
@@ -721,6 +734,13 @@ public class PanelLandmarks implements Info {
 
 				int totalCity = 0;
 		        totalCity = selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+
+		        if ("Canada".equals(comboCountry.getSelectedItem())) {
+					distanceSpin.getLandkmarkSpinner().setEnabled(true);
+				} else {
+					distanceSpin.getLandkmarkSpinner().setValue(0);
+					distanceSpin.getLandkmarkSpinner().setEnabled(false);
+				}
 				
 		       // setResult(labelHeader,totalCity);
 			}
@@ -749,12 +769,21 @@ public class PanelLandmarks implements Info {
    	    panelCombo.add(comboCountry);
 		panelCombo.add(comboState);
 		panelCombo.add(comboCity);
+		
+		dialog = UtilityEarth.getInstance().panelWait();
 
 		searchBt = new JButton("Search");
 		searchBt.addActionListener(new ActionListener()
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
+		          
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+		    	  
 		          new ReadData().createKMLCity(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
 		        		  selectMountain,selectVor,selectNdb,
 			        		 new Distance(0, 
@@ -763,16 +792,26 @@ public class PanelLandmarks implements Info {
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
 			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 		        				     distanceSpin.getCheckLinedist().isSelected(),
-			        				 0.0)
-			        		 
-		        		  
-		        		  );
+			        				 0.0));
+		         
+		         
+		         
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
+		    	  
 		             searchBt.setText("Update");
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
-					 
-					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
@@ -799,6 +838,8 @@ public class PanelLandmarks implements Info {
 				panelResult.removeAll();
 				result.getCityFormPanel();
 				result.getCityListModel();
+				result.resetButton();
+
 				
 				googleBt.setEnabled(false);
 				resetBt.setEnabled(false);
@@ -814,6 +855,12 @@ public class PanelLandmarks implements Info {
 		googleBt.setEnabled(false);
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+		    	  
 		          new ReadData().createKMLCity(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
 		        		  selectMountain,selectVor,selectNdb,
 			        		 new Distance(0, 
@@ -821,17 +868,26 @@ public class PanelLandmarks implements Info {
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
 			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-			        				 distanceSpin.getCheckLinedist().isSelected(),
-			        				 0.0)
-			        		 
-		        		  
-		        		  );
+		        				     distanceSpin.getCheckLinedist().isSelected(),
+			        				 0.0));
+		         
+		         
+		         
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
 		             searchBt.setText("Update");
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
-					 
-					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);
@@ -948,12 +1004,7 @@ public class PanelLandmarks implements Info {
 				for (String state : selectDB.getMountain((String) comboCountry.getSelectedItem())) {
 					comboMountain.addItem(state);
 				}
-				
 
-				int totalCity = 0;
-		      //  totalCity = selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboMountain.getSelectedItem(), comboMountain.getItemCount());
-				
-		       // setResult(labelHeader,totalCity);
 			}
 	
 		});
@@ -1006,6 +1057,8 @@ public class PanelLandmarks implements Info {
 				panelResult.removeAll();
 				result.getCityFormPanel();
 				result.getCityListModel();
+				result.resetButton();
+
 				
 				googleBt.setEnabled(false);
 				resetBt.setEnabled(false);
@@ -1036,8 +1089,6 @@ public class PanelLandmarks implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getMountainFormPanel());
 					 panelResult.validate();
-					 
-					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 					 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);

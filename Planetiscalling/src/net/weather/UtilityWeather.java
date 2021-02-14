@@ -241,8 +241,6 @@ public class UtilityWeather implements Info {
 		} catch (Exception e) {
 		}
          
-		System.out.println("openmap = "+data);
-		System.out.println("https://nominatim.openstreetmap.org/reverse?format=json&lat="+lat+"&lon="+lon);
          reader.close();
 		
 	}

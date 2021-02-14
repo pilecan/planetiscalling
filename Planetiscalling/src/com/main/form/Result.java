@@ -157,6 +157,16 @@ public class Result implements Info {
 		});	
 	}
 
+	public void resetButton() {
+		if ("Close Me".equals(askMeBt.getText())) {
+			 resultPanel.setVisible(false);
+			 askMeBt.setText("Ask Me");
+			 askMePanel.setVisible(false);
+			 resultPanel.setVisible(true);
+        } 
+	}
+
+	
 	public void setButtons(JButton delMeBt, JButton landMeBt, JButton askMe) {
 		this.leftBtn = landMeBt;
 		this.askMeBt = askMe;
@@ -201,7 +211,7 @@ public class Result implements Info {
 
 		formUtility = new FormUtility();
 
-		formUtility.addLabel("Title:", resultPanel);
+		formUtility.addLabel("Departure/Arrival:", resultPanel);
 		label = new JLabel(this.flightplan.getTitle());
 	//	label.setToolTipText(this.flightplan.getDepartureName() + "/" + this.flightplan.getDestinationName());
 		panel = new JPanel();
@@ -278,9 +288,7 @@ public class Result implements Info {
 		setformLine(resultPanel, "NDBs:", this.selectedNdbs.size(), ndbBtn);
 		setformLine(resultPanel, "Cities:", this.selectedCities.size(), cityBtn);
 		setformLine(resultPanel, "Mountains:", this.selectedMountains.size(), mountainBtn);
-		if (!"".equals(UtilityDB.getInstance().getProvince())) {
-			setformLine(resultPanel, "Landmark:", this.selectedLandmarks.size(), landmarkBtn);
-		}
+		setformLine(resultPanel, "Landmarks:", this.selectedLandmarks.size(), landmarkBtn);
 
 		resultPanel.validate();
 

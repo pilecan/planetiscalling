@@ -9,6 +9,7 @@ import java.net.URL;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -37,11 +39,11 @@ import com.db.SelectCity;
 import com.db.SelectMountain;
 import com.db.SelectNdb;
 import com.db.SelectVor;
-import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Util;
 import com.util.Utility;
+import com.util.UtilityEarth;
 
 public class PaneIcaolAiport extends JFrame {
 
@@ -63,7 +65,7 @@ public class PaneIcaolAiport extends JFrame {
 	private SelectCity selectCity;
 	private DistanceSpinner distanceSpin; 
 	
-	
+	private JDialog dialog;
 	
 	private JPanel askMePanel;
 	private JPanel buttonLeftPanel;
@@ -95,12 +97,9 @@ public class PaneIcaolAiport extends JFrame {
 		this.selectCity = selectCity;
 		this.selectMountain = selectMountain;
 		this.selectAirport = new SelectAirport();
-
 		
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("icao");
-		distanceSpin.getLandkmarkSpinner().setEnabled(false);
-
 		
         jEditorPane = new JEditorPane();
 		jEditorPane.setEditable(false);
@@ -153,23 +152,32 @@ public class PaneIcaolAiport extends JFrame {
 		public void actionPerformed(ActionEvent e)
 
 		{
-			//System.out.println(Utility.getInstance().getIcaoFromListModel(listIcao));
-			readData.creatIcaoAirports(Utility.getInstance().getIcaoFromMapAirport(result.getMapAirport()),
-					new Distance(
-		    			     (int)distanceSpin.getCitySpinner().getValue(), 
-	        				 (int)distanceSpin.getMountainSpinner().getValue(), 
-	        				 0,
-	        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-         				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-	        				 distanceSpin.getCheckLinedist().isSelected(),
-	        				 0.0)
-							 ); 
+			SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+				protected Void doInBackground() {
+
+					readData.creatIcaoAirports(Utility.getInstance().getIcaoFromMapAirport(result.getMapAirport()),
+							new Distance((int) distanceSpin.getCitySpinner().getValue(),
+									(int) distanceSpin.getMountainSpinner().getValue(), 0,
+									(int) distanceSpin.getVorNdbSpinner().getValue(),
+									(int) distanceSpin.getLandkmarkSpinner().getValue(),
+									distanceSpin.getCheckLinedist().isSelected(), 0.0));
+
+					return null;
+				}
+
+				@Override
+				protected void done() {
+					dialog.dispose();
+				}
+			};
+			worker.execute();
+			dialog.setVisible(true); // will block but with a responsive GUI
+
 			setResultPanel();
 			Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(Info.kmlFlightplanName)));
 		}
 	});
 
-	
 
 	final JTextArea textArea = new JTextArea();
 	//textArea.setFont(textArea.getFont().deriveFont(14f));
@@ -232,8 +240,11 @@ public class PaneIcaolAiport extends JFrame {
 				result.getAirportListModel();
 
 				panelResult.add(result.getIcaoFormPanel());
+				result.resetButton();
 				
 			}
+			
+
 			textArea.setText("");
 			
 			googleBt.setEnabled(false);
@@ -246,24 +257,42 @@ public class PaneIcaolAiport extends JFrame {
 
       }
     });
+	dialog = UtilityEarth.getInstance().panelWait();
 
     searchBt = new JButton("Search");
 	searchBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
-	    	  readData = new ReadData(textArea.getText(),result, selectVor,selectNdb, selectMountain, selectCity,
-	    			  new Distance(
-	    			     (int)distanceSpin.getCitySpinner().getValue(), 
-        				 (int)distanceSpin.getMountainSpinner().getValue(), 
-        				 0,
-        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-       				     (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-        				 distanceSpin.getCheckLinedist().isSelected(),
-        				 0.0));
+	    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+	  		{
+	  		    protected Void doInBackground()
+	  		    {
+
+	    	  
+	 	    	  readData = new ReadData(textArea.getText(),result, selectVor,selectNdb, selectMountain, selectCity,
+    			  new Distance(
+    			     (int)distanceSpin.getCitySpinner().getValue(), 
+    				 (int)distanceSpin.getMountainSpinner().getValue(), 
+    				 0,
+    				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+   				     (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+    				 distanceSpin.getCheckLinedist().isSelected(),
+    				 0.0));
+     
+  		        return null;
+  		    }
+  		 
+  		    @Override
+  		    protected void done()
+  		    {
+  		        dialog.dispose();
+  		    }
+  		};
+  		worker.execute();
+  		dialog.setVisible(true); // will block but with a responsive GUI		         
 	    	  
 			  result.getAirportListModel();
-		      distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 
 	    	  
 	    	//  setIcaoResult();

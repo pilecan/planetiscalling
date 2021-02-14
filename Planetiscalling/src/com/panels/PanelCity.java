@@ -204,7 +204,6 @@ public class PanelCity implements Info {
 			         panelResult.removeAll();	
 					 panelResult.add(result.getCityFormPanel());
 					 panelResult.validate();
-					 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 
 					 googleBt.setEnabled(true);
 					 resetBt.setEnabled(true);

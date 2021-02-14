@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.swing.Action;
 import javax.swing.JComboBox;
@@ -162,6 +163,8 @@ public class ReadData implements Info{
 					selectNdb.getNdbs());
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
+			
+			result.resetButton();
 		   
 			setResult();
 			result.setLegPoints(createKmlFSPlan.getLegPoints());
@@ -256,7 +259,10 @@ public class ReadData implements Info{
 		selectedCities = new HashMap<>();
 		selectedNdbs = new HashMap<>();
 		selectedVors = new HashMap<>();
-		
+		selectedLandmarks = new HashMap<>();
+		UtilityDB.getInstance().setGroupLandmark(new TreeMap<String, List<Landmark>>()) ;
+		result.resetButton();
+
 		String search = Utility.getInstance().valideIcao(icaos);
 		
 	    if (!"".equals(search)) {
@@ -271,11 +277,6 @@ public class ReadData implements Info{
 			searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 			searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor, selectNdb);
 			
-			if (dist.isLandmark()) {
-				Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
-			}
-
-				
 			result.setMapAirport(selectAirport.getMapAirport());
 			
 			result.setMapAirport(selectAirport.getMapAirport());
@@ -483,21 +484,27 @@ public class ReadData implements Info{
 		}
 	
 		if (dist.isLandmark()) {
-
 			
 			for (int i = 0; i < airports.size(); i++) {
 				try {
 					String province =  UtilityMap.getInstance().checkProvince(airports.get(i).getLaty(),airports.get(i).getLonx());
 					
-					Boundingbox.getInstance().createBox(airports.get(i).getLaty(),airports.get(i).getLonx(),
-							airports.get(i).getLaty(),airports.get(i).getLonx(), 
-														dist.getLandmarkDist());
+					if (province != null) {
+						Boundingbox.getInstance().createBox(airports.get(i).getLaty(),airports.get(i).getLonx(),
+								airports.get(i).getLaty(),airports.get(i).getLonx(), 
+															dist.getLandmarkDist());
+						
+						UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+						selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
+						System.out.println(province);					
+					}
 					
-					UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
-					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
-					System.out.println(province);
+
 				} catch (Exception e) {
 				}
+				
+				Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
+
 				
 			}
 		}
@@ -548,18 +555,20 @@ public class ReadData implements Info{
 			}
 		}
 
-		if (dist.isLandmark()) {
+	    if (dist.isLandmark()){
 			
 			for (City city : selectCity.getCities()) {
 				try {
 					String province =  UtilityMap.getInstance().checkProvince(city.getLaty(),city.getLonx());
+					if (province != null) {
+						Boundingbox.getInstance().createBox(city.getLaty(),city.getLonx(),
+								city.getLaty(),city.getLonx(), dist.getLandmarkDist());
+						
+						UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+						selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
+						System.out.println(province);
+					}
 					
-					Boundingbox.getInstance().createBox(city.getLaty(),city.getLonx(),
-							city.getLaty(),city.getLonx(), dist.getLandmarkDist());
-					
-					UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
-					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
-					System.out.println(province);
 				} catch (Exception e) {
 				}
 				
@@ -719,6 +728,7 @@ public class ReadData implements Info{
 		this.dataline = new Dataline();
 		this.result = result;
 		this.dist = dist;
+		result.resetButton();
     	
     	String sqlCountry = "";
     	String str = ((String) comboCountry.getSelectedItem());
@@ -787,6 +797,8 @@ public class ReadData implements Info{
 		this.dist = dist;
 		this.result = result;
 		selectedLandmarks = new HashMap<>();
+		UtilityDB.getInstance().setGroupLandmark(new TreeMap<String, List<Landmark>>()) ;
+		result.resetButton();
 
 		String sql = "";	
 		String strQuote = "";
@@ -861,6 +873,7 @@ public class ReadData implements Info{
 	   	selectedCities = new HashMap<>();
 		selectedMountains = new HashMap<>();
 		selectedAirports = new HashMap<>();
+		result.resetButton();
 
 
 		String sql = "";	
@@ -921,6 +934,9 @@ public class ReadData implements Info{
 		String strQuote = "";
 		this.result = result;
 		selectedLandmarks = new HashMap<>();
+		UtilityDB.getInstance().setGroupLandmark(new TreeMap<String, List<Landmark>>()) ;
+		result.resetButton();
+
 	
 		this.dist = dist;
 
@@ -960,10 +976,10 @@ public class ReadData implements Info{
 		searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
 		searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor,selectNdb);
 
-		if (dist.isLandmark()) {
+/*		if (dist.isLandmark()) {
 			Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
 		}
-		
+*/		
 		result.setMapAirport(selectAirport.getMapAirport());
 		result.setSelectedCities(selectedCities);
 		result.setSelectedLandmarks(selectedLandmarks);

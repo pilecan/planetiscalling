@@ -55,7 +55,8 @@ public class PanelFlightplan {
 	private JPanel buttonLeftPanel;
 	private JPanel buttonRightPanel;
 	
-	
+	private JDialog dialog;
+
 	private String flightPlanFile;
 	private JButton flightPlanBt;
 	private JButton refreshBt;
@@ -87,7 +88,6 @@ public class PanelFlightplan {
 	public JPanel createPanel() {
 		distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("plan");
-		distanceSpin.getLandkmarkSpinner().setEnabled(false);
 		
 		jEditorPane = Utility.getInstance().initjEditorPane(jEditorPane);
 		
@@ -117,8 +117,6 @@ public class PanelFlightplan {
 		 outputPanel.setBorder(new CompoundBorder(border, margin));
 
 		
-//		outputPanel = Utility.getInstance().setBorderPanel(outputPanel);
-		
 		askMePanel = new JPanel(new BorderLayout());
 		askMePanel.setBorder(new TitledBorder(""));
 			
@@ -130,23 +128,39 @@ public class PanelFlightplan {
 		result.setAskMePanel(askMePanel);
 		result.setOutputPanel(outputPanel);
 		
-		flightPlanBt = new JButton("Select Flightplan");
+		dialog = UtilityEarth.getInstance().panelWait();
 		
+		flightPlanBt = new JButton("Select Flightplan");
 		flightPlanBt.addActionListener(new ActionListener()
 	    {
 	      public void actionPerformed(ActionEvent e)
-	      
 	      {
-	          
+	    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
 
-	    	  readData =  new ReadData(result, selectCity, selectMountain, selectVor, selectNdb,
-		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
-		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
-		        				 (int)distanceSpin.getAirportSpinner().getValue(),
-		        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-		        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-		        				 distanceSpin.getCheckTocTod().isSelected(),
-		        				 0.0));
+		    	  
+					  readData =  new ReadData(result, selectCity, selectMountain, selectVor, selectNdb,
+								 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
+										 (int)distanceSpin.getMountainSpinner().getValue(), 
+										 (int)distanceSpin.getAirportSpinner().getValue(),
+										 (int)distanceSpin.getVorNdbSpinner().getValue(), 
+										 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+										 distanceSpin.getCheckTocTod().isSelected(),
+										 0.0));
+         
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
     	  
 	    	 if (result.getFlightplan() != null) {
 		    	 flightPlanFile = new File(result.getFlightplan().getFlightplanFile()).getName();
@@ -158,7 +172,6 @@ public class PanelFlightplan {
 				 panelResult.add(result.getFlightPlanFormPanel());
 				 panelResult.validate();
 				 
-				 distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
 				 
 			  	 result.getWaypointListModel();
 
@@ -180,21 +193,34 @@ public class PanelFlightplan {
 		refreshBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				//UtilityEarth.getInstance().terminate();
 
-				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+					readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
 						(int) distanceSpin.getMountainSpinner().getValue(),
 						(int) distanceSpin.getAirportSpinner().getValue(),
 						(int) distanceSpin.getVorNdbSpinner().getValue(),
 						(int) distanceSpin.getLandkmarkSpinner().getValue(), distanceSpin.getCheckTocTod().isSelected(),
 						(double) result.getAltitudeModel().getValue()));
+       
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
 
 				panelResult.removeAll();
 
 				result.getWaypointListModel();
-
-				distanceSpin.getLandkmarkSpinner().setEnabled(!"".equals(UtilityDB.getInstance().getProvince()));
-
 				resetBt.setEnabled(true);
 
 				panelResult.add(result.getFlightPlanFormPanel());
@@ -221,6 +247,7 @@ public class PanelFlightplan {
 				panelResult.removeAll();
 				result.getFlightPlanFormPanel().validate();
 				result.getWaypointListModel();
+				result.resetButton();
 
 				panelResult.add(result.getFlightPlanFormPanel());
 				
@@ -239,21 +266,41 @@ public class PanelFlightplan {
 				
 				//UtilityDB.getInstance().updateAirportState();
 				
-				readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
+		    	 
+		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+		  		{
+		  		    protected Void doInBackground()
+		  		    {
+
+		    	  
+					readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
 						(int) distanceSpin.getMountainSpinner().getValue(),
 						(int) distanceSpin.getAirportSpinner().getValue(),
 						(int) distanceSpin.getVorNdbSpinner().getValue(), 
-       				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+     				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 						distanceSpin.getCheckTocTod().isSelected(),
 						(double) result.getAltitudeModel().getValue()));
-				panelResult.removeAll();
+       
+	  		        return null;
+	  		    }
+	  		 
+	  		    @Override
+	  		    protected void done()
+	  		    {
+	  		        dialog.dispose();
+	  		    }
+	  		};
+	  		worker.execute();
+	  		dialog.setVisible(true); // will block but with a responsive GUI		         
 
-				panelResult.add(result.getFlightPlanFormPanel());
-				panelResult.validate();
-				panelFlightplan.add(panelResult);
-				panelFlightplan.validate();
 
-				Utility.getInstance().launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
+			panelResult.removeAll();
+			panelResult.add(result.getFlightPlanFormPanel());
+			panelResult.validate();
+			panelFlightplan.add(panelResult);
+			panelFlightplan.validate();
+
+			Utility.getInstance().launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 
 			}
 		});
@@ -340,7 +387,7 @@ public class PanelFlightplan {
 
 		UtilityEarth.getInstance().createEarth();
 		
-		UtilityEarth.getInstance().getPanelImage().setBounds(250, 77, 200, 200);
+		UtilityEarth.getInstance().getPanelWelcome().setBounds(250, 77, 200, 200);
 		panelFlightplan.add(UtilityEarth.getInstance().createEarth());
 
 		

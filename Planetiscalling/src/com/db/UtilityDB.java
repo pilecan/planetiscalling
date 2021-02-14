@@ -68,16 +68,26 @@ public class UtilityDB extends Thread implements Info {
 		}
 		return conn;
 	}
+	private Connection connectNavdata() {
+		// SQLite connection string
+		Connection conn = null;
+		try {
+			conn = DriverManager.getConnection(dbNavPath);
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return conn;
+	}
 
 /*	
-INSERT INTO airport_runway.airport_test 
+INSERT INTO info.airport_update 
 
 select b.* 
-FROM airport_runway.airport a left join navdata.airport b on a.ident = b.ident
+FROM info.airport a left join navdata.airport b on a.ident = b.ident
 where b.ident is null and b.ident is not null
 union all
 select  b.* 
-from  navdata.airport b left join airport_runway.airport a on a.ident = b.ident
+from  navdata.airport b left join info.airport a on a.ident = b.ident
 where a.ident is null and b.ident is not null
 
 */	
@@ -149,7 +159,36 @@ where a.ident is null and b.ident is not null
 	        }
 	    }
 
-	
+	 public void updateNewAirport() {
+		 int cptGood = 0;
+		 int cptBad = 0;
+	        String sql = "INSERT INTO info.airport " + 
+	        		"" + 
+	        		"select b.* " + 
+	        		"FROM info.airport a left join navdata.airport b on a.ident = b.ident " + 
+	        		"where b.ident is null and b.ident is not null " + 
+	        		"union all " + 
+	        		"select  b.* " + 
+	        		"from  navdata.airport b left join info.airport a on a.ident = b.ident " + 
+	        		"where a.ident is null and b.ident is not null" + 
+	        		"";
+
+	        try (Connection conn = this.connect();
+	                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+ 
+	            pstmt.executeUpdate();
+	            cptGood++;
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	            cptBad++;
+	        }
+	        
+	        System.out.println("cptGood "+cptGood);
+	        System.out.println("cptBad  "+cptBad);
+	    }
+
+		
 	public void selectLandmark(String search) {
 		landmarks = new ArrayList<>();
 		mapLandmark = new TreeMap<>();
