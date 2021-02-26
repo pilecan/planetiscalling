@@ -108,7 +108,7 @@ public class UtilityEarth implements ActionListener , Info{
 		JProgressBar bar = new JProgressBar();
 		bar.setIndeterminate(true);
 		bar.setStringPainted(true);
-		bar.setString("Scanning the Planet...");
+		bar.setString("Planet is Scanning...");
 		dialog.add(bar);
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
@@ -130,7 +130,7 @@ public class UtilityEarth implements ActionListener , Info{
 
 	public void playSound(String sound) {
     	URL url = null;
-
+/*
        	try {
 			File soundfile = new File(sound);
 			//url = background.toURI().toURL();
@@ -161,7 +161,7 @@ public class UtilityEarth implements ActionListener , Info{
     			// TODO Auto-generated catch block
     			e.printStackTrace();
     		}
-       	
+*/       	
 	}
 
 	

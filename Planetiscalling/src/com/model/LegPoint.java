@@ -15,6 +15,7 @@ public class LegPoint {
 	private double lonx;
 	private double laty;
 	private String icaoIdent;
+	private String icaoRegion;
     private static DecimalFormat df = new DecimalFormat("0.00");
 
 
@@ -153,12 +154,6 @@ public class LegPoint {
 	public Double getAltitude() {
 		return altitude;
 	}
-	@Override
-	public String toString() {
-		return "LegPoint [id=" + id + ", order=" + order + ", type=" + type + ", position=" + position + ", altitude="
-				+ altitude + ", distFrom=" + distFrom + ", visible=" + visible + ", lonx=" + lonx + ", laty=" + laty
-				+ ", icaoIdent=" + icaoIdent + "]";
-	}
 	public double getDistFrom() {
 		return distFrom;
 	}
@@ -186,6 +181,21 @@ public class LegPoint {
 	}
 	public void setIcaoIdent(String icaoIdent) {
 		this.icaoIdent = icaoIdent;
+	}
+
+	public String getIcaoRegion() {
+		return icaoRegion;
+	}
+
+	public void setIcaoRegion(String icaoRegion) {
+		this.icaoRegion = icaoRegion;
+	}
+
+	@Override
+	public String toString() {
+		return "LegPoint [id=" + id + ", order=" + order + ", type=" + type + ", position=" + position + ", altitude="
+				+ altitude + ", distFrom=" + distFrom + ", visible=" + visible + ", lonx=" + lonx + ", laty=" + laty
+				+ ", icaoIdent=" + icaoIdent + ", icaoRegion=" + icaoRegion + "]";
 	}
 
 }

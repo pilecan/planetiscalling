@@ -16,7 +16,6 @@ import java.util.TreeMap;
 
 import javax.swing.Action;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -78,23 +77,24 @@ public class ReadData implements Info{
 	private boolean isMountain = true;
 	private boolean isDistance = true;
 	
-	public ReadData(Result result,  SelectCity selectCity, SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist){
-		this.selectCity = selectCity;
-		this.selectMountain = selectMountain;
-		this.selectVor =selectVor;
-		this.selectNdb	= selectNdb;
-		
-		this.result = result;
+	public ReadData(Result result,   Distance dist){
+			this.result = result;
 		this.dataline = new Dataline();
 		selectFlightplan(dist);
 		
 	}
 	
-	public ReadData(String icaos, Result result, SelectVor selectVor, SelectNdb selectNdb, SelectMountain selectMountain, SelectCity selectCity, Distance dist){
-		this.selectVor =selectVor;
-		this.selectNdb	= selectNdb;
-		this.selectCity = selectCity;
-		this.selectMountain = selectMountain;
+	private void initDB() {
+		if (!UtilityDB.getInstance().isInitAll()) {
+			UtilityDB.getInstance().selectMountain("");
+			UtilityDB.getInstance().selectVor("");
+			UtilityDB.getInstance().selectNdb("");
+			UtilityDB.getInstance().setInitAll(true);
+		} 
+		
+	}
+	
+	public ReadData(String icaos, Result result, Distance dist){
 		this.result = result;
 		this.dataline = new Dataline();
 		this.dist = dist;
@@ -156,11 +156,7 @@ public class ReadData implements Info{
 		
 		try {
 
-			this.createKmlFSPlan =  new CreateKmlFSPlan(flightplanName, dist, 
-					selectCity.getCities(), 
-					selectMountain.getMountains(),
-					selectVor.getVors(),
-					selectNdb.getNdbs());
+			this.createKmlFSPlan =  new CreateKmlFSPlan(flightplanName, dist);
 			
 			kmlFlightPlanFile = createKmlFSPlan.getKmlFlightPlanFile();
 			
@@ -262,6 +258,8 @@ public class ReadData implements Info{
 		selectedLandmarks = new HashMap<>();
 		UtilityDB.getInstance().setGroupLandmark(new TreeMap<String, List<Landmark>>()) ;
 		result.resetButton();
+		
+		initDB();
 
 		String search = Utility.getInstance().valideIcao(icaos);
 		
@@ -274,8 +272,8 @@ public class ReadData implements Info{
 	    	SelectAirport selectAirport = new SelectAirport();	
 			selectAirport.select(sql);
 			
-			searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
-			searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor, selectNdb);
+			searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()));
+			searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()));
 			
 			result.setMapAirport(selectAirport.getMapAirport());
 			
@@ -297,12 +295,12 @@ public class ReadData implements Info{
      * @param selectVor
      * @param selectNdb
      */
-    private void searchIcaoVorNdb(List<Airport> airports,SelectVor selectVor,SelectNdb selectNdb) {
+    private void searchIcaoVorNdb(List<Airport> airports) {
     	
 		selectedVors = new HashMap<>();
 
 		if (dist.isVorNdb()) {
-    		for(Vor vor : selectVor.getVors()){
+    		for(Vor vor : UtilityDB.getInstance().getVors()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
 				
  				for(Airport airport : airports){
@@ -322,7 +320,7 @@ public class ReadData implements Info{
 		//Search NDB
 		selectedNdbs = new HashMap<>();
 		if (dist.isVorNdb()) {
-		    for(Ndb ndb : selectNdb.getNdbs()){
+			for(Ndb ndb : UtilityDB.getInstance().getNdbs()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
 				
  				for(Airport airport : airports){
@@ -342,12 +340,12 @@ public class ReadData implements Info{
    	
     }
 
-    private void searchCityVorNdb(SelectVor selectVor,SelectNdb selectNdb) {
+    private void searchCityVorNdb() {
     	
 		selectedVors = new HashMap<>();
 
 		if (dist.isVorNdb()) {
-    		for(Vor vor : selectVor.getVors()){
+    		for(Vor vor : UtilityDB.getInstance().getVors()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
 				
  				for(City city : selectCity.getCities()){
@@ -367,7 +365,7 @@ public class ReadData implements Info{
 		//Search NDB
 		selectedNdbs = new HashMap<>();
 		if (dist.isVorNdb()) {
-		    for(Ndb ndb : selectNdb.getNdbs()){
+		    for(Ndb ndb : UtilityDB.getInstance().getNdbs()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
 				
  				for(City city : selectCity.getCities()){
@@ -446,28 +444,26 @@ public class ReadData implements Info{
  		
      }	
 
-    private void searchAirportNeighbor(List<Airport> airports,SelectCity selectCity,SelectMountain selectMoutain) {
+    private void searchAirportNeighbor(List<Airport> airports) {
 		
     	selectedCities = new HashMap<String, City>();
- 		if (dist.isCity()) {
- 			for(City city : selectCity.getCities()){
- 				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
- 				
- 				for(Airport airport : airports){
- 					Double[] dd2 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
- 					
- 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
- 						selectedCities.put(city.getCityName(),new City(city));
-						if (dist.isLine()) {
-							dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
-						}
-					}
- 				}
- 			}
- 		}
+  		
+		if (dist.isCity()) {
+			for (int i = 0; i < airports.size(); i++) {
+				String countries = UtilityMap.getInstance().checkCountry(airports.get(i).getRegion());
+				Boundingbox.getInstance().createBox(airports.get(i).getLaty(),airports.get(i).getLonx(),
+						airports.get(i).getLaty(),airports.get(i).getLonx(), 
+						dist.getCityDist());
+				UtilityDB.getInstance().selectCityInBox("where country in ("+countries+")");
+				selectedCities.putAll(UtilityDB.getInstance().getMapCities());
+
+			}
+
+		}
+		
 		selectedMountains = new HashMap<>();
 		if (dist.isMountain()) {
-			for(Mountain mountain : selectMoutain.getMountains()){
+			for(Mountain mountain : UtilityDB.getInstance().getMountains()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
 
  				for(Airport airport : airports){
@@ -494,9 +490,9 @@ public class ReadData implements Info{
 								airports.get(i).getLaty(),airports.get(i).getLonx(), 
 															dist.getLandmarkDist());
 						
-						UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+						UtilityDB.getInstance().selectLandmarkInBox("where admin = '"+province+"'");
 						selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
-						System.out.println(province);					
+											
 					}
 					
 
@@ -517,14 +513,24 @@ public class ReadData implements Info{
      * @param selectCity
      * @param selectMoutain
      */
-	private void searchCityNeighbor(List<Airport> airports, SelectCity selectCity, SelectMountain selectMoutain) {
+	private void searchCityNeighbor(String sql, JComboBox<String>comboCountry) {
 		selectedAirports = new HashMap<String, Airport>();
 		selectedMapAirports  = new HashMap<>();
 		if (dist.isAirport()) {
-			for (Airport airport : airports) {
+		   	sql = sql.replace("admin_name", "state");
+		   	
+			UtilityDB.getInstance().selectAirport(sql);
+
+			
+			if (UtilityDB.getInstance().getMapAirport().size() == 0) {
+				sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
+				UtilityDB.getInstance().selectAirport(sql);
+			}
+
+			for (Airport airport : UtilityDB.getInstance().getAirports()) {
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(airport.getCoordinates());
 
-				for (City city : selectCity.getCities()) {
+				for (City city : UtilityDB.getInstance().getCities()) {
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
@@ -539,10 +545,10 @@ public class ReadData implements Info{
 		selectedMountains = new HashMap<>();
 		if (dist.isMountain()) {
 			selectedMountains = new HashMap<>();
-			for(Mountain mountain : selectMoutain.getMountains()){
+			for(Mountain mountain : UtilityDB.getInstance().getMountains()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
 
-				for (City city : selectCity.getCities()) {
+				for (City city : UtilityDB.getInstance().getCities()) {
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getMountainDist()) {
@@ -564,9 +570,9 @@ public class ReadData implements Info{
 						Boundingbox.getInstance().createBox(city.getLaty(),city.getLonx(),
 								city.getLaty(),city.getLonx(), dist.getLandmarkDist());
 						
-						UtilityDB.getInstance().selectProvinceLandmark("where admin = '"+province+"'");
+						UtilityDB.getInstance().selectLandmarkInBox("where admin = '"+province+"'");
 						selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
-						System.out.println(province);
+						
 					}
 					
 				} catch (Exception e) {
@@ -598,7 +604,7 @@ public class ReadData implements Info{
 					Double[] dd2 = Geoinfo.convertDoubleLongLat(mountain.getCoordinates());
 
 					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getAirportDist()) {
-						selectedAirports.put(airport.getName(), new Airport(airport));
+						selectedAirports.put(airport.getIdent(), new Airport(airport));
 						if (dist.isLine()) {
 							dataline.setData("airport",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
 						}
@@ -629,7 +635,7 @@ public class ReadData implements Info{
 		selectedVors = new HashMap<>();
 
 		if (dist.isVorNdb()) {
-    		for(Vor vor : selectVor.getVors()){
+    		for(Vor vor : UtilityDB.getInstance().getVors()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(vor.getCoordinates());
 				
 				for (Mountain mountain : selectMoutain.getMountains()) {
@@ -649,7 +655,7 @@ public class ReadData implements Info{
 		//Search NDB
 		selectedNdbs = new HashMap<>();
 		if (dist.isVorNdb()) {
-		    for(Ndb ndb : selectNdb.getNdbs()){
+		    for(Ndb ndb : UtilityDB.getInstance().getNdbs()){
 				Double[] dd1 = Geoinfo.convertDoubleLongLat(ndb.getCoordinates());
 				
 				for (Mountain mountain : selectMoutain.getMountains()) {
@@ -721,7 +727,7 @@ public class ReadData implements Info{
      * @param comboMountain
      * @param dist
      */
-	public void createKMLMountain(Result result, Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboMountain,SelectVor selectVor, SelectNdb selectNdb, Distance dist) {
+	public void createKMLMountain(Result result,  JComboBox comboCountry, JComboBox comboMountain,Distance dist) {
 		String sql = "";	
     	SelectCity selectCity = new SelectCity();
     	SelectMountain selectMountain = new SelectMountain();
@@ -729,6 +735,7 @@ public class ReadData implements Info{
 		this.result = result;
 		this.dist = dist;
 		result.resetButton();
+		initDB();
     	
     	String sqlCountry = "";
     	String str = ((String) comboCountry.getSelectedItem());
@@ -768,7 +775,7 @@ public class ReadData implements Info{
 		} 
 
     	result.setSelectedMapAirports(selectedAirports);
-	    result.setMapAirport(selectAirport.getMapAirport());
+	    result.setMapAirport(selectedAirports);
 		result.setSelectedCities(selectedCities);
 		result.setSelectedMountains(selectedMountains);
 		result.setSelectedNdbs(selectedNdbs);
@@ -791,14 +798,16 @@ public class ReadData implements Info{
      * @param comboState
      * @param comboCity
      */
-	public void createKMLCity(Result result, Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity, 
-			SelectMountain selectMountain,SelectVor selectVor, SelectNdb selectNdb, Distance dist) {
+	public void createKMLCity(Result result, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity, 
+			 Distance dist) {
 		this.dataline = new Dataline();
 		this.dist = dist;
 		this.result = result;
 		selectedLandmarks = new HashMap<>();
 		UtilityDB.getInstance().setGroupLandmark(new TreeMap<String, List<Landmark>>()) ;
 		result.resetButton();
+		
+		initDB();
 
 		String sql = "";	
 		String strQuote = "";
@@ -808,10 +817,10 @@ public class ReadData implements Info{
 		if (!" All".equals(comboCity.getSelectedItem())) {
 			
 			if (!" All".equals(comboState.getSelectedItem())) { 
-				sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"' and admin_name = '"+((String) comboState.getSelectedItem()).replace("'", "''")+"' and city = '"+strQuote+"'";
+				sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"' and admin_name = '"+((String) comboState.getSelectedItem()).replace("'", "''")+"' and city_ascii = '"+strQuote+"'";
 
 			} else {
-				sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"' and city = '"+strQuote+"'";
+				sql = "where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"' and city_ascii = '"+strQuote+"'";
 			}
 			
 		} else if (" All".equals(comboCity.getSelectedItem())) { 
@@ -827,32 +836,20 @@ public class ReadData implements Info{
 		} else {
 			System.out.println("Oups sais pas quoi faire....");
 		}
-		
-		this.selectCity = new SelectCity();
-		selectCity.selectAll(sql);
+	
+		UtilityDB.getInstance().selectCity(sql);
+	
 
-    	SelectAirport selectAirport = new SelectAirport();
-    	
-    	sql = sql.replace("admin_name", "state");
-    	
-	    selectAirport.select(sql);
-		
-		if (selectAirport.getMapAirport().size() == 0) {
-			sql ="where country = '"+ ((String) comboCountry.getSelectedItem()).replace("'", "''")+"'";
-		    selectAirport.select(sql);
-		}
+		searchCityNeighbor(sql, comboCountry);
+		searchCityVorNdb();
 
-	     // List<Airport> airports = new ArrayList<Airport>(selectAirport.getMapAirport().values());
-
-		searchCityNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
-		searchCityVorNdb(selectVor,selectNdb);
-
-		selectedCities = selectCity.getMapCities();
 		
 		if (selectedAirports.size() == 0) {
-			selectAirport.setMapAirport(new HashMap<String, Airport>());
+			UtilityDB.getInstance().setMapAirport(new HashMap<String, Airport>());
 		} 
 		
+		selectedCities = UtilityDB.getInstance().getMapCities();
+	
 		result.setSelectedMapAirports(selectedAirports);
 	    result.setMapAirport(selectedAirports);
 		result.setSelectedCities(selectedCities);
@@ -861,7 +858,7 @@ public class ReadData implements Info{
 		result.setSelectedVors(selectedVors);
 		result.setSelectedLandmarks(selectedLandmarks);
 		
-		saveKMLFile(new ArrayList<Airport>(selectAirport.getMapAirport().values()),Utility.getInstance().getFlightPlanName(Info.kmlCityAirportMountainName),dist);
+		saveKMLFile(new ArrayList<Airport>(selectedAirports.values()),Utility.getInstance().getFlightPlanName(Info.kmlCityAirportMountainName),dist);
 
 	}
 	
@@ -893,12 +890,13 @@ public class ReadData implements Info{
 
 		}
 		 
-		UtilityDB.getInstance().selectLandmark(sql);;
+		UtilityDB.getInstance().selectLandmark(sql);
 		selectedLandmarks = UtilityDB.getInstance().getMapLandmark();
 		
 		sql = "where country = '"+((String) comboCountry.getSelectedItem()).replace("'", "''")+
 				"' and admin_name ='"+((String) comboState.getSelectedItem()).replace("'", "''")+"'";
 		
+		UtilityDB.getInstance().setInitAll(false);
 		UtilityDB.getInstance().selectCity(sql);
 		UtilityDB.getInstance().getCities();
 		
@@ -928,7 +926,7 @@ public class ReadData implements Info{
 	 * @param comboCity
 	 */
 	public void createKMLAirport(Result result, Map<String, City> mapCities, JComboBox comboCountry, JComboBox comboState, JComboBox comboCity,
-			SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb, Distance dist) {
+			 Distance dist) {
 		this.dataline = new Dataline();
 		String sql = "";	
 		String strQuote = "";
@@ -965,21 +963,19 @@ public class ReadData implements Info{
 			System.out.println("Oups sais pas quoi faire....");
 		}
 		
-		SelectCity selectCity = new SelectCity();
+/*		SelectCity selectCity = new SelectCity();
 		selectCity.selectAll(sql.replace("state", "admin_name"));
-
+*/
     	SelectAirport selectAirport = new SelectAirport();
 		
 		selectAirport.select(sql);
 		selectedAirports = selectAirport.getMapAirport();
 		
-		searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()),selectCity,selectMountain);
-		searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()), selectVor,selectNdb);
-
-/*		if (dist.isLandmark()) {
-			Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
-		}
-*/		
+		initDB();
+		
+		searchAirportNeighbor(new ArrayList<Airport>(selectAirport.getMapAirport().values()));
+		searchIcaoVorNdb(new ArrayList<Airport>(selectAirport.getMapAirport().values()));
+		
 		result.setMapAirport(selectAirport.getMapAirport());
 		result.setSelectedCities(selectedCities);
 		result.setSelectedLandmarks(selectedLandmarks);

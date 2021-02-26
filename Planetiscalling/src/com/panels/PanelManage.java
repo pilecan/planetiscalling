@@ -46,11 +46,13 @@ public class PanelManage implements Info, Runnable {
 	private JLabel labelColor;
 	private JLabel labelGoogle;
 	private JLabel labelTimer;
+	private JLabel labelSound;
 	
 	private JPanel timerPanel;
 	private JPanel folderPanel;
 	private JPanel googlePanel;
 	private JPanel colorPanel;
+	private JPanel soundPanel;
 
 	private String timerSartAt = "";
 	
@@ -90,6 +92,9 @@ public class PanelManage implements Info, Runnable {
 		colorPanel = new JPanel(new BorderLayout());
 		colorPanel.setBorder(new TitledBorder("Colors of the Day"));
 		
+		soundPanel = new JPanel(new BorderLayout());
+		soundPanel.setBorder(new TitledBorder("Enable/Disable Sound"));
+		
 		
 		JLabel labelHeader = new JLabel("Setting Panel");
 
@@ -98,6 +103,7 @@ public class PanelManage implements Info, Runnable {
 		labelKML = new JLabel();
 		labelColor = new JLabel();
 		labelTimer = new JLabel();
+		labelSound = new JLabel();
 		
 		comboFPDir = new JComboBox<>();
 		comboKMLDir = new JComboBox<>();

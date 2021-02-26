@@ -69,16 +69,13 @@ public class PanelFlightplan {
 	private JEditorPane jEditorPane;
 	
 	private JScrollPane askmeScrollPan;
+	
 
 	public PanelFlightplan() {
 		super();
 	}
 
-	public JPanel getPanel(SelectCity selectCity,SelectMountain selectMountain, SelectVor selectVor, SelectNdb selectNdb) {
-		this.selectCity = selectCity;
-		this.selectMountain = selectMountain;
-		this.selectVor = selectVor;
-		this.selectNdb = selectNdb;
+	public JPanel getPanel() {
 		this.flightPlanFile = "";
 		this.selectAirport = new SelectAirport();
 
@@ -135,13 +132,15 @@ public class PanelFlightplan {
 	    {
 	      public void actionPerformed(ActionEvent e)
 	      {
+	    	  distanceSpin.setSpinnerChanged(true);
+			  result.setSpinnerChanged(true);
 	    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
 		  		{
 		  		    protected Void doInBackground()
 		  		    {
 
 		    	  
-					  readData =  new ReadData(result, selectCity, selectMountain, selectVor, selectNdb,
+					  readData =  new ReadData(result, 
 								 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 										 (int)distanceSpin.getMountainSpinner().getValue(), 
 										 (int)distanceSpin.getAirportSpinner().getValue(),
@@ -181,6 +180,9 @@ public class PanelFlightplan {
 				 resetBt.setEnabled(true);
 				 googleBt.setEnabled(true);
 				 refreshBt.setEnabled(true);
+				 distanceSpin.setSpinnerChanged(false);
+			     result.setSpinnerChanged(false);
+
 
 	    	 }
 	      }
@@ -191,8 +193,10 @@ public class PanelFlightplan {
 		refreshBt.setEnabled(false);
 
 		refreshBt.addActionListener(new ActionListener() {
+			
 			public void actionPerformed(ActionEvent e) {
-
+		    	  distanceSpin.setSpinnerChanged(false);
+				  result.setSpinnerChanged(false);
 
 		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
 		  		{
@@ -255,6 +259,9 @@ public class PanelFlightplan {
 
 				panelResult.validate();
 				panelFlightplan.validate();
+		    	 distanceSpin.setSpinnerChanged(true);
+		    	 result.setSpinnerChanged(true);
+
 			}
 		});		
 
@@ -266,39 +273,44 @@ public class PanelFlightplan {
 				
 				//UtilityDB.getInstance().updateAirportState();
 				
-		    	 
-		    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
-		  		{
-		  		    protected Void doInBackground()
-		  		    {
+		    	 if (distanceSpin.isSpinnerChanged() || result.isSpinnerChanged()  ) {
+			    	  SwingWorker<Void,Void> worker = new SwingWorker<Void,Void>()
+				  		{
+				  		    protected Void doInBackground()
+				  		    {
 
-		    	  
-					readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
-						(int) distanceSpin.getMountainSpinner().getValue(),
-						(int) distanceSpin.getAirportSpinner().getValue(),
-						(int) distanceSpin.getVorNdbSpinner().getValue(), 
-     				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
-						distanceSpin.getCheckTocTod().isSelected(),
-						(double) result.getAltitudeModel().getValue()));
-       
-	  		        return null;
-	  		    }
-	  		 
-	  		    @Override
-	  		    protected void done()
-	  		    {
-	  		        dialog.dispose();
-	  		    }
-	  		};
-	  		worker.execute();
-	  		dialog.setVisible(true); // will block but with a responsive GUI		         
+				    	  
+							readData.createFlightplan(new Distance((int) distanceSpin.getCitySpinner().getValue(),
+								(int) distanceSpin.getMountainSpinner().getValue(),
+								(int) distanceSpin.getAirportSpinner().getValue(),
+								(int) distanceSpin.getVorNdbSpinner().getValue(), 
+		     				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+								distanceSpin.getCheckTocTod().isSelected(),
+								(double) result.getAltitudeModel().getValue()));
+		       
+			  		        return null;
+			  		    }
+			  		 
+			  		    @Override
+			  		    protected void done()
+			  		    {
+			  		        dialog.dispose();
+			  		    }
+			  		};
+			  		worker.execute();
+			  		dialog.setVisible(true); // will block but with a responsive GUI		         
 
 
-			panelResult.removeAll();
-			panelResult.add(result.getFlightPlanFormPanel());
-			panelResult.validate();
-			panelFlightplan.add(panelResult);
-			panelFlightplan.validate();
+					panelResult.removeAll();
+					panelResult.add(result.getFlightPlanFormPanel());
+					panelResult.validate();
+					panelFlightplan.add(panelResult);
+					panelFlightplan.validate();
+			    	distanceSpin.setSpinnerChanged(false);
+				    result.setSpinnerChanged(false);
+
+		    		 
+		    	 }
 
 			Utility.getInstance().launchGoogleEarth(new File(readData.getKmlFlightPlanFile()));
 
@@ -323,22 +335,11 @@ public class PanelFlightplan {
 						CreateKML.makeOn(result, result.getCurrentView()+"-"+keyICAO);
 					}
 					
-				}  else if ("airport".equals(result.getCurrentView())){
-					selectAirport.select("where ident = '"+keyICAO+"'");
-					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-				}  else if ("vor".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
-				 } else if ("ndb".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
-				 }else if ("city".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
-				 }else if ("mountain".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
-				 }else if ("landmark".equals(result.getCurrentView())){
-						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
-				 }
-				
+				}  else {
+					result.landMe();
 				}
+				
+			}
 		});		
 
 		askMeBt = new JButton("Ask Me");
@@ -401,6 +402,7 @@ public class PanelFlightplan {
   
 		return panelFlightplan;					
 	}
+
 	
 }
 

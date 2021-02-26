@@ -86,12 +86,27 @@ public class CreateKmlFSPlan{
 	private String flightPlanTitle;
 
 	
+	private void initDB() {
+		if (!UtilityDB.getInstance().isInitAll()) {
+			cities = UtilityDB.getInstance().selectCity("");
+			mountains = UtilityDB.getInstance().selectMountain("");
+			vors = UtilityDB.getInstance().selectVor("");
+			ndbs = UtilityDB.getInstance().selectNdb("");
+			UtilityDB.getInstance().setInitAll(true);
+		} else {
+			cities = UtilityDB.getInstance().getCities();
+			mountains = UtilityDB.getInstance().getMountains();
+			vors = UtilityDB.getInstance().getVors();
+			ndbs = UtilityDB.getInstance().getNdbs();
+			UtilityDB.getInstance().setInitAll(true);
+				
+		}
+		
+	}
 	
-	public CreateKmlFSPlan(String flightPlanFile,  Distance dist, 
-			List<City> cities, 
-			List<Mountain> mountains,
-			List<Vor> vors,
-			List<Ndb> ndbs) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
+	
+	
+	public CreateKmlFSPlan(String flightPlanFile,  Distance dist) throws FileNotFoundException,NoPoints, NullPointerException, IOException{
 		this.flightPlanFile = flightPlanFile;
 		this.dist = dist;
 		this.selectedAirports = new HashMap<>();
@@ -101,10 +116,6 @@ public class CreateKmlFSPlan{
 		this.selectedNdbs = new HashMap<>();
 		this.selectedVors = new HashMap<>();
 		this.isDone = false;
-		this.cities = cities;
-		this.mountains = mountains;
-		this.vors = vors;
-		this.ndbs = ndbs;
 		
 		this.dataline = new Dataline();
 		
@@ -121,12 +132,18 @@ public class CreateKmlFSPlan{
 		
 		legPoints = fsxPlan.getLegPoints();
 	
-		//check if altitude as been changed 
-		if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(flightplan.getCruisingAlt())) {
-			fsxPlan.modifyAltitude(legPoints, Double.parseDouble(flightplan.getCruisingAlt()), dist.getAltitude());
-			flightplan.setCruisingAlt(dist.getAltitude()+"");
+		initDB();
+		
+		try {
+			//check if altitude as been changed 
+			if (dist.getAltitude() != 0 && dist.getAltitude() != Double.parseDouble(flightplan.getCruisingAlt())) {
+				fsxPlan.modifyAltitude(legPoints, Double.parseDouble(flightplan.getCruisingAlt()), dist.getAltitude());
+				flightplan.setCruisingAlt(dist.getAltitude()+"");
 
-		} else {
+			} else {
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
 		}
 			
 
@@ -139,7 +156,7 @@ public class CreateKmlFSPlan{
 		}
 		
 		long stopTime = System.currentTimeMillis();
-		System.out.println(" stopTime - startTime = "+(stopTime - startTime));
+		//System.out.println(" stopTime - startTime = "+(stopTime - startTime));
 
 		
 	}
@@ -154,6 +171,18 @@ public class CreateKmlFSPlan{
 
 		selectAirport = new SelectAirport(); 
 		selectAirport.select("");
+/*		
+	       selectCity = new SelectCity();
+			selectMountain = new SelectMountain();
+			selectVor = new SelectVor();
+			selectNdb = new SelectNdb();
+	
+		selectCity.selectAll("");
+		selectMountain.selectAll("");
+		selectVor.selectAll("");
+		selectNdb.selectAll("");
+*/		
+
 		
 		flightplan.validIcao(selectAirport.getMapAirport(), legPoints.get(0), true, dist);
 		flightplan.validIcao(selectAirport.getMapAirport(), legPoints.get(legPoints.size()-1), false, dist);
@@ -211,8 +240,6 @@ public class CreateKmlFSPlan{
 		
 		Utility.getInstance().createLandmarkByGroup(selectedLandmarks);
 		
-		System.out.println("selectedLandmarks "+selectedLandmarks.size());
-		
 
 		if (distanceBetween < 1000) {
 			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
@@ -235,7 +262,7 @@ public class CreateKmlFSPlan{
 		} catch (NullPointerException e) {
 		}
 
-	   	createAndsaveFlightPlan();
+	   	createAndsaveFlightPlan(flightplan.getTitle());
 		
 		isDone = true;
 		
@@ -273,26 +300,7 @@ public class CreateKmlFSPlan{
 			}
 		}
 
-		
-		// search cities
-		if (dist.isCity()) {
-			for(City city : cities){
-				Double[] dd1 = Geoinfo.convertDoubleLongLat(city.getCoordinates());
-				current++;
-				
-				for(LegPoint point : legPoints){
-					Double[] dd2 = Geoinfo.convertDoubleLongLat(point.getPosition());
-					
-					if (Geoinfo.distance(dd1[1], dd1[0], dd2[1], dd2[0], 'N') < dist.getCityDist()){
-						selectedCities.put(city.getCityName(),new City(city));
-						if (dist.isLine()) {
-							//dataline.setData("city",dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
-						}
-					}
-				}
-			}
-		}
-			
+
 		// search mountains
 		if (dist.isMountain()) {
 			for(Mountain mountain : mountains){
@@ -353,9 +361,9 @@ public class CreateKmlFSPlan{
 		}
 
 		
+		legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 		if (dist.isLandmark()) {
 			
-			legPoints =	Geoinfo.removeInvisiblePointAndInitialiseDist(legPoints);
 			for (int i = 0; i < legPoints.size()-1; i++) {
 				try {
 					String provinces =  UtilityMap.getInstance().check2Provinces(legPoints.get(i).getLaty(),legPoints.get(i).getLonx(),
@@ -365,25 +373,39 @@ public class CreateKmlFSPlan{
 														legPoints.get(i+1).getLaty(),legPoints.get(i+1).getLonx(), 
 														dist.getLandmarkDist());
 					
-					UtilityDB.getInstance().selectProvinceLandmark("where admin in ("+provinces+")");
+					UtilityDB.getInstance().selectLandmarkInBox("where admin in ("+provinces+")");
 					selectedLandmarks.putAll(UtilityDB.getInstance().getMapLandmark());
-					System.out.println(provinces);
+					//System.out.println(provinces);
 				} catch (Exception e) {
 				}
 				
 			}
 		}
+		
+		if (dist.isCity()) {
+			for (int i = 0; i < legPoints.size()-1; i++) {
+				String countries = UtilityMap.getInstance().check2Countries(legPoints.get(i), legPoints.get(i+1));
+				Boundingbox.getInstance().createBox(legPoints.get(i).getLaty(),legPoints.get(i).getLonx(),
+						legPoints.get(i+1).getLaty(),legPoints.get(i+1).getLonx(), 
+						dist.getCityDist());
+				UtilityDB.getInstance().selectCityInBox("where country in ("+countries+")");
+				selectedCities.putAll(UtilityDB.getInstance().getMapCities());
+
+			}
+
+		}
+
 
 	}
 	
-	public  synchronized void createAndsaveFlightPlan(){
+	public  synchronized void createAndsaveFlightPlan(String title){
 		Writer writer = null;
 		
 		createKML = new CreateKML();
 				
  		try {
  			
-			kmlFlightPlanFile = Utility.getInstance().getPrefs().getProperty("kmlflightplandir")+"/last_flightplan.kml";
+			kmlFlightPlanFile = Utility.getInstance().getPrefs().getProperty("kmlflightplandir")+"/"+title+".kml";
  			if (kmlFlightPlanFile.contains("/data/")){
  	 			Path currentRelativePath = Paths.get("");
 	 	   		kmlFlightPlanFile = currentRelativePath.toAbsolutePath().toString()+kmlFlightPlanFile.replace("\\", "/");

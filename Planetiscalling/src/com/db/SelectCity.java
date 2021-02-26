@@ -13,6 +13,7 @@ import java.util.TreeMap;
 
 import com.backend.CreateKML;
 import com.cfg.common.Info;
+import com.geo.util.Geoinfo;
 import com.model.City;
 import com.util.Utility;
 
@@ -35,7 +36,7 @@ public class SelectCity implements Info{
 		
 
 		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region "
-				+ "FROM world_city_new ";
+				+ "FROM world_city_big ";
 		
 		if (!"".equals(search)) {
 			 sql += search;
@@ -47,7 +48,7 @@ public class SelectCity implements Info{
 				String lastAirport = "";
 
 				while (rs.next()) {
-				    city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital").trim(), rs.getLong("population"));
+				    city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital"), rs.getLong("population"));
 				    cities.add(city);
 				    mapCities.put(rs.getString("city").replace(" ", "").toUpperCase()+rs.getLong("population"), city);
 				}
@@ -61,6 +62,168 @@ public class SelectCity implements Info{
 			e1.printStackTrace();
 
 		}
+		
+
+   }
+	public void selectStateCity(String search, City citySource ) {
+		city = new City();
+		cities = new ArrayList<>();
+		mapCities = new TreeMap<>();
+		
+		double distance = 1000;
+		double shortDistance = 1000;
+
+		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region "
+				+ "FROM world_city_new ";
+		
+		if (!"".equals(search)) {
+			 sql += search;
+		}
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					//System.out.println(Geoinfo.distance(citySource.getLaty(), rs.getDouble("laty"), citySource.getLonx(), rs.getDouble("lonx")));
+					if (distance > Geoinfo.distance(citySource.getLaty(), rs.getDouble("laty"), citySource.getLonx(), rs.getDouble("lonx"))) {
+						distance = Geoinfo.distance(citySource.getLaty(), rs.getDouble("laty"), citySource.getLonx(), rs.getDouble("lonx"));
+						if (shortDistance > distance) {		
+							shortDistance = distance;
+							city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital"), rs.getLong("population"));
+							System.out.println(distance);
+						}
+					}
+				}
+				
+				
+
+		}
+			
+			System.out.println(citySource.getCityName()+" -  "+citySource.getAdminName());
+			System.out.println(city.getCityName()+" -  "+city.getAdminName());
+			System.out.println("distance between = "+distance);
+			System.out.println("---------------------------------------------------");
+			
+			} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		
+
+		}
+		
+
+   }
+	public void selectCountryPoint(double laty, double lonx) {
+		city = new City();
+		cities = new ArrayList<>();
+		mapCities = new TreeMap<>();
+		
+		double distance = 1000;
+		double shortDistance = 1000;
+
+		String sql = "SELECT lonx,laty, country FROM world_city_new ";
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					//System.out.println(Geoinfo.distance(citySource.getLaty(), rs.getDouble("laty"), citySource.getLonx(), rs.getDouble("lonx")));
+					if (distance > Geoinfo.distance(laty, rs.getDouble("laty"), lonx, rs.getDouble("lonx"))) {
+						distance = Geoinfo.distance(laty, rs.getDouble("laty"), lonx, rs.getDouble("lonx"));
+						if (shortDistance > distance) {		
+							shortDistance = distance;
+							city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital"), rs.getLong("population"));
+							System.out.println(distance);
+						}
+					}
+				}
+				
+				
+
+		}
+			
+			System.out.println(city.getCityName()+" -  "+city.getCountry());
+			System.out.println("distance between = "+distance);
+			System.out.println("---------------------------------------------------");
+			
+			} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		
+
+		}
+		
+
+   }
+	public List<String>  selectCountryCity( ) {
+		List<String> listCountries = new ArrayList<>();
+		
+		String sql = "SELECT country FROM world_city_new group by country ";
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				String lastAirport = "";
+
+				while (rs.next()) {
+					listCountries.add(rs.getString("country"));
+				}
+		}
+			
+			} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+
+		}
+		
+		
+		return listCountries;
+		
+
+   }
+	
+	public List<String>  selectStateCityNull() {
+		List<String> listCountries = new ArrayList<>();
+		
+		City city = new City();
+		
+		
+		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region " + 
+				"FROM world_city_big  ";
+		
+		int cpt = 0;
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					if (rs.getString("admin_name") == null) {
+						city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital"), rs.getLong("population"));
+
+						System.out.println(city.toString());
+						selectStateCity("where country = '"+city.getCountry()+"'",city);
+						cpt++;
+						if (cpt > 100) {
+							break;
+						}
+					}
+				}
+		}
+			
+			} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+
+		}
+		
+		
+		return listCountries;
 		
 
    }

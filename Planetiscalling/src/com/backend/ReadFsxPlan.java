@@ -214,6 +214,8 @@ public class ReadFsxPlan extends DefaultHandler{
 	        flightplan.setDestinationName(tempVal);
 		}else if (qName.equalsIgnoreCase("ICAOIdent")) {
 			legPoint.setIcaoIdent(tempVal);
+		}else if (qName.equalsIgnoreCase("ICAORegion")) {
+			legPoint.setIcaoRegion(tempVal);
 		}else if (qName.equalsIgnoreCase("WorldPosition")) {
 			String coords[] = tempVal.split(",");
 			try {

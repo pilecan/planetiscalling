@@ -60,13 +60,28 @@ public class PanelLandmarks implements Info {
 	
 	private SelectDB selectDB;
 	public SelectAirport selectAiport;
+
+	private boolean isLandmarkSetted;
+	private JComboBox<String> comboCountryLandmark;
+	private JComboBox<String> comboStateLandmark;
+	private JComboBox<String> comboGeoterm;
+	private JComboBox<String> comboGeoname;
+
+	private boolean isAirportSetted;
+	private JComboBox<String> comboCountryAirport;
+	private JComboBox<String> comboStateAirport;
+	private JComboBox<String> comboCityAirport;
 	
 	private JComboBox<String> comboCountry;
 	private JComboBox<String> comboState;
-	private JComboBox<String> comboGeoterm;
-	private JComboBox<String> comboGeoname;
 	private JComboBox<String> comboCity;
 	private JComboBox<String> comboMountain;
+
+	private boolean isCitySetted;
+
+	private JComboBox<String> comboCountryCity;
+	private JComboBox<String> comboStateCity;
+	private JComboBox<String> comboCityCity;
 
 	private ReadData readData;
 	private JDialog dialog;
@@ -86,7 +101,9 @@ public class PanelLandmarks implements Info {
 	String [] provArray;
 	String [] geoTermArray; 
 	String [] geoNameArray;
-
+	String [] countryArray; 
+	String [] adminArray;
+	String [] cityArray;
 	
 	public PanelLandmarks() {
 		
@@ -97,10 +114,17 @@ public class PanelLandmarks implements Info {
 		geoTermArray = UtilityDB.getInstance().getGeoterm(provArray[0]); 
 		geoNameArray = UtilityDB.getInstance().getGeoname(provArray[0],geoTermArray[0]); 
 
-		comboCountry = new JComboBox<>(UtilityDB.getInstance().getCountryCgn());
-		comboState = new JComboBox<>(provArray);
-		comboGeoterm  = new JComboBox<>(geoTermArray);
-		comboGeoname = new JComboBox<>(geoNameArray);
+		comboCountryLandmark.addItem("Canada");
+		for (String str:provArray) {
+			comboStateLandmark.addItem(str);
+		}
+		for (String str:geoTermArray) {
+			comboGeoterm.addItem(str);
+		}
+		for (String str:geoNameArray) {
+			comboGeoname.addItem(str);
+		}
+		isLandmarkSetted = true;
 		
 	}
 
@@ -149,34 +173,37 @@ public class PanelLandmarks implements Info {
 		selectDB = new SelectDB();
 		selectDB.selectAirportTableNew();
 
-		provArray = UtilityDB.getInstance().getProvinces(); 
+/*		provArray = UtilityDB.getInstance().getProvinces(); 
 		geoTermArray = UtilityDB.getInstance().getGeoterm(provArray[0]); 
 		geoNameArray = UtilityDB.getInstance().getGeoname(provArray[0],geoTermArray[0]); 
 
-		comboCountry = new JComboBox<>(UtilityDB.getInstance().getCountryCgn());
-		comboState = new JComboBox<>(provArray);
+		comboCountryLandmark = new JComboBox<>(UtilityDB.getInstance().getCountryCgn());
+		comboStateLandmark = new JComboBox<>(provArray);
 		comboGeoterm  = new JComboBox<>(geoTermArray);
 		comboGeoname = new JComboBox<>(geoNameArray);
-
-     //   selectDB.setComboCity("airport",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+*/
+		comboCountryLandmark = new JComboBox<>();
+		comboStateLandmark = new JComboBox<>();
+		comboGeoterm  = new JComboBox<>();
+		comboGeoname = new JComboBox<>();
 
         int widht = 240;
-		comboCountry.setPreferredSize(new Dimension(widht,25));
-        comboState.setPreferredSize(new Dimension(widht,25));
+        comboCountryLandmark.setPreferredSize(new Dimension(widht,25));
+        comboStateLandmark.setPreferredSize(new Dimension(widht,25));
         comboGeoterm.setPreferredSize(new Dimension(widht,25));
         comboGeoname.setPreferredSize(new Dimension(widht,25));
         
         
-		comboState.addItemListener(new ItemListener() {
+        comboStateLandmark.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				comboGeoterm.removeAllItems();
 				comboGeoname.removeAllItems();
 
 				int totalCity = 0;
-				if (comboState.getSelectedItem() != null) {
-					geoTermArray = UtilityDB.getInstance().getGeoterm((String) comboState.getSelectedItem());
-					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboState.getSelectedItem(),
+				if (comboStateLandmark.getSelectedItem() != null) {
+					geoTermArray = UtilityDB.getInstance().getGeoterm((String) comboStateLandmark.getSelectedItem());
+					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboStateLandmark.getSelectedItem(),
 							geoTermArray[0]);
 
 					for (String string : geoTermArray) {
@@ -199,7 +226,7 @@ public class PanelLandmarks implements Info {
 
 				int totalCity = 0;
 				if (comboGeoterm.getSelectedItem() != null) {
-					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboState.getSelectedItem(),
+					geoNameArray = UtilityDB.getInstance().getGeoname((String) comboStateLandmark.getSelectedItem(),
 							(String) comboGeoterm.getSelectedItem());
 
 					for (String string : geoNameArray) {
@@ -219,8 +246,8 @@ public class PanelLandmarks implements Info {
 
 		});
 		
-   	    panelCombo.add(comboCountry);
-		panelCombo.add(comboState);
+   	    panelCombo.add(comboCountryLandmark);
+		panelCombo.add(comboStateLandmark);
 		panelCombo.add(comboGeoterm);
 		panelCombo.add(comboGeoname);
 
@@ -230,7 +257,7 @@ public class PanelLandmarks implements Info {
 		      public void actionPerformed(ActionEvent e)
 		      {
 		    	  
-		    	        readData.createKMLLandmark(result, comboCountry,comboState,comboGeoterm,comboGeoname,
+		    	        readData.createKMLLandmark(result, comboCountryLandmark,comboStateLandmark,comboGeoterm,comboGeoname,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 (int)distanceSpin.getAirportSpinner().getValue(), 
@@ -287,7 +314,7 @@ public class PanelLandmarks implements Info {
 		googleBt.setEnabled(false);
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-    	        readData.createKMLLandmark(result, comboCountry,comboState,comboGeoterm,comboGeoname,
+    	        readData.createKMLLandmark(result, comboCountryLandmark,comboStateLandmark,comboGeoterm,comboGeoname,
         		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
         				 (int)distanceSpin.getMountainSpinner().getValue(), 
         				 (int)distanceSpin.getAirportSpinner().getValue(), 
@@ -320,22 +347,7 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
-				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
-				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-				
-				if ("airport".equals(result.getCurrentView())){
-					selectAirport.select("where ident = '"+keyICAO+"'");
-					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-				 }else if ("city".equals(result.getCurrentView())){
-						CreateKML.makeOn(UtilityDB.getInstance().getMapCities().get(keyCityMountain), result.getCurrentView());
-				 }else if ("mountain".equals(result.getCurrentView())){
-						CreateKML.makeOn(UtilityDB.getInstance().getMapMountains().get(keyCityMountain), result.getCurrentView());
-				 } else if ("landmark".equals(result.getCurrentView())){
-						CreateKML.makeOn(UtilityDB.getInstance().getMapLandmark().get(keyICAO), result.getCurrentView());
-				 }
-
+				result.landMe();
 			}
 		});		
 
@@ -344,7 +356,28 @@ public class PanelLandmarks implements Info {
 	   return setLandmarkPanel(distanceSpin);
 	}
 	
-	public JPanel getAirportPanel(final SelectCity selectCity,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
+	public void setPanelAirport() {
+		selectDB = new SelectDB();
+		selectDB.selectAirportTableNew();
+	
+		for (String str:selectDB.getCountry()) {
+			comboCountryAirport.addItem(str);
+		}
+		comboCountryAirport.setSelectedIndex(0);
+		
+		for (String str:selectDB.getStates(comboCountryAirport.getSelectedItem())) {
+			comboStateAirport.addItem(str);
+		}
+
+		comboCityAirport.addItem(" All");
+
+        selectDB.setComboCity("v_airport_runway",comboCityAirport, comboCountryAirport.getSelectedItem(), comboStateAirport.getSelectedItem(), comboStateAirport.getItemCount());
+        
+		isAirportSetted = true;
+		
+	}
+	
+	public JPanel getAirportPanel() {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("airport");
 		distanceSpin.getLandkmarkSpinner().setEnabled(false);
@@ -386,36 +419,28 @@ public class PanelLandmarks implements Info {
 		panelCombo = new  JPanel();
 		panelLandMark.setLayout(null);
 
+		comboCountryAirport = new JComboBox<>();
+		comboStateAirport = new JComboBox<>();
+		comboCityAirport = new JComboBox<>();
 
-		selectDB = new SelectDB();
-		selectDB.selectAirportTableNew();
-
-		comboCountry = new JComboBox<>(selectDB.getCountry());
-		comboState = new JComboBox<>(selectDB.getStates(comboCountry.getSelectedItem()));
-		comboCity = new JComboBox<>();
-		comboCity.addItem(" All");
-
-        selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
-
-		comboCountry.setPreferredSize(new Dimension(240,25));
-        comboState.setPreferredSize(new Dimension(240,25));
-        comboCity.setPreferredSize(new Dimension(240,25));
+		comboCountryAirport.setPreferredSize(new Dimension(240,25));
+        comboStateAirport.setPreferredSize(new Dimension(240,25));
+        comboCityAirport.setPreferredSize(new Dimension(240,25));
         
-        
-		comboCountry.addItemListener(new ItemListener() {
+		comboCountryAirport.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				comboState.removeAllItems();
-				for (String state : selectDB.getStates(comboCountry.getSelectedItem())) {
-					comboState.addItem(state);
+				comboStateAirport.removeAllItems();
+				for (String state : selectDB.getStates(comboCountryAirport.getSelectedItem())) {
+					comboStateAirport.addItem(state);
 				}
 
 				int totalCity = 0;
-				if (comboState.getSelectedItem() != null && comboState.getItemCount() ==1 ) {
-			        totalCity = selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+				if (comboStateAirport.getSelectedItem() != null && comboStateAirport.getItemCount() ==1 ) {
+			        totalCity = selectDB.setComboCity("v_airport_runway",comboCityAirport, comboCountryAirport.getSelectedItem(), comboStateAirport.getSelectedItem(), comboStateAirport.getItemCount());
 				}
 				
-				if ("Canada".equals(comboCountry.getSelectedItem())) {
+				if ("Canada".equals(comboCountryAirport.getSelectedItem())) {
 					distanceSpin.getLandkmarkSpinner().setEnabled(true);
 				} else {
 					distanceSpin.getLandkmarkSpinner().setValue(0);
@@ -426,15 +451,15 @@ public class PanelLandmarks implements Info {
 			}
 	
 		});
-		comboState.addItemListener(new ItemListener() {
+		comboStateAirport.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				comboCity.removeAllItems();
-				comboCity.addItem(" All");
+				comboCityAirport.removeAllItems();
+				comboCityAirport.addItem(" All");
 
 		        int totalCity = 0;
-				if (comboState.getSelectedItem() != null && !" All".equals(comboState.getSelectedItem() )) {
-					totalCity =  selectDB.setComboCity("v_airport_runway",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getMaximumRowCount());
+				if (comboStateAirport.getSelectedItem() != null && !" All".equals(comboStateAirport.getSelectedItem() )) {
+					totalCity =  selectDB.setComboCity("v_airport_runway",comboCityAirport, comboCountryAirport.getSelectedItem(), comboStateAirport.getSelectedItem(), comboStateAirport.getMaximumRowCount());
 				}
 				
 				//setResult(labelHeader,totalCity);
@@ -443,9 +468,9 @@ public class PanelLandmarks implements Info {
 
 		});
 
-   	    panelCombo.add(comboCountry);
-		panelCombo.add(comboState);
-		panelCombo.add(comboCity);
+   	    panelCombo.add(comboCountryAirport);
+		panelCombo.add(comboStateAirport);
+		panelCombo.add(comboCityAirport);
 
 		searchBt = new JButton("Search");
 		
@@ -461,8 +486,7 @@ public class PanelLandmarks implements Info {
 		  		    {
 
 		    	  
-		    	  readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		 selectMountain, selectVor,selectNdb,
+		    	  readData.createKMLAirport(result, selectDB.getMapCities(), comboCountryAirport,comboStateAirport,comboCityAirport,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 0, 
@@ -533,8 +557,7 @@ public class PanelLandmarks implements Info {
 		  		    {
 
 		    	  
-		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		 selectMountain, selectVor,selectNdb,
+		         readData.createKMLAirport(result, selectDB.getMapCities(), comboCountryAirport,comboStateAirport,comboCityAirport,
 		        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 		        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 		        				 0, 
@@ -576,26 +599,7 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
-				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
-				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-				
-				if ("airport".equals(result.getCurrentView())){
-					selectAirport.select("where ident = '"+keyICAO+"'");
-					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-				}  else if ("vor".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
-				 } else if ("ndb".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
-				 }else if ("city".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
-				 }else if ("mountain".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
-				 }else if ("landmark".equals(result.getCurrentView())){
-						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
-				 }
-
+				result.landMe();
 			}
 		});		
 
@@ -647,6 +651,36 @@ public class PanelLandmarks implements Info {
 		
 	}
 	
+	
+	
+	public void setPanelCity() {
+/*		selectDB = new SelectDB();
+		selectDB.selectAirportTableNew();
+*/
+		
+		countryArray = UtilityDB.getInstance().getCountryCity(); 
+		adminArray = UtilityDB.getInstance().getSateCity(countryArray[0]) ;
+		cityArray = UtilityDB.getInstance().getCityCity(countryArray[0],adminArray[0]) ;
+
+		for (String str:countryArray) {
+			comboCountryCity.addItem(str);
+		}
+		for (String str:adminArray) {
+			comboStateCity.addItem(str);
+		}
+		
+		for (String str:cityArray) {
+			comboCityCity.addItem(str);
+		}
+		
+		comboCountryCity.setSelectedIndex(0);
+     
+        
+		isCitySetted = true;
+
+	}
+
+	
 	/**
 	 * 
 	 * getCityWorld
@@ -655,7 +689,7 @@ public class PanelLandmarks implements Info {
 	 * @param manageXMLFile
 	 * @return
 	 */
-	public JPanel getCityPanel(final SelectCity selectCity ,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
+	public JPanel getCityPanel() {
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("city");
 		distanceSpin.getLandkmarkSpinner().setEnabled(false);
@@ -698,77 +732,61 @@ public class PanelLandmarks implements Info {
 		panelLandMark = new JPanel();
 		panelCombo = new  JPanel();
 		panelLandMark.setLayout(null);
-
-		selectDB = new SelectDB();
-		selectDB.selectAirportTableNew();
 		
-		final SelectDB selectDB = new SelectDB();
-		selectDB.selectCityTable();
-		
-		comboCountry = new JComboBox<>(selectDB.getCountryCity());
-		comboState = new JComboBox<>(selectDB.getStateCity("Afghanistan"));
-		comboCity = new JComboBox<>();
-		comboCity.addItem(" All");
-	    comboState.addItem(" All");
-
-        selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+		comboCountryCity = new JComboBox<>();
+		comboStateCity = new JComboBox<>();
+		comboCityCity = new JComboBox<>();
 
 
-		comboCountry.setPreferredSize(new Dimension(240,25));
-        comboState.setPreferredSize(new Dimension(240,25));
-        comboCity.setPreferredSize(new Dimension(240,25));
+		comboCountryCity.setPreferredSize(new Dimension(240,25));
+        comboStateCity.setPreferredSize(new Dimension(240,25));
+        comboCityCity.setPreferredSize(new Dimension(240,25));
         
         
-		comboCountry.addItemListener(new ItemListener() {
+		comboCountryCity.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				comboState.removeAllItems();
-				comboCity.removeAllItems();
-/*				comboCity.addItem(" All");
-				comboState.addItem(" All");
-*/
-				for (String state : selectDB.getStateCity((String) comboCountry.getSelectedItem())) {
-					comboState.addItem(state);
-				}
-				
+				comboStateCity.removeAllItems();
+				comboCityCity.removeAllItems();
 
-				int totalCity = 0;
-		        totalCity = selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getItemCount());
+				if (comboCountryCity.getSelectedItem() != null) {
+					adminArray = UtilityDB.getInstance().getSateCity((String) comboCountryCity.getSelectedItem()) ;
+					cityArray = UtilityDB.getInstance().getCityCity((String) comboCountryCity.getSelectedItem(),adminArray[0]) ;
 
-		        if ("Canada".equals(comboCountry.getSelectedItem())) {
-					distanceSpin.getLandkmarkSpinner().setEnabled(true);
-				} else {
-					distanceSpin.getLandkmarkSpinner().setValue(0);
-					distanceSpin.getLandkmarkSpinner().setEnabled(false);
+					for (String str:adminArray) {
+						comboStateCity.addItem(str);
+					}
+					
+					for (String str:cityArray) {
+						comboCityCity.addItem(str);
+					}
+
 				}
-				
-		       // setResult(labelHeader,totalCity);
-			}
+
+		}
 	
 		});
-		comboState.addItemListener(new ItemListener() {
+		comboStateCity.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
-				comboCity.removeAllItems();
-				comboCity.addItem(" All");
-				if (!" All".equals(comboCity.getItemAt(1))) {
-				//	comboCity.addItem(" All");
-				}
+				comboCityCity.removeAllItems();
+				comboCityCity.addItem(" All");
+				if (comboStateCity.getSelectedItem() != null) {
+					cityArray = UtilityDB.getInstance().getCityCity((String) comboCountryCity.getSelectedItem(),
+							(String) comboStateCity.getSelectedItem()) ;
+					
+					for (String str:cityArray) {
+						comboCityCity.addItem(str);
+					}
 
-		        int totalCity = 0;
-				if (comboState.getSelectedItem() != null && !" All".equals(comboState.getSelectedItem() )) {
-					totalCity =  selectDB.setComboCity("world_city_new",comboCity, comboCountry.getSelectedItem(), comboState.getSelectedItem(), comboState.getMaximumRowCount());
 				}
-				
-				//setResult(labelHeader,totalCity);
-				
-			}
+		}
 
 		});
 
-   	    panelCombo.add(comboCountry);
-		panelCombo.add(comboState);
-		panelCombo.add(comboCity);
+   	    panelCombo.add(comboCountryCity);
+		panelCombo.add(comboStateCity);
+		panelCombo.add(comboCityCity);
 		
 		dialog = UtilityEarth.getInstance().panelWait();
 
@@ -784,8 +802,7 @@ public class PanelLandmarks implements Info {
 		  		    {
 
 		    	  
-		          new ReadData().createKMLCity(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		  selectMountain,selectVor,selectNdb,
+		          new ReadData().createKMLCity(result, comboCountryCity,comboStateCity,comboCityCity,
 			        		 new Distance(0, 
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
@@ -861,8 +878,7 @@ public class PanelLandmarks implements Info {
 		  		    {
 
 		    	  
-		          new ReadData().createKMLCity(result, selectDB.getMapCities(), comboCountry,comboState,comboCity,
-		        		  selectMountain,selectVor,selectNdb,
+		          new ReadData().createKMLCity(result,  comboCountryCity,comboStateCity,comboCityCity,
 			        		 new Distance(0, 
 			        				 (int)distanceSpin.getMountainSpinner().getValue(), 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
@@ -906,26 +922,7 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			
-				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
-				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
-				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-				
-				if ("airport".equals(result.getCurrentView())){
-					selectAirport.select("where ident = '"+keyICAO+"'");
-					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-				}  else if ("vor".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
-				 } else if ("ndb".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
-				 }else if ("city".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
-				 }else if ("mountain".equals(result.getCurrentView())){
-						CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
-				 } else if ("landmark".equals(result.getCurrentView())){
-						CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
-				 }
-
+				result.landMe();
 			}
 		});		
 
@@ -940,7 +937,7 @@ public class PanelLandmarks implements Info {
 	  * @param manageXMLFile
 	  * @return
 	  */
-	public JPanel getMountainPanel(final SelectCity selectCity ,final SelectMountain selectMountain, final SelectVor selectVor, final SelectNdb selectNdb) {
+	public JPanel getMountainPanel() {
 		
 		final DistanceSpinner distanceSpin = new DistanceSpinner();
 		distanceSpin.initPanelDistances("mountain");
@@ -1016,7 +1013,7 @@ public class PanelLandmarks implements Info {
 		    {
 		      public void actionPerformed(ActionEvent e)
 		      {
-		          new ReadData().createKMLMountain(result, selectDB.getMapCities(), comboCountry,comboMountain, selectVor,selectNdb,
+		          new ReadData().createKMLMountain(result, comboCountry,comboMountain,
 			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 			        				 0, 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
@@ -1074,12 +1071,12 @@ public class PanelLandmarks implements Info {
 		googleBt.setEnabled(false);
 		googleBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		          new ReadData().createKMLMountain(result, selectDB.getMapCities(), comboCountry,comboMountain, selectVor,selectNdb,
+		          new ReadData().createKMLMountain(result, comboCountry,comboMountain, 
 			        		 new Distance((int)distanceSpin.getCitySpinner().getValue(), 
 			        				 0, 
 			        				 (int)distanceSpin.getAirportSpinner().getValue(), 
 			        				 (int)distanceSpin.getVorNdbSpinner().getValue(), 
-			        				    (int)distanceSpin.getLandkmarkSpinner().getValue(), 
+			        				 (int)distanceSpin.getLandkmarkSpinner().getValue(), 
 			        				 distanceSpin.getCheckLinedist().isSelected(),
 			        				 0.0)
 			        		 
@@ -1107,28 +1104,23 @@ public class PanelLandmarks implements Info {
 		landMeBt.setEnabled(false);
 		landMeBt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
-				String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
-				String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-				
-				if ("airport".equals(result.getCurrentView())){
-					selectAirport.select("where ident = '"+keyICAO+"'");
-					CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-				}  else if ("vor".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
-				 } else if ("ndb".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
-				 }else if ("city".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
-				 }else if ("mountain".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
-				 }
-
+				result.landMe();
 			}
 		});		
 
 		return setLandmarkPanel(distanceSpin);
+	}
+
+	public boolean isLandmarkSetted() {
+		return isLandmarkSetted;
+	}
+
+	public boolean isAirportSetted() {
+		return isAirportSetted;
+	}
+
+	public boolean isCitySetted() {
+		return isCitySetted;
 	}
 	
 

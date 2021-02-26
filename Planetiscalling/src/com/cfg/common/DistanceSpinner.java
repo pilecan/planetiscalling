@@ -3,11 +3,10 @@ package com.cfg.common;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
@@ -15,6 +14,8 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.util.FormUtility;
 
@@ -24,6 +25,8 @@ public class DistanceSpinner implements Info {
 	private SpinnerModel distanceLandmark;
 	private SpinnerModel distanceAirport;
 	private SpinnerModel distanceVorNdb;
+	
+	private boolean isSpinnerChanged = false;
 	
 	public JSpinner citySpinner;
 	public JSpinner mountainSpinner;
@@ -36,6 +39,7 @@ public class DistanceSpinner implements Info {
 	
 	public JPanel spinnerPanel;
 	
+	
 	private JPanel panel;
 	
 	private FormUtility formUtility;
@@ -45,36 +49,51 @@ public class DistanceSpinner implements Info {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	class SpinnerListener implements ChangeListener {
+		@Override
+		public void stateChanged(ChangeEvent e) {
+			isSpinnerChanged = true;
+
+		}
+	}
 
 	public void initPanelDistances(String topic) {
+		
+		SpinnerListener spinnerListener = new SpinnerListener();
 		
 		
 		distanceCity =  new SpinnerNumberModel(0, 
       		  0, //min
       		  200, //max
       	      10);               
-		
+		distanceCity.addChangeListener(spinnerListener);
+	
 		distanceMountain =  new SpinnerNumberModel(0, 
 	      		  0, //min
 	      		  200, //max
 	      	      10);               
 
+		distanceMountain.addChangeListener(spinnerListener);
+
 		distanceLandmark =  new SpinnerNumberModel(0, 
 	      		  0, //min
 	      		  200, //max
 	      	      10);               
-		
+		distanceLandmark.addChangeListener(spinnerListener);
+
 		distanceAirport =  new SpinnerNumberModel(0, 
       		  0, //min
       		  1000, //max
       	      10);     
-		
+		distanceAirport.addChangeListener(spinnerListener);
+	
 		distanceVorNdb =  new SpinnerNumberModel(0, 
 	      		  0, //min
 	      		  100, //max
 	      	      10);               
 
-         //spinnerPanel = new JPanel();
+		distanceVorNdb.addChangeListener(spinnerListener);
+   //spinnerPanel = new JPanel();
 		
          
          spinnerPanel = new JPanel(new BorderLayout());
@@ -225,6 +244,18 @@ public class DistanceSpinner implements Info {
 
 	public void setLandkmarkSpinner(JSpinner landkmarkSpinner) {
 		this.landkmarkSpinner = landkmarkSpinner;
+	}
+
+
+
+	public boolean isSpinnerChanged() {
+		return isSpinnerChanged;
+	}
+
+
+
+	public void setSpinnerChanged(boolean isSpinnerChanged) {
+		this.isSpinnerChanged = isSpinnerChanged;
 	}
 
 	

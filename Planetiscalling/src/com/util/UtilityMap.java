@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.cfg.common.Info;
@@ -21,6 +22,7 @@ import com.model.Landmark;
 import com.model.LegPoint;
 import com.model.Mountain;
 import com.model.Runway;
+import com.model.StateCoord;
 
 public class UtilityMap {
 	private static UtilityMap instance = new UtilityMap();
@@ -95,7 +97,39 @@ public class UtilityMap {
 		
 	    return checkProvinces(newLegs);
 	}
+	
+	public String checkCountry(String region) {
+		String country1;
+		
+		country1 = UtilityDB.getInstance().selectRegion(region);
+		
+		country1 = "'"+country1+"'"; 
+		
+	    return country1;
+	}
 
+	public String check2Countries(LegPoint point1, LegPoint point2 ) {
+		String country1;
+		String country2;
+		
+		country1 = UtilityDB.getInstance().selectRegion(point1.getIcaoRegion());
+		if ("".equals(country1)) {
+			country1 = UtilityDB.getInstance().selectCountryPoint(point1.getLaty(), point1.getLonx());
+		}
+
+		country2 = UtilityDB.getInstance().selectRegion(point2.getIcaoRegion());
+		if ("".equals(country2)) {
+			country1 = UtilityDB.getInstance().selectCountryPoint(point2.getLaty(), point2.getLonx());
+		}
+		
+		if (country1.equals(country2)) {
+			country1 = "'"+country1+"'"; 
+		} else {
+			country1 = "'"+country1+"','"+country2+"'"; 
+		}
+
+	    return country1;
+	}
 	
 	public String checkWichProvince(Landcoord coord) {
 		String province = null;
@@ -119,7 +153,7 @@ public class UtilityMap {
 		}else if (isLocationInsideTheFencing(new CoordinatesDTO(coord.getLaty(), coord.getLonx()), coordQuebec())){
 			province = "Quebec";
 		}else if (isLocationInsideTheFencing(new CoordinatesDTO(coord.getLaty(), coord.getLonx()), coordNewfoundLandLabrador())){
-			province = "Newfoundland and Labrador";
+			province = "Newfoundland";
 		}else if (isLocationInsideTheFencing(new CoordinatesDTO(coord.getLaty(), coord.getLonx()), coordNewfoundLand())){
 			province = "Newfoundland";
 		}else if (isLocationInsideTheFencing(new CoordinatesDTO(coord.getLaty(), coord.getLonx()), coordPrinceEdward())){
@@ -136,6 +170,18 @@ public class UtilityMap {
 		return province;
 	}
 	
+	public String  checkWichState(Landcoord coord ) {
+		String province = null;
+		
+		for (Entry<String, StateCoord> state: UtilityDB.getInstance().getMapStateCoords().entrySet()) {
+			if (isLocationInsideTheFencing(new CoordinatesDTO(coord.getLaty(), coord.getLonx()), state.getValue().getCoordinatesDTOs())) {
+				return UtilityDB.getInstance().getMapStateCoords().get(state.getKey()).getState();
+			}
+			
+		}
+		
+		return null;
+	}
 	public void selectProvince(double lat1, double lon1, double lat2, double lon2) {
 		
 	}

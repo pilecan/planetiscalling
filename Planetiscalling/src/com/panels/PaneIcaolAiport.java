@@ -91,11 +91,7 @@ public class PaneIcaolAiport extends JFrame {
 	private SelectAirport selectAirport;
 	
 	
-	public JPanel getPanel(final SelectVor selectVor,  final SelectNdb selectNdb,final SelectMountain selectMountain, final SelectCity selectCity) {
-		this.selectVor = selectVor;
-		this.selectNdb = selectNdb;
-		this.selectCity = selectCity;
-		this.selectMountain = selectMountain;
+	public JPanel getPanel() {
 		this.selectAirport = new SelectAirport();
 		
 		distanceSpin = new DistanceSpinner();
@@ -270,7 +266,7 @@ public class PaneIcaolAiport extends JFrame {
 	  		    {
 
 	    	  
-	 	    	  readData = new ReadData(textArea.getText(),result, selectVor,selectNdb, selectMountain, selectCity,
+	 	    	  readData = new ReadData(textArea.getText(),result, 
     			  new Distance(
     			     (int)distanceSpin.getCitySpinner().getValue(), 
     				 (int)distanceSpin.getMountainSpinner().getValue(), 
@@ -311,31 +307,7 @@ public class PaneIcaolAiport extends JFrame {
 	landMeBt.setEnabled(false);
 	landMeBt.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-
-			String keyVor = Utility.getInstance().findKeyVor(result.getCurrentSelection());
-			String keyICAO = Utility.getInstance().findKeyICAO(result.getCurrentSelection());
-			String keyCityMountain = Utility.getInstance().findKeyCity(result.getCurrentSelection());
-			
-			Distance dist = null;
-			if ("airport".equals(result.getCurrentView())){
-				selectAirport.select("where ident = '"+keyICAO+"'");
-				CreateKML.makeOn(selectAirport.getAirport(), result.getCurrentView());
-			}  else if ("vor".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectVor.getMapVors().get(keyVor), result.getCurrentView());
-			 } else if ("ndb".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectNdb.getMapNdb().get(keyVor), result.getCurrentView());
-			 }else if ("city".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectCity.getMapCities().get(keyCityMountain), result.getCurrentView());
-			 }else if ("mountain".equals(result.getCurrentView())){
-					CreateKML.makeOn(selectMountain.getMapMountains().get(keyCityMountain), result.getCurrentView());
-			 }else if ("landmark".equals(result.getCurrentView())){
-					CreateKML.makeOn(result.getSelectedLandmarks().get(keyICAO), result.getCurrentView());
-			 }
-			
-			
-	   //     Utility.getInstance().launchGoogleEarth(new File(Utility.getInstance().getFlightPlanName(result.getCurrentView()+".kml")));
-
-
+			result.landMe();
 		}
 	});		
 

@@ -86,10 +86,10 @@ public class CreateKML {
         aMap.put("Village", "http://maps.google.com/mapfiles/kml/shapes/square.png" ); 
         aMap.put("Church", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
         aMap.put("Abbey", "http://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png" ); 
-        aMap.put("", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
+        aMap.put("", "http://maps.google.com/mapfiles/kml/paddle/ltblu-blank.png" ); 
         aMap.put("VILG", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
         aMap.put("CITY", "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
-        aMap.put(null, "http://maps.google.com/mapfiles/kml/paddle/wht-pushpin.png" ); 
+        aMap.put(null, "http://maps.google.com/mapfiles/kml/paddle/wht-blank.png" ); 
         aMap.put("minor", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" ); 
         aMap.put("TER", "http://maps.google.com/mapfiles/kml/paddle/blu-stars.png" ); 
         aMap.put("admin", "http://maps.google.com/mapfiles/kml/paddle/pink-stars.png" ); 
@@ -254,41 +254,46 @@ public class CreateKML {
 	}
 	
 	private static void makeLine(String topic, Writer writer, String fromCoordinats) {
-		if (!"".equals(UtilityWeather.getInstance().getWeather().htmlData())) {
-			dataline = new Dataline();
-			Double[] dd2 = null;
-			Double[] dd1 = Geoinfo.convertDoubleLongLat(fromCoordinats);
-			if (UtilityWeather.getInstance().getWeather().isSamePlace()) {
-				dd2 = Geoinfo.convertDoubleLongLat(fromCoordinats);
-			} else {
-				dd2 = Geoinfo.convertDoubleLongLat(UtilityWeather.getInstance().getWeather().getCoordinates());
-			}
-			dataline.setData(topic,dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
-
-	    	for (String key: dataline.getMapData().keySet()) {
-		    	try {
-					writer.write("<Folder><name>"+key+" distance </name>"
-							+ "<Placemark> "
-							+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
-							+ " <Style>" + 
-							"  <LineStyle> " + 
-							"   <color>"+dataline.getColor(key)+"</color>"
-							+ "<width>2</width> " + 
-							"  </LineStyle>" + 
-							" </Style>"
-							+ "<LineString><extrude>1</extrude>"
-							+ "<tessellate>1</tessellate>"
-							+ "<altitudeMode>clampToGround</altitudeMode>"
-							+ "<coordinates>\r\n");
-			    	writer.write(dataline.getMapData().get(key));
-			    	writer.write("</coordinates></LineString></Placemark></Folder>");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		try {
+			if (!"".equals(UtilityWeather.getInstance().getWeather().htmlData())) {
+				dataline = new Dataline();
+				Double[] dd2 = null;
+				Double[] dd1 = Geoinfo.convertDoubleLongLat(fromCoordinats);
+				if (UtilityWeather.getInstance().getWeather().isSamePlace()) {
+					dd2 = Geoinfo.convertDoubleLongLat(fromCoordinats);
+				} else {
+					dd2 = Geoinfo.convertDoubleLongLat(UtilityWeather.getInstance().getWeather().getCoordinates());
 				}
-	    		
-	    	}
-			
+				dataline.setData(topic,dd1[0]+","+ dd1[1]+",0"+"\n\r"+dd2[0]+","+ dd2[1]+",0"+"\n\r");
+
+				for (String key: dataline.getMapData().keySet()) {
+			    	try {
+						writer.write("<Folder><name>"+key+" distance </name>"
+								+ "<Placemark> "
+								+ "<styleUrl>#msn_ylw-pushpin</styleUrl>"
+								+ " <Style>" + 
+								"  <LineStyle> " + 
+								"   <color>"+dataline.getColor(key)+"</color>"
+								+ "<width>2</width> " + 
+								"  </LineStyle>" + 
+								" </Style>"
+								+ "<LineString><extrude>1</extrude>"
+								+ "<tessellate>1</tessellate>"
+								+ "<altitudeMode>clampToGround</altitudeMode>"
+								+ "<coordinates>\r\n");
+				    	writer.write(dataline.getMapData().get(key));
+				    	writer.write("</coordinates></LineString></Placemark></Folder>");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				}
+				
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
 		}
 		
 	}
@@ -316,12 +321,7 @@ public class CreateKML {
 	static public String buildCityPlaceMark(City city){
 		
 		String description = buildCityDescriptionLink(city);
-		String icone = "";
-
-		String coordinates =city.getLonx()+","+city.getLaty();
-		
-		icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(city.getCapital())+"</href></Icon></IconStyle></Style>";
-
+		String icone = "<Style id=\"silo\"><IconStyle><Icon><href>"+ICON_MAP.get(city.getCapital())+"</href></Icon></IconStyle></Style>";
 
 		return "<Placemark><name>"+city.getCityName()+"</name>\n"
 				+ "<description><![CDATA["+description+"]]></description>\n"
@@ -335,22 +335,36 @@ public class CreateKML {
 	static public String buildCityDescriptionLink(City city){
 		
 		String description = "";
-
-		description += "<div>City Name: "+Util.createHref(city.getCityName(),city.getCityName()+" "+city.getAdminName()+" "+city.getCountry()+" wikipedia", 0)+" ("
-				+Util.createHref("Weather",city.getCityName()+" "+city.getAdminName()+" "+city.getCountry()+" weather", 0)+ ")</div>";
+		
+		String  admin ="";
+		if ( !"UNKNOW".equals(city.getAdminName()) &&!"".equals(city.getAdminName())) {
+			admin = city.getAdminName();
+		}
+		
+		String stateName = "State";
+		if ("Canada".equals(city.getCountry())){
+			stateName = "Province";
+		} else if ("France".equals(city.getCountry())){
+			stateName = "Department";
+		} 
+		description += "<div>City Name: "+Util.createHref(city.getCityName(),city.getCityName()+" "+admin+" "+city.getCountry()+" wikipedia", 0)+" ("
+				+Util.createHref("Weather",city.getCityName()+" "+admin+" "+city.getCountry()+" weather", 0)+ ")</div>";
 		if (!city.getCityAscii().equals(city.getCityName())) {
 			description += "<div>City Acsii: "+city.getCityAscii()+"</div>";
 		}
-		if (!"".equals(city.getAdminName())) {
-			description += "<div>State:"+Util.createHref(city.getAdminName(),city.getAdminName()+" "+city.getCountry()+" wikipedia", 0)+"</div>";
+		if ( !"".equals(admin)) {
+			description += "<div>"+stateName+": "+Util.createHref(city.getAdminName(),city.getAdminName()+" "+city.getCountry()+" wikipedia", 0)+"</div>";
 		}
 
 		description += "<div>Country: "+Util.createHref(city.getCountry(),city.getCountry()+" wikipedia", 0)+"</div>";
-		description += "<div>Population: "+city.getPopulation()+"</div>";
-		if (!"".equals(city.getCapital())) {
+		if (city.getPopulation() > 0) {
+			description += "<div>Population: "+city.getPopulation()+"</div>";
+		}
+		if (city.getCapital() != null && !"".equals(city.getCapital())) {
 			description += "<div>Capital: "+city.getCapital()+"</div>";
 		}
-    	description += "<div>Abreviations: "+city.getIso2()+"/"+city.getIso3()+"</div>";
+    	description += "<div>Country code: "+city.getIso2()+"</div>";
+    	description += "<div>Region: "+city.getRegion()+"</div>";
 		description += "<div>GPS: "+Util.formatGPS(city.getLaty()+","+city.getLonx())+"</div>";
 		description = "<div style=\"width: 300px; font-size: 12px;\">"+description+"</div>";
 
@@ -473,7 +487,6 @@ public class CreateKML {
 			} else {
 				coordinates = UtilityWeather.getInstance().getWeather().getCoordinates();
 			}
-			System.out.println("Icon = "+UtilityWeather.getInstance().getWeather().getIcon());
 
 			icone = "<Style id=\"silo\"><IconStyle><Icon><href>"
 					+ ICON_MAP.get(UtilityWeather.getInstance().getWeather().getIcon())

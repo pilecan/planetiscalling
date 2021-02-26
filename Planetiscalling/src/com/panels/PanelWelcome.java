@@ -262,22 +262,22 @@ public class PanelWelcome extends Thread implements ActionListener, Info {
 	private String getAbout() {
 		
 		return "<html><body>"
-				+ "Planet Is Calling (PIC) provide information from almost a half million of Points of interest that you can see within the application or land them on Google Earth from flight plans, ICAOs, Airport cities, Country cities, High Peaks and Volcanos from all parts of our Beautiful Planet.<br>" + 
+				+ "Planet Is Calling (PIC) provide information from half million of Points of interest that you can see within the application or land them on Google Earth from flight plans, ICAOs, Weather Cities and airports, Airport cities, Country cities, High Peaks and Volcanos from all around the World!<br>" + 
 				"<br>PIC is also: <br>" + 
 				"<div style='display: block; width:350px; clear: left; font-size: medium; font-weight: bold; padding: 0pt 0pt;'> "
 				+"<li>All 36 973 airports of MSFS2020, 87388 runways and 4076 ILS information (ATIS, Length, Altitude, Frequencies, Courses, etc.)"+
 				"<li>All 4 756 VOR information (Position, Frequency, Range, Altitude, etc.)" + 
 				"<li>All 764 NDB information (Position, Frequency, Range, Altitude, etc.)<br>" + 
 				"<i>Source</i>: "+Util.createLink("https://www.flightsimulator.com/", "flightsimulator.com") + 
-				"<li>26 562 cities information (Prominent cities (large, Capital, Population, State, Regions, Link to Wikipedia and communities etc.)<br>" + 
+				"<li>26 562 cities information (Prominent cities (large, Capital, Population, State, Regions, Weather, Link to Wikipedia and communities etc.)<br>" + 
 				"<i>Source</i>: "+Util.createLink("https://simplemaps.com/data/world-cities","simplemaps.com") + 
-				"<li>2 500+ peaks and volcanos information (Position, Elevation, Country, Type, Last activities, , Link to Wikipedia and communities, etc.)<br>" + 
+				"<li>209 579 cities with live weather information and link to Wikipedia that you can see within application and on Google Earth<br>" + 
+				"<i>Source</i>: "+Util.createLink("https://openweathermap.org/","openweathermap.org")+"*" + 
+				"<li>2 500+ peaks and volcanos information (Position, Elevation, Country, Type, Weather, Last activities, Link to Wikipedia and communities, etc.)<br>" + 
 				"<i>Source</i>: "+Util.createLink("https://public.opendatasoft.com/","opendatasoft.com" )+ 
 				"<li>5 000+ METAR information update on time from NOAA.<br>" + 
 				"<i>Source</i>: "+Util.createLink("https://www.noaa.gov/weather","noaa.gov") + 
-				"<li>209 579 weather stations information for all Airports, Cities, Mountains and Waypoints (From nearest city if no Weather/METAR) etc.<br>" + 
-				"<i>Source</i>: "+Util.createLink("https://openweathermap.org/","openweathermap.org")+" * Need to install your own free APIKEY after on week of us." + 
-				"<li>351 152 Canada Landmark informations by Province, City, Park, Natural and Indian Reserves, Mountains, Caves, Under Sea, Military sites, Lakes and More!)<br>" + 
+				"<li>351 152 Canada Landmark informations(only Canada for now) by Province, City, Park, Natural and Indian Reserves, Mountains, Caves, Under Sea, Military sites, Lakes, All with Nearest Airport and Cities with Live Weather!)<br>" + 
 				"<i>Source</i>: "+Util.createLink("https://www.nrcan.gc.ca/earth-sciences/geography/download-geographical-names-data/9245?_ga=2.52506344.1741568538.1611667934-1542046856.1611417811","https://www.nrcan.gc.ca") + 
 				"</div>" + 
 				"</body></html)";

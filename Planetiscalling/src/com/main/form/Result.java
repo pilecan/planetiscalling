@@ -124,6 +124,8 @@ public class Result implements Info {
 	private JButton askMeBt;
 	private JButton landAllBt;
 	private JButton delMeBt;
+	
+	private boolean isSpinnerChanged;
 
 	public Result() {
 		super();
@@ -246,6 +248,8 @@ public class Result implements Info {
 
 			@Override
 			public void stateChanged(ChangeEvent e) {
+				isSpinnerChanged = true;
+
 				/*
 				 * JSpinner s = (JSpinner) e.getSource();
 				 * System.out.println("spiner value "+s.getValue().toString()); altitude =
@@ -826,7 +830,7 @@ public class Result implements Info {
 
 		for (City city : selectedCities.values()) {
 			if (city.getCityName().equals(line)) {
-				htmlString += CreateKML.buildCityDescriptionPlane(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
+				htmlString += CreateKML.buildCityDescriptionLink(city).replaceAll("12px", "10px").replaceAll("\\|", "<br>");
 				UtilityWeather.getInstance().searchCityWeather(city);
 				htmlString += UtilityWeather.getInstance().getWeather().htmlData();
 				try {
@@ -982,6 +986,29 @@ public class Result implements Info {
 
 	    
 	    
+	
+	}
+		
+	public void landMe() {
+		String keyVor = Utility.getInstance().findKeyVor(getCurrentSelection());
+		String keyICAO = Utility.getInstance().findKeyICAO(getCurrentSelection());
+		String keyCityMountain = Utility.getInstance().findKeyCity(getCurrentSelection());
+		
+		if ("airport".equals(getCurrentView())){
+			UtilityDB.getInstance().selectAirport("where ident = '"+keyICAO+"'");
+			CreateKML.makeOn(UtilityDB.getInstance().getAirport(), getCurrentView());
+		}  else if ("vor".equals(getCurrentView())){
+			CreateKML.makeOn(UtilityDB.getInstance().getMapVors().get(keyVor), getCurrentView());
+		 } else if ("ndb".equals(getCurrentView())){
+			CreateKML.makeOn(UtilityDB.getInstance().getMapNdb().get(keyVor), getCurrentView());
+		 }else if ("city".equals(getCurrentView())){
+			CreateKML.makeOn(selectedCities.get(keyCityMountain), getCurrentView());
+		 }else if ("mountain".equals(getCurrentView())){
+			CreateKML.makeOn(UtilityDB.getInstance().getMapMountains().get(keyCityMountain), getCurrentView());
+		 } else if ("landmark".equals(getCurrentView())){
+			CreateKML.makeOn(selectedLandmarks.get(keyICAO), getCurrentView());
+		 }
+
 	
 	}
  	
@@ -1215,6 +1242,16 @@ public class Result implements Info {
 
 	public void setSelectedLandmarks(Map<String, Landmark> selectedLandmarks) {
 		this.selectedLandmarks = selectedLandmarks;
+	}
+
+
+	public boolean isSpinnerChanged() {
+		return isSpinnerChanged;
+	}
+
+
+	public void setSpinnerChanged(boolean isSpinnerChanged) {
+		this.isSpinnerChanged = isSpinnerChanged;
 	}
 
 }
