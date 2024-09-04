@@ -37,7 +37,7 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PanelMountains implements Info {
 

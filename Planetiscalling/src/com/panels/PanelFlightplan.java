@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -30,9 +29,8 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Airport;
 import com.model.Distance;
-import com.model.WaitMessage;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PanelFlightplan {
 
@@ -125,7 +123,7 @@ public class PanelFlightplan {
 		result.setAskMePanel(askMePanel);
 		result.setOutputPanel(outputPanel);
 		
-		dialog = UtilityEarth.getInstance().panelWait();
+		dialog = UtilityEarthAnimation.getInstance().panelWait();
 		
 		flightPlanBt = new JButton("Select Flightplan");
 		flightPlanBt.addActionListener(new ActionListener()
@@ -386,10 +384,10 @@ public class PanelFlightplan {
 		panelFlightplan.add(landMeBt);
 
 
-		UtilityEarth.getInstance().createEarth();
+		UtilityEarthAnimation.getInstance().createEarth();
 		
-		UtilityEarth.getInstance().getPanelWelcome().setBounds(250, 77, 200, 200);
-		panelFlightplan.add(UtilityEarth.getInstance().createEarth());
+		UtilityEarthAnimation.getInstance().getPanelWelcome().setBounds(250, 77, 200, 200);
+		panelFlightplan.add(UtilityEarthAnimation.getInstance().createEarth());
 
 		
  

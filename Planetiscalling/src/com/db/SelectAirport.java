@@ -1,6 +1,5 @@
 package com.db;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,8 +12,9 @@ import java.util.TreeMap;
 
 import com.cfg.common.Info;
 import com.model.Airport;
+import com.model.Landcoord;
 import com.model.Runway;
-import com.util.Utility;
+import com.util.UtilityMap;
 
 /**
  *
@@ -51,7 +51,7 @@ public class SelectAirport implements Info{
 		
 		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty,"
 				+ "runway_name, length, runway_heading, mag_var, width, surface, ils_ident, ils_frequency, ils_name  "
-				+ "FROM v_airport_runway ";
+				+ "FROM v_view_2 ";
 		if (!"".equals(search)) {
 			sql += search;
 		}
@@ -133,11 +133,93 @@ public class SelectAirport implements Info{
 					
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
-			//e1.printStackTrace();
+			e1.printStackTrace();
 		}
 		
 		
 	}
+	public void selectStateNull() {
+		listRunways = new ArrayList<>();
+		airports = new ArrayList<>();
+		airport = new Airport();
+		mapAirport = new TreeMap<String, Airport>();
+		
+		int cpt = 0;
+		int cptCountry = 0;
+		String namefound = null;
+		String region = null;
+		String country = null;
+		String state = null;
+		
+		String sql = "SELECT airport_id, ident, iata, region, name, atis_frequency,tower_frequency,altitude, city, country, state, lonx, laty "
+				+ "FROM airport ";
+			
+		Connection conn = this.connect();
+		try {
+			final PreparedStatement statement = conn.prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+				String lastAirport = "";
+
+				while (rs.next()) {
+
+					if ("".equals(rs.getString("state")) || rs.getString("state") == null 
+							|| "".equals(rs.getString("country")) || rs.getString("country") == null) {
+						namefound = UtilityMap.getInstance().checkWichState(new Landcoord(rs.getDouble("laty"), rs.getDouble("lonx")));
+						if (namefound != null) {
+							
+							country = namefound.split("\\|")[0];
+							state = namefound.split("\\|")[1];
+							
+							if ("".equals(rs.getString("region"))) {
+								region = UtilityDB.getInstance().getMapCountryRegion().get(country);
+								if ("Alaska".equals(state)) {
+									region = "PA";
+								}
+							} else {
+								region = rs.getString("region").substring(0,2);
+							}
+							
+							if (region == null) {
+								region = rs.getString("ident").substring(0,2);
+
+							}
+							
+								update(conn, rs.getString("ident"), state, country, region);
+								cpt++;
+							    System.out.println(cpt+" - "+ rs.getString("ident") + " " + rs.getString("name")+" "+country+" "+state+ " ("+region +")" );
+
+						}
+					}
+				}
+
+				System.out.println("total = "+cpt );
+			}			
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
+	}
+	
+	private void update(Connection conn, String ident, String state, String country,String region) {
+		String sql = "UPDATE airport SET state = ? , " + "country = ? , " + "region= ?" + "WHERE ident = ?";
+
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, state);
+			pstmt.setString(2, country);
+			pstmt.setString(3, region);
+			pstmt.setString(4, ident);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
 
 	/**
 	 * @param args the command line arguments

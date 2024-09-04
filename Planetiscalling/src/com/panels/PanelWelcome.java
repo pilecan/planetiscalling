@@ -33,7 +33,7 @@ import javax.swing.text.html.HTMLEditorKit;
 import com.cfg.common.Info;
 import com.util.Util;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -61,11 +61,16 @@ public class PanelWelcome extends Thread implements ActionListener, Info {
 	private static Document doc;
 	private static HTMLEditorKit kit;
 
+	private void sysout() {
+		// TODO Auto-generated method stub
+
+	}
 	public JPanel getPanel()
 	{
 
 		message = new JLabel("");
 		System.out.println(Util.getComputerName());
+		System.out.println("cicicic");
 		
 		if (!Util.isFileExist((String)Utility.getInstance().getPrefs().get("googleearth"))) {
 			message.setText("Important! Select Google Earth (googleearth.exe) program in the Settings Panel." );
@@ -98,7 +103,7 @@ public class PanelWelcome extends Thread implements ActionListener, Info {
 		labelText.setForeground(new Color(26,108,26));
 		
 		labelWelcome = new JLabel("Welcome to Planet is Calling");
-		labelSlogan = new JLabel("Another Way to Explore the World");
+		labelSlogan = new JLabel("Another Way to Fly Over the Planet");
 		labelClickMe = new JLabel("Click on the Marble");
 		labelWelcome.setBounds(180,20, 500, 35);
 		labelSlogan.setBounds(230,65, 500, 25);
@@ -171,9 +176,9 @@ public class PanelWelcome extends Thread implements ActionListener, Info {
 	    };
 	    labelImage.addMouseListener( ml );
 
-		thread =new Thread(this);  
+/*		thread =new Thread(this);  
 		thread.start();
-		
+*/		
 		return panelWelcome;
 		
 	}
@@ -291,7 +296,7 @@ public class PanelWelcome extends Thread implements ActionListener, Info {
         while(true) 
         {
     		if (isPlaysound) {
-    			UtilityEarth.getInstance().playSound(soundAbout);
+    			UtilityEarthAnimation.getInstance().playSound(soundAbout);
     	        isPlaysound = false;
     		}
         	

@@ -43,7 +43,7 @@ import com.main.form.Result;
 import com.model.Distance;
 import com.util.Util;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PaneIcaolAiport extends JFrame {
 
@@ -253,7 +253,7 @@ public class PaneIcaolAiport extends JFrame {
 
       }
     });
-	dialog = UtilityEarth.getInstance().panelWait();
+	dialog = UtilityEarthAnimation.getInstance().panelWait();
 
     searchBt = new JButton("Search");
 	searchBt.addActionListener(new ActionListener()

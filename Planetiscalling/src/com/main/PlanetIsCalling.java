@@ -6,6 +6,7 @@ import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -25,7 +26,7 @@ import com.panels.PanelMountains;
 import com.panels.PanelWelcome;
 import com.util.Util;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 import com.util.UtilityTimer;
 
 
@@ -61,7 +62,8 @@ public class PlanetIsCalling extends JFrame implements  Info {
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    setLocation(dim.width/2 - getWidth()/2, dim.height/2 - getHeight()/2);
 	    setResizable(false);
-	    setTitle("The Planet Is Calling 0.910 ");
+	    
+	    setTitle("The Planet Is Calling 0.910 "+ new Date());
 	    
 		Utility.getInstance().readPrefProperties();
 	//	int numColor = Util.getStoredPeriodNumber();//Utility.getInstance().getPrefs().getProperty("day.period");
@@ -141,7 +143,9 @@ public class PlanetIsCalling extends JFrame implements  Info {
 		UtilityTimer.getInstance().initTimer();
 		UtilityTimer.getInstance().startTimer(this);
 		
-		UtilityEarth.getInstance().initPanelWait(this);
+		UtilityEarthAnimation.getInstance().initPanelWait(this);
+		
+		UtilityEarthAnimation.getInstance().setSound("on".equals(Utility.getInstance().getPrefs().get("sound")));
 
 	}
 	

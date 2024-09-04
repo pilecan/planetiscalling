@@ -6,7 +6,7 @@ public class UpdateCityState {
 		
 		SelectCity selectCity = new SelectCity();
 		
-		selectCity.selectStateCityNull();
+	//	selectCity.selectStateCityNull();
 	}
 
 }

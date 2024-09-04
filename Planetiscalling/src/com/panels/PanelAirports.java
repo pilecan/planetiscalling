@@ -37,7 +37,7 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PanelAirports implements Info {
 
@@ -210,7 +210,7 @@ public class PanelAirports implements Info {
 
 		searchBt = new JButton("Search");
 		
-		dialog = UtilityEarth.getInstance().panelWait();
+		dialog = UtilityEarthAnimation.getInstance().panelWait();
 
 		searchBt.addActionListener(new ActionListener()
 		    {

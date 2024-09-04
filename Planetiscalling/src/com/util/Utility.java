@@ -411,6 +411,7 @@ public class Utility implements Info {
 
 	public String findKeyCity(String line) {
 		try {
+			line = line.replace("Unknow Pop", "0");
 			String[] array = line.split("\t");
 			line = array[0] + array[2].replace(" ", "");
 			line = line.replace("<html><pre>", "").trim();

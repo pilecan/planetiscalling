@@ -37,7 +37,7 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PanelLandmarks implements Info {
 
@@ -474,7 +474,7 @@ public class PanelLandmarks implements Info {
 
 		searchBt = new JButton("Search");
 		
-		dialog = UtilityEarth.getInstance().panelWait();
+		dialog = UtilityEarthAnimation.getInstance().panelWait();
 
 		searchBt.addActionListener(new ActionListener()
 		    {
@@ -788,7 +788,7 @@ public class PanelLandmarks implements Info {
 		panelCombo.add(comboStateCity);
 		panelCombo.add(comboCityCity);
 		
-		dialog = UtilityEarth.getInstance().panelWait();
+		dialog = UtilityEarthAnimation.getInstance().panelWait();
 
 		searchBt = new JButton("Search");
 		searchBt.addActionListener(new ActionListener()

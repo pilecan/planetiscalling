@@ -51,6 +51,7 @@ public class UtilityDB extends Thread implements Info {
 	private List<Ndb> ndbs;
 	private Map<String, Ndb> mapNdb;
 	private Map<String, StateCoord> mapStateCoords;
+	private Map <String, String> mapCountryRegion; 
 
 	private boolean isInitAll;
 
@@ -888,6 +889,33 @@ public class UtilityDB extends Thread implements Info {
 		return country;
 
 	}
+	
+	public void selectCountryRegion() {
+		mapCountryRegion = new HashMap<String, String>();
+
+		String sql = "SELECT country, region FROM region_country";
+
+		try {
+			final PreparedStatement statement = this.connect().prepareStatement(sql);
+
+			try (ResultSet rs = statement.executeQuery()) {
+
+				while (rs.next()) {
+					mapCountryRegion.put(rs.getString("country"),rs.getString("region"));
+
+				}
+			}
+
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			// e1.printStackTrace();
+
+		}
+
+
+
+	}
+
 
 	public Airport getAirport() {
 		return airport;
@@ -1023,6 +1051,18 @@ public class UtilityDB extends Thread implements Info {
 
 	public Map<String, StateCoord> getMapStateCoords() {
 		return mapStateCoords;
+	}
+
+	public void setMapStateCoords(Map<String, StateCoord> mapStateCoords) {
+		this.mapStateCoords = mapStateCoords;
+	}
+
+	public Map<String, String> getMapCountryRegion() {
+		return mapCountryRegion;
+	}
+
+	public void setMapCountryRegion(Map<String, String> mapCountryRegion) {
+		this.mapCountryRegion = mapCountryRegion;
 	}
 
 }

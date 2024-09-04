@@ -10,6 +10,7 @@ public class StateCoord {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	private int id;
 	private String region;
 	private String state;
 	private String description;
@@ -60,6 +61,15 @@ public class StateCoord {
 	public String toString() {
 		return "StateCoord [region=" + region + ", state=" + state + ", description=" + description
 				+ ", coordinatesDTO=" + coordinatesDTO + ", coordinatesDTOs=" + coordinatesDTOs + "]";
+	}
+	public void setCoordinatesDTOs(List<CoordinatesDTO> coordinatesDTOs) {
+		this.coordinatesDTOs = coordinatesDTOs;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 
 

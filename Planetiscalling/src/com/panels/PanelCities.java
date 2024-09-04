@@ -37,7 +37,7 @@ import com.db.UtilityDB;
 import com.main.form.Result;
 import com.model.Distance;
 import com.util.Utility;
-import com.util.UtilityEarth;
+import com.util.UtilityEarthAnimation;
 
 public class PanelCities implements Info {
 
@@ -157,6 +157,7 @@ public class PanelCities implements Info {
 		for (String str:adminArray) {
 			comboStateCity.addItem(str);
 		}
+		comboStateCity.addItem(" All");
 		
 		for (String str:cityArray) {
 			comboCityCity.addItem(str);
@@ -236,6 +237,9 @@ public class PanelCities implements Info {
 			public void itemStateChanged(ItemEvent e) {
 				comboStateCity.removeAllItems();
 				comboCityCity.removeAllItems();
+/*				comboCityCity.addItem(" All");
+				comboStateCity.addItem(" All");
+*/
 
 				if (comboCountryCity.getSelectedItem() != null) {
 					adminArray = UtilityDB.getInstance().getSateCity((String) comboCountryCity.getSelectedItem()) ;
@@ -276,7 +280,7 @@ public class PanelCities implements Info {
 		panelCombo.add(comboStateCity);
 		panelCombo.add(comboCityCity);
 		
-		dialog = UtilityEarth.getInstance().panelWait();
+		dialog = UtilityEarthAnimation.getInstance().panelWait();
 
 		searchBt = new JButton("Search");
 		searchBt.addActionListener(new ActionListener()

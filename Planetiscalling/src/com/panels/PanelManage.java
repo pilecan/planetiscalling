@@ -1,12 +1,15 @@
 package com.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Map;
@@ -17,7 +20,6 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -141,6 +143,10 @@ public class PanelManage implements Info, Runnable {
 	    });
 		
 		labelFP.setText("Current Flight Plan folder (?)");
+		labelFP.addMouseListener(new MyMouseListener());
+		labelFP.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
 		comboFPDir.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -162,11 +168,16 @@ public class PanelManage implements Info, Runnable {
 		});
 
 		labelKML.setText("Current KML folder (?)");
+		labelKML.addMouseListener(new MyMouseListener());
+		labelKML.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
 		comboKMLDir.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				try {
 					if (!isFromAdd) {
+
 						labelKML.setToolTipText(hashKML.get(e.getItem()).getPath());
 						comboKMLDir.setToolTipText(hashKML.get(e.getItem()).getPath());
 						Utility.getInstance().getPrefs().put("kmlflightplandir", hashKML.get(e.getItem()).getPath());
@@ -183,6 +194,8 @@ public class PanelManage implements Info, Runnable {
 		});
 		
 		labelGoogle.setText("Current Google Earth.exe (?)");
+		labelGoogle.addMouseListener(new MyMouseListener());
+		labelGoogle.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		JButton buttonGoogle = new JButton("Select Google Earth (googleearth.exe)");
 		buttonGoogle.addActionListener(new ActionListener()
 	    {
@@ -321,7 +334,7 @@ public class PanelManage implements Info, Runnable {
 				 } else if ("googleearth".equals(key)) {
 						System.out.println("key = "+key);
 						Utility.getInstance().getPrefs().put(key, chooser.getSelectedFile().toString());
-						labelGoogle.setToolTipText(chooser.getSelectedFile().toString());
+						labelGoogle.setToolTipText(chooser.getSelectedFile().toString().replace("\\googleearth.exe",""));
 						
 					       for(Entry<Object, Object> e : Utility.getInstance().getPrefs().entrySet()) {
 					            System.out.println(e);
@@ -388,7 +401,7 @@ public class PanelManage implements Info, Runnable {
 		
 		labelFP.setToolTipText(Utility.getInstance().getPrefs().getProperty("flightplandir"));
 		labelKML.setToolTipText(Utility.getInstance().getPrefs().getProperty("kmlflightplandir"));
-		labelGoogle.setToolTipText(Utility.getInstance().getPrefs().getProperty("googleearth"));
+		labelGoogle.setToolTipText(Utility.getInstance().getPrefs().getProperty("googleearth").replace("\\googleearth.exe",""));
 		labelGoogle.setText(Utility.getInstance().getPrefs().getProperty("googleearth"));
 		labelColor.setText(Utility.getInstance().getPrefs().getProperty("numcolor"));
 
@@ -422,6 +435,21 @@ public class PanelManage implements Info, Runnable {
       
 
 	
+	}
+	
+	class MyMouseListener extends MouseAdapter {
+
+	    @Override
+	    public void mouseClicked(MouseEvent e) {
+	         JLabel l = (JLabel) e.getSource();
+	         
+	         System.out.println(l.getToolTipText());
+	         
+	         try {
+				Runtime.getRuntime().exec("explorer "+l.getToolTipText().replace("/", "\\"));
+			} catch (IOException e1) {}
+
+	    }
 	}
 	
 	

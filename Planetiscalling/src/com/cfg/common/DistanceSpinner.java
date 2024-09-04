@@ -20,6 +20,7 @@ import javax.swing.event.ChangeListener;
 import com.util.FormUtility;
 
 public class DistanceSpinner implements Info {
+	
 	private SpinnerModel distanceCity;
 	private SpinnerModel distanceMountain;
 	private SpinnerModel distanceLandmark;

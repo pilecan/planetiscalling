@@ -234,7 +234,8 @@ public String getPlaceMarkName() {
 					//+ "|Airport Name: "+name.replace("&","&amp;")
 					+ "|Airport Name: "+Util.createHref(name ,name+" airport wiki", 0)+" ("+Util.createHref("Weather",name+" "+country+" airport weather", 0)+ ")"
 					+ "|City: "+Util.createHref(city ,city+" City "+(state!=null?state:"")+" "+(country!=null?country:""), 0)+" ("+Util.createHref("Weather",city+" "+(state!=null?state:"")+" "+(country!=null?country:"")+" weather", 0)+ ")"
-					+ (state!=null?"|State: "+state:"")
+//					+ (state!=null?"|State: "+state:"")
+					+ "|State: "+Util.createHref(state ,state+" "+(country!=null?country:""), 0)
 					+ (country!=null?"|Country: "+country:"")
 				//	+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
@@ -259,7 +260,8 @@ public String getPlaceMarkName() {
 					//+ "|Airport Name: "+name.replace("&","&amp;")
 					+ "|Airport Name: "+Util.createHref(name ,name+" airport wiki", 0)
 					+ "|City: "+Util.createHref(city ,city+" City "+(state!=null?state:"")+" "+(country!=null?country:""), 0)
-					+ (state!=null?"|State: "+state:"")
+					//+ (state!=null?"|State: "+state:"")
+					+ "|State: "+Util.createHref(state ,state+" "+(country!=null?country:""), 0)
 					+ (country!=null?"|Country: "+country:"")
 	//				+ (timeZone!=null?"|Time Zone: "+timeZone + " ("+ Util.formatTimeZone(hourZone)+")":"").replace("&","&amp;")
 					+ "|Altitude: "+altitude+"ft ("+((int)Math.round(altitude/3.28084)+"m)") 
@@ -276,8 +278,6 @@ public String getPlaceMarkName() {
 	
 	return result;
 }
-
-
 
 
 private String makeRunways(){

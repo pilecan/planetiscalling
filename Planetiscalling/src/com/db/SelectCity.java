@@ -15,7 +15,9 @@ import com.backend.CreateKML;
 import com.cfg.common.Info;
 import com.geo.util.Geoinfo;
 import com.model.City;
+import com.model.Landcoord;
 import com.util.Utility;
+import com.util.UtilityMap;
 
 public class SelectCity implements Info{
 	
@@ -186,36 +188,50 @@ public class SelectCity implements Info{
 
    }
 	
-	public List<String>  selectStateCityNull() {
+	public List<String> selectStateCityNull(String country ) {
 		List<String> listCountries = new ArrayList<>();
 		
 		City city = new City();
 		
 		
-		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,iso3,region,admin_name,capital, population, region " + 
-				"FROM world_city_big  ";
+		String sql = "SELECT id,city, city_ascii, lonx,laty, country,iso2,region,admin_name " + 
+				"FROM world_city_big  where country = '"+country+"'";
 		
 		int cpt = 0;
 
+		Connection conn = this.connect();
+		
+		String adminFound = "";
+		String region = null;
+		String admin = null;
+
 		try {
-			final PreparedStatement statement = this.connect().prepareStatement(sql);
+			final PreparedStatement statement = conn.prepareStatement(sql);
 
 			try (ResultSet rs = statement.executeQuery()) {
 
 				while (rs.next()) {
-					if (rs.getString("admin_name") == null) {
-						city = new City(rs.getLong("id"), rs.getString("city"), rs.getString("city_ascii"), rs.getDouble("lonx"), rs.getDouble("laty"), rs.getString("country"), rs.getString("iso2"), rs.getString("iso3"),rs.getString("region"), rs.getString("admin_name"), rs.getString("capital"), rs.getLong("population"));
-
-						System.out.println(city.toString());
-						selectStateCity("where country = '"+city.getCountry()+"'",city);
-						cpt++;
-						if (cpt > 100) {
-							break;
+				if ("".equals(rs.getString("admin_name")) || "UNKNOW".equals(rs.getString("admin_name")) 
+							|| rs.getString("admin_name") == null) {
+						adminFound = UtilityMap.getInstance().checkWichState(new Landcoord(rs.getDouble("laty"), rs.getDouble("lonx")));
+						if (adminFound != null) {
+							cpt++;
+							country = adminFound.split("\\|")[0];
+							admin = adminFound.split("\\|")[1];
+							if ("".equals(rs.getString("region")) || rs.getString("region") == null) {
+								region = UtilityDB.getInstance().getMapCountryRegion().get(country);
+							} else {
+								region = rs.getString("region");
+							}
+							update(conn, rs.getString("city"),rs.getDouble("laty"), admin, country, region);
+							//System.out.println(cpt + " " +rs.getString("country") + " "+rs.getString("city") + " - " + admin+ " - " + region);
 						}
 					}
 				}
-		}
+			}
 			
+			
+			System.out.println(country+ "changed = "+cpt);
 			} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -228,6 +244,24 @@ public class SelectCity implements Info{
 
    }
 
+	private void update(Connection conn, String city, double lat, String admin, String country,String region) {
+		String sql = "UPDATE world_city_big SET admin_name = ? , " + "country = ? , " + "region= ?" + " WHERE city = ? and laty = ?";
+
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, admin);
+			pstmt.setString(2, country);
+			pstmt.setString(3, region);
+			pstmt.setString(4, city);
+			pstmt.setDouble(5, lat);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
 	private Connection connect() {
 		Connection conn = null;
 		try {

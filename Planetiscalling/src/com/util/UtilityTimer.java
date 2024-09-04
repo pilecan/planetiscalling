@@ -3,6 +3,7 @@ package com.util;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -127,7 +128,7 @@ public class UtilityTimer extends Thread implements Info {
 			        if(o != null && o instanceof PlanetIsCalling)
 			        	mc = (PlanetIsCalling) o;
 			        mc.setTitle("Good "+Util.getPeriod()+" World!");
-			        UtilityEarth.getInstance().playSound(soundIntro);
+			        UtilityEarthAnimation.getInstance().playSound(soundIntro);
 			      //  Util.pause(2000);
 		  
 		        while(true) 
@@ -140,8 +141,8 @@ public class UtilityTimer extends Thread implements Info {
 		            //delay the loop for 1 sec
 		            try {
 		                Thread.currentThread().sleep(sequence);
-		                mc.setTitle("The Planet Is Calling 0.910"
-		               +"                                                        "+ timeUTC+ " UTC    "
+		                mc.setTitle("The Planet Is Calling 0.910" + getTime("UTC",false)
+		               +"                                    "+ timeUTC+ " UTC    "
 		               +timeLocal+" "+localAbbreviation+"             "+timer);
 
 		                } catch (InterruptedException e) {
